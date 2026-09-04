@@ -25,3 +25,6 @@ dist-ssr
 
 # Captures produites par tools/smoke.mjs
 captures
+
+# Cache local de Wrangler
+.wrangler

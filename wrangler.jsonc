@@ -1,0 +1,17 @@
+{
+  // Worker composé uniquement de fichiers statiques : aucun code ne s'exécute
+  // côté serveur, Cloudflare se contente de servir le contenu de dist/.
+  "name": "pellicule",
+  "compatibility_date": "2026-09-04",
+
+  "assets": {
+    "directory": "./dist",
+    // Le routage se faisant par fragment d'URL, toute adresse inconnue doit
+    // rendre index.html plutôt qu'une page d'erreur.
+    "not_found_handling": "single-page-application"
+  },
+
+  "observability": {
+    "enabled": true
+  }
+}
