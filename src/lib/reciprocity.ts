@@ -56,7 +56,8 @@ export function formatDuration(seconds: number): string {
   if (!Number.isFinite(seconds) || seconds <= 0) return '—';
   if (seconds < 1) return secondsToShutter(seconds);
   if (seconds < 60) {
-    return `${seconds < 10 ? Math.round(seconds * 10) / 10 : Math.round(seconds)} s`;
+    const rounded = seconds < 10 ? Math.round(seconds * 10) / 10 : Math.round(seconds);
+    return `${rounded.toLocaleString('fr-FR')} s`;
   }
 
   const total = Math.round(seconds);

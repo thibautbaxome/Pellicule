@@ -59,6 +59,28 @@ numériques dans n'importe quelle photothèque.
 iCloud Drive par la feuille de partage. Restauration au choix par remplacement
 ou par fusion.
 
+## Parti pris visuel
+
+Néo-rétro argentique : le vocabulaire graphique vient du matériel lui-même —
+noir chaud des boîtiers en peinture martelée, blanc cassé du papier baryté,
+ambre de la lampe inactinique, perforations 135 comme motif structurant, voile
+de grain sur l'ensemble.
+
+Deux règles portent le système : les valeurs chiffrées sont en monospace
+tabulaire, espacées comme les graduations gravées d'une bague d'objectif ; les
+micro-libellés sont en capitales largement interlettrées, à la manière des
+mentions imprimées sur une boîte de film.
+
+Les polices — Space Grotesk pour l'interface, Space Mono pour les chiffres —
+sont auto-hébergées dans `src/fonts/`, sans quoi l'application ne s'afficherait
+pas correctement hors ligne. Les icônes sont dessinées dans
+`src/components/icons.tsx` : le vocabulaire dont l'application a besoin — une
+amorce de pellicule, un diaphragme, une cellule — n'existe dans aucune
+bibliothèque.
+
+Quatre thèmes : sombre par défaut, clair en planche contact sur papier crème,
+automatique, et chambre noire entièrement rouge.
+
 ## Développement
 
 ```sh

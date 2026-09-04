@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCameras, useFilmStocks, useLenses } from '../hooks/useData';
 import { EmptyState, ScreenHeader, Segmented } from '../components/ui';
+import { IconCamera, IconChevronRight, IconLens, IconPlus } from '../components/icons';
 import { isPrime } from '../db/types';
 import { formatAperture } from '../lib/exposure';
 
@@ -21,7 +22,7 @@ export default function GearScreen() {
 
   return (
     <main className="screen">
-      <ScreenHeader title="Matériel" subtitle="Boîtiers, objectifs et pellicules" />
+      <ScreenHeader eyebrow="Équipement" title="Matériel" />
 
       <div style={{ marginBottom: 18 }}>
         <Segmented
@@ -39,7 +40,7 @@ export default function GearScreen() {
       {tab === 'cameras' && (
         <>
           {cameras.length === 0 ? (
-            <EmptyState icon="📷" title="Aucun boîtier enregistré">
+            <EmptyState icon={<IconCamera size={30} />} title="Aucun boîtier enregistré">
               <p className="dim">Déclarez votre appareil pour commencer un rouleau.</p>
             </EmptyState>
           ) : (
@@ -55,14 +56,15 @@ export default function GearScreen() {
                           .join(' · ') || 'Aucun détail'}
                       </p>
                     </div>
-                    <span className="dim">›</span>
+                    <IconChevronRight size={16} className="faint" />
                   </div>
                 </Link>
               ))}
             </div>
           )}
           <Link className="btn btn--primary fab" to="/gear/cameras/new">
-            + Boîtier
+            <IconPlus size={18} />
+            Boîtier
           </Link>
         </>
       )}
@@ -70,7 +72,7 @@ export default function GearScreen() {
       {tab === 'lenses' && (
         <>
           {lenses.length === 0 ? (
-            <EmptyState icon="🔍" title="Aucun objectif enregistré">
+            <EmptyState icon={<IconLens size={30} />} title="Aucun objectif enregistré">
               <p className="dim">
                 Facultatif, mais c’est ce qui permettra de renseigner la focale dans les
                 métadonnées de vos scans.
@@ -89,14 +91,15 @@ export default function GearScreen() {
                         {lens.filterThread ? ` · ⌀${lens.filterThread}` : ''}
                       </p>
                     </div>
-                    <span className="dim">›</span>
+                    <IconChevronRight size={16} className="faint" />
                   </div>
                 </Link>
               ))}
             </div>
           )}
           <Link className="btn btn--primary fab" to="/gear/lenses/new">
-            + Objectif
+            <IconPlus size={18} />
+            Objectif
           </Link>
         </>
       )}
@@ -109,7 +112,7 @@ export default function GearScreen() {
               if (typeFilms.length === 0) return null;
               return (
                 <div key={type}>
-                  <p className="section-title">{FILM_TYPE_LABELS[type]}</p>
+                  <p className="eyebrow">{FILM_TYPE_LABELS[type]}</p>
                   {typeFilms.map((film) => (
                     <Link key={film.id} className="card" to={`/gear/films/${film.id}`}>
                       <div className="card-row">
@@ -136,7 +139,8 @@ export default function GearScreen() {
             })}
           </div>
           <Link className="btn btn--primary fab" to="/gear/films/new">
-            + Pellicule
+            <IconPlus size={18} />
+            Pellicule
           </Link>
         </>
       )}

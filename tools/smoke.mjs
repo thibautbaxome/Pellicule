@@ -57,6 +57,7 @@ await step('Accueil vide', async () => {
 
 await step('Créer un boîtier', async () => {
   await page.goto(`${BASE}#/gear/cameras/new`);
+  await page.waitForTimeout(400);
   await page.fill('input[type="text"]', 'Nikon FM2');
   await page.locator('input[placeholder="Nikon F"]').first().fill('Nikon F');
   await shot('02-nouveau-boitier');
@@ -66,6 +67,7 @@ await step('Créer un boîtier', async () => {
 
 await step('Créer un objectif', async () => {
   await page.goto(`${BASE}#/gear/lenses/new`);
+  await page.waitForTimeout(400);
   await page.locator('input[placeholder="Nikkor 50 mm f/1.4 AI-S"]').fill('Nikkor 50 mm f/1.4');
   await page.locator('input[placeholder="50"]').fill('50');
   await page.locator('input[placeholder="1.4"]').fill('1.4');
@@ -91,7 +93,7 @@ await step('Charger un rouleau', async () => {
 });
 
 await step('Saisir la vue 1', async () => {
-  await page.getByRole('link', { name: /Enregistrer la vue n° 1/ }).click();
+  await page.getByRole('link', { name: /Vue n° 1/ }).click();
   await page.waitForURL(/frames\/new/);
   await page.getByRole('group', { name: "Vitesse d’obturation" }).getByRole('button', { name: '1/250', exact: true }).click();
   await page.getByRole('group', { name: 'Ouverture' }).getByRole('button', { name: '8', exact: true }).click();

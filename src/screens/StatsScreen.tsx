@@ -3,6 +3,7 @@ import { db } from '../db/db';
 import { useCamerasById, useFilmStocksById, useLensesById, useRolls } from '../hooks/useData';
 import { useSettings } from '../hooks/useSettings';
 import { EmptyState, KeyValue, ScreenHeader, Section } from '../components/ui';
+import { IconChart } from '../components/icons';
 import { formatAperture } from '../lib/exposure';
 import { formatMoney, plural } from '../lib/format';
 
@@ -57,7 +58,7 @@ export default function StatsScreen() {
     return (
       <main className="screen">
         <ScreenHeader title="Statistiques" back={{ to: '/', label: 'Rouleaux' }} />
-        <EmptyState icon="📊" title="Rien à compter pour l’instant">
+        <EmptyState icon={<IconChart size={30} />} title="Rien à compter pour l’instant">
           <p className="dim">Les statistiques apparaîtront dès votre premier rouleau.</p>
         </EmptyState>
       </main>
@@ -122,6 +123,7 @@ export default function StatsScreen() {
   return (
     <main className="screen">
       <ScreenHeader
+        eyebrow="Bilan"
         title="Statistiques"
         subtitle={`${plural(rolls.length, 'rouleau', 'rouleaux')} · ${plural(frames.length, 'vue')}`}
         back={{ to: '/', label: 'Rouleaux' }}

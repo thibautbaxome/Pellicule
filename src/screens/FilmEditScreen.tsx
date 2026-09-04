@@ -181,7 +181,7 @@ export default function FilmEditScreen() {
           </select>
         </Field>
 
-        <p className="section-title">Réciprocité</p>
+        <p className="eyebrow">Réciprocité</p>
         <div className="field-inline">
           <Field label="Exposant" hint="1,0 = aucun défaut. 1,3 = valeur courante en N&B.">
             <input
@@ -233,7 +233,7 @@ export default function FilmEditScreen() {
 
         {existing?.devTimes && existing.devTimes.length > 0 && (
           <>
-            <p className="section-title">Temps de développement de référence</p>
+            <p className="eyebrow">Temps de développement de référence</p>
             <div className="card">
               {existing.devTimes.map((entry, index) => (
                 <KeyValue

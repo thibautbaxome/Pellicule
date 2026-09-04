@@ -10,6 +10,7 @@ import {
 } from '../hooks/useData';
 import { useSettings } from '../hooks/useSettings';
 import { EmptyState, Field, KeyValue, Note, ScreenHeader, Section } from '../components/ui';
+import { IconExport, IconFilm, IconFlask, IconPin, IconPlus, IconTrash } from '../components/icons';
 import {
   ROLL_STATUSES,
   ROLL_STATUS_LABELS,
@@ -106,8 +107,13 @@ export default function RollScreen() {
       </div>
 
       {open && nextNumber !== null && (
-        <Link className="btn btn--primary btn--block" to={`/rolls/${roll.id}/frames/new`}>
-          Enregistrer la vue n° {nextNumber}
+        <Link
+          className="btn btn--primary btn--block"
+          to={`/rolls/${roll.id}/frames/new`}
+          style={{ marginBottom: 26 }}
+        >
+          <IconPlus size={18} />
+          Vue n° {nextNumber}
         </Link>
       )}
 
@@ -120,7 +126,7 @@ export default function RollScreen() {
 
       <Section title="Vues">
         {frames.length === 0 && !open ? (
-          <EmptyState icon="📭" title="Aucune vue enregistrée sur ce rouleau" />
+          <EmptyState icon={<IconFilm size={30} />} title="Aucune vue enregistrée" />
         ) : (
           <div className="frame-grid">
             {Array.from({ length: roll.exposures }, (_, index) => index + 1).map((number) => {
@@ -160,9 +166,11 @@ export default function RollScreen() {
             </button>
           )}
           <Link className="btn btn--block" to={`/rolls/${roll.id}/development`}>
+            <IconFlask size={17} />
             Journal de développement
           </Link>
           <Link className="btn btn--block" to={`/export?roll=${roll.id}`}>
+            <IconExport size={17} />
             Exporter les métadonnées
           </Link>
         </div>
@@ -207,6 +215,7 @@ export default function RollScreen() {
       </Section>
 
       <button type="button" className="btn btn--danger btn--block" onClick={deleteRoll}>
+        <IconTrash size={17} />
         Supprimer le rouleau
       </button>
     </main>
@@ -238,7 +247,7 @@ function FrameCell({ rollId, frame }: { rollId: string; frame: Frame }) {
       {thumbUrl && <img className="frame-thumb" src={thumbUrl} alt="" />}
       <span className="frame-number" style={{ position: 'relative' }}>
         {frame.number}
-        {frame.location && ' 📍'}
+        {frame.location && <IconPin size={9} />}
       </span>
       <span className="frame-settings" style={{ position: 'relative' }}>
         {frame.shutter ?? '—'}
@@ -319,7 +328,7 @@ function RollDetailsForm({ rollId }: { rollId: string }) {
         </Field>
       </div>
 
-      <p className="section-title">Coûts ({settings.currency})</p>
+      <p className="eyebrow">Coûts ({settings.currency})</p>
       <div className="field-inline">
         <Field label="Film">
           <input

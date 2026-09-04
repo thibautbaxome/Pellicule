@@ -11,6 +11,7 @@ import {
 } from '../hooks/useData';
 import { useSettings } from '../hooks/useSettings';
 import { Dial, Field, Note, ScreenHeader, Segmented } from '../components/ui';
+import { IconMap, IconPin, IconShutter } from '../components/icons';
 import {
   FRAME_STATUS_LABELS,
   type Frame,
@@ -411,8 +412,9 @@ export default function FrameScreen() {
                   href={mapsUrl(form.location)}
                   target="_blank"
                   rel="noreferrer"
+                  aria-label="Ouvrir dans Plans"
                 >
-                  Carte
+                  <IconMap size={16} />
                 </a>
               )}
               <button
@@ -421,6 +423,7 @@ export default function FrameScreen() {
                 onClick={refreshLocation}
                 disabled={geoStatus === 'loading'}
               >
+                <IconPin size={16} />
                 {form.location ? 'Actualiser' : 'Localiser'}
               </button>
             </div>
@@ -584,15 +587,10 @@ export default function FrameScreen() {
         </div>
       )}
 
+      {/* Deux boutons au maximum : à trois, les libellés passaient à la ligne et
+          la cible devenait trop étroite. Annuler reste accessible par le lien
+          de retour, en haut de l'écran. */}
       <div className="action-bar">
-        <button
-          type="button"
-          className="btn"
-          onClick={() => navigate(`/rolls/${roll.id}`)}
-          disabled={saving}
-        >
-          Annuler
-        </button>
         <button
           type="button"
           className="btn btn--primary"
@@ -630,7 +628,8 @@ function RefPhoto({
   if (!url) {
     return (
       <button type="button" className="btn btn--block" onClick={onPick}>
-        📸 Photo de repérage
+        <IconShutter size={18} />
+        Photo de repérage
       </button>
     );
   }
@@ -640,7 +639,7 @@ function RefPhoto({
       <img
         src={url}
         alt="Photo de repérage"
-        style={{ width: '100%', borderRadius: 'var(--radius-sm)', display: 'block' }}
+        style={{ width: '100%', borderRadius: 'var(--radius)', display: 'block' }}
       />
       <div className="btn-row" style={{ marginTop: 8 }}>
         <button type="button" className="btn btn--sm" onClick={onPick}>

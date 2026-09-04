@@ -109,7 +109,7 @@ export default function SettingsScreen() {
 
   return (
     <main className="screen">
-      <ScreenHeader title="Réglages" />
+      <ScreenHeader eyebrow="Configuration" title="Réglages" />
 
       <Section title="Apparence">
         <Field label="Thème">

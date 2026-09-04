@@ -1,5 +1,6 @@
 import { NavLink, Route, Routes, useLocation } from 'react-router-dom';
 import { useSettings, useThemeEffect } from './hooks/useSettings';
+import { IconAperture, IconCamera, IconFilm, IconSliders } from './components/icons';
 import RollsScreen from './screens/RollsScreen';
 import RollNewScreen from './screens/RollNewScreen';
 import RollScreen from './screens/RollScreen';
@@ -16,10 +17,10 @@ import ExportScreen from './screens/ExportScreen';
 
 /** Onglets de la barre inférieure, dans l'ordre d'affichage. */
 const TABS = [
-  { to: '/', icon: '🎞', label: 'Rouleaux' },
-  { to: '/gear', icon: '📷', label: 'Matériel' },
-  { to: '/tools', icon: '🧮', label: 'Outils' },
-  { to: '/settings', icon: '⚙️', label: 'Réglages' },
+  { to: '/', Icon: IconFilm, label: 'Rouleaux' },
+  { to: '/gear', Icon: IconCamera, label: 'Matériel' },
+  { to: '/tools', Icon: IconAperture, label: 'Outils' },
+  { to: '/settings', Icon: IconSliders, label: 'Réglages' },
 ];
 
 /**
@@ -62,17 +63,15 @@ export default function App() {
 
       {!hideTabBar && (
         <nav className="tabbar">
-          {TABS.map((tab) => (
+          {TABS.map(({ to, Icon, label }) => (
             <NavLink
-              key={tab.to}
-              to={tab.to}
-              end={tab.to === '/'}
+              key={to}
+              to={to}
+              end={to === '/'}
               className={({ isActive }) => (isActive ? 'active' : '')}
             >
-              <span className="tab-icon" aria-hidden="true">
-                {tab.icon}
-              </span>
-              {tab.label}
+              <Icon size={21} />
+              {label}
             </NavLink>
           ))}
         </nav>

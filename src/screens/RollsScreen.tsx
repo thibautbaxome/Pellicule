@@ -6,7 +6,14 @@ import {
   useRolls,
 } from '../hooks/useData';
 import { EmptyState, ScreenHeader, Section } from '../components/ui';
-import { ROLL_STATUS_LABELS, isRollOpen, type Roll, type RollStatus } from '../db/types';
+import { IconChart, IconFilm, IconPlus } from '../components/icons';
+import {
+  ROLL_STATUS_LABELS,
+  isRollOpen,
+  type FilmType,
+  type Roll,
+  type RollStatus,
+} from '../db/types';
 import { pushPullLabel } from '../lib/exposure';
 import { formatRelative, plural } from '../lib/format';
 
@@ -17,11 +24,19 @@ const GROUPS: { title: string; statuses: RollStatus[] }[] = [
   { title: 'Terminés', statuses: ['scanned', 'archived'] },
 ];
 
+/**
+ * Liseré de la carte, par type d'émulsion : argenté pour le noir et blanc,
+ * ambre pour le négatif couleur, vert d'eau pour la diapositive. On reconnaît
+ * la nature d'un rouleau avant même d'avoir lu son nom.
+ */
+const FILM_HUE: Record<FilmType, string> = {
+  bw: 'var(--text-dim)',
+  color_neg: 'var(--accent)',
+  slide: 'var(--ok)',
+};
+
 const STATUS_BADGE: Partial<Record<RollStatus, string>> = {
-  loaded: 'badge--info',
   shooting: 'badge--accent',
-  finished: 'badge--info',
-  at_lab: 'badge--info',
   developed: 'badge--success',
   scanned: 'badge--success',
 };
@@ -37,24 +52,27 @@ export default function RollsScreen() {
   return (
     <main className="screen">
       <ScreenHeader
+        eyebrow="Carnet argentique · 135"
         title="Pellicule"
         subtitle={
           rolls.length > 0
             ? `${plural(rolls.length, 'rouleau', 'rouleaux')} · ${plural(shotTotal, 'vue')}`
-            : 'Carnet de prise de vue argentique'
+            : undefined
         }
         action={
-          <Link className="btn btn--sm btn--ghost" to="/stats">
-            Stats
-          </Link>
+          rolls.length > 0 ? (
+            <Link className="btn btn--sm btn--ghost" to="/stats" aria-label="Statistiques">
+              <IconChart size={18} />
+            </Link>
+          ) : undefined
         }
       />
 
       {rolls.length === 0 ? (
-        <EmptyState icon="🎞" title="Aucun rouleau pour l’instant">
-          <p className="dim" style={{ maxWidth: 320, margin: '0 auto 18px' }}>
-            Commencez par déclarer le boîtier et la pellicule que vous venez de charger.
-            Chaque déclenchement s’enregistrera ensuite en deux gestes.
+        <EmptyState icon={<IconFilm size={34} />} title="Aucun rouleau chargé">
+          <p style={{ maxWidth: 330, margin: '0 auto 22px', fontSize: '0.88rem' }}>
+            Déclarez le boîtier et la pellicule que vous venez de charger. Chaque
+            déclenchement s’enregistrera ensuite en deux gestes.
           </p>
           <Link className="btn btn--primary" to="/rolls/new">
             Charger un rouleau
@@ -68,29 +86,32 @@ export default function RollsScreen() {
           return (
             <Section key={group.title} title={group.title}>
               <div className="list">
-                {groupRolls.map((roll) => (
-                  <RollCard
-                    key={roll.id}
-                    roll={roll}
-                    filmLabel={
-                      films[roll.filmStockId]
-                        ? `${films[roll.filmStockId].brand} ${films[roll.filmStockId].name}`
-                        : 'Pellicule inconnue'
-                    }
-                    boxIso={films[roll.filmStockId]?.iso ?? roll.shotIso}
-                    cameraLabel={cameras[roll.cameraId]?.name ?? 'Boîtier inconnu'}
-                    shotCount={counts[roll.id] ?? 0}
-                  />
-                ))}
+                {groupRolls.map((roll) => {
+                  const film = films[roll.filmStockId];
+                  return (
+                    <RollCard
+                      key={roll.id}
+                      roll={roll}
+                      filmLabel={film ? `${film.brand} ${film.name}` : 'Pellicule inconnue'}
+                      filmType={film?.type ?? 'bw'}
+                      boxIso={film?.iso ?? roll.shotIso}
+                      cameraLabel={cameras[roll.cameraId]?.name ?? 'Boîtier inconnu'}
+                      shotCount={counts[roll.id] ?? 0}
+                    />
+                  );
+                })}
               </div>
             </Section>
           );
         })
       )}
 
-      <Link className="btn btn--primary fab" to="/rolls/new">
-        + Rouleau
-      </Link>
+      {rolls.length > 0 && (
+        <Link className="btn btn--primary fab" to="/rolls/new">
+          <IconPlus size={18} />
+          Rouleau
+        </Link>
+      )}
     </main>
   );
 }
@@ -98,12 +119,14 @@ export default function RollsScreen() {
 function RollCard({
   roll,
   filmLabel,
+  filmType,
   boxIso,
   cameraLabel,
   shotCount,
 }: {
   roll: Roll;
   filmLabel: string;
+  filmType: FilmType;
   boxIso: number;
   cameraLabel: string;
   shotCount: number;
@@ -113,32 +136,41 @@ function RollCard({
   const progress = Math.min(100, (shotCount / Math.max(1, roll.exposures)) * 100);
 
   return (
-    <Link className="card" to={`/rolls/${roll.id}`}>
-      <div className="card-row">
-        <div style={{ minWidth: 0 }}>
-          <p className="card-title">{roll.label || filmLabel}</p>
-          <p className="card-meta">
-            {roll.label ? `${filmLabel} · ` : ''}
-            {cameraLabel}
-          </p>
+    <Link
+      className="roll"
+      to={`/rolls/${roll.id}`}
+      style={{ ['--roll-hue' as string]: FILM_HUE[filmType] }}
+    >
+      <div className="roll-body">
+        <div className="roll-head">
+          <div style={{ minWidth: 0 }}>
+            <p className="roll-name">{roll.label || filmLabel}</p>
+            <p className="roll-film">
+              {roll.label ? `${filmLabel} · ` : ''}
+              {cameraLabel}
+            </p>
+          </div>
+          <div className="roll-counter">
+            <b>{String(shotCount).padStart(2, '0')}</b>
+            <span>/{roll.exposures}</span>
+          </div>
         </div>
-        <span className={`badge ${STATUS_BADGE[roll.status] ?? ''}`}>
-          {ROLL_STATUS_LABELS[roll.status]}
-        </span>
-      </div>
 
-      {open && (
-        <div className="gauge" aria-hidden="true">
-          <div className="gauge-fill" style={{ width: `${progress}%` }} />
+        {open && (
+          <div className="gauge" aria-hidden="true">
+            <div className="gauge-fill" style={{ width: `${progress}%` }} />
+          </div>
+        )}
+
+        <div className="roll-foot">
+          <span>
+            ISO {roll.shotIso}
+            {push ? ` · ${push}` : ''} · {formatRelative(roll.loadedAt)}
+          </span>
+          <span className={`badge ${STATUS_BADGE[roll.status] ?? ''}`}>
+            {ROLL_STATUS_LABELS[roll.status]}
+          </span>
         </div>
-      )}
-
-      <div className="card-row" style={{ marginTop: open ? 2 : 9 }}>
-        <span className="card-meta mono">
-          {shotCount}/{roll.exposures} vues · {roll.shotIso} ISO
-          {push ? ` · ${push}` : ''}
-        </span>
-        <span className="card-meta">{formatRelative(roll.loadedAt)}</span>
       </div>
     </Link>
   );

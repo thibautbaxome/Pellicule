@@ -313,7 +313,10 @@ export interface Settings {
 
 export const DEFAULT_SETTINGS: Settings = {
   id: 'app',
-  theme: 'auto',
+  // Sombre par défaut plutôt qu'automatique : une application de prise de vue
+  // s'utilise autant au crépuscule qu'en plein jour, et le fond noir chaud est
+  // le registre de l'objet lui-même. Le mode clair reste accessible.
+  theme: 'dark',
   currency: 'EUR',
   stopIncrement: 'full',
   autoGeolocate: true,

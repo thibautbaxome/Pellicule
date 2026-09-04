@@ -39,7 +39,7 @@ export default function ToolsScreen() {
 
   return (
     <main className="screen">
-      <ScreenHeader title="Outils" subtitle="Les calculs qu’on ne fait pas de tête" />
+      <ScreenHeader eyebrow="Calculs" title="Outils" subtitle="Ce qu’on ne fait pas de tête" />
 
       <div style={{ marginBottom: 20 }}>
         <Segmented label="Calculateur" value={tool} onChange={setTool} options={TOOLS} />
@@ -80,13 +80,8 @@ function Sunny16Tool() {
             <button
               key={item.id}
               type="button"
-              className="card"
+              className={`card${item.id === conditionId ? ' card--selected' : ''}`}
               onClick={() => setConditionId(item.id)}
-              style={
-                item.id === conditionId
-                  ? { borderColor: 'var(--accent)', background: 'var(--surface-2)' }
-                  : undefined
-              }
             >
               <div className="card-row">
                 <div>
@@ -349,13 +344,8 @@ function FiltersTool() {
             <button
               key={preset.id}
               type="button"
-              className="card"
+              className={`card${selected.includes(preset.id) ? ' card--selected' : ''}`}
               onClick={() => toggle(preset.id)}
-              style={
-                selected.includes(preset.id)
-                  ? { borderColor: 'var(--accent)', background: 'var(--surface-2)' }
-                  : undefined
-              }
             >
               <div className="card-row">
                 <div style={{ minWidth: 0 }}>

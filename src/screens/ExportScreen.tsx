@@ -81,6 +81,7 @@ export default function ExportScreen() {
   return (
     <main className="screen">
       <ScreenHeader
+        eyebrow="Métadonnées"
         title="Exporter"
         subtitle="Injecter vos réglages dans les scans du labo"
         back={{ to: roll ? `/rolls/${roll.id}` : '/', label: 'Retour' }}
@@ -184,19 +185,7 @@ export default function ExportScreen() {
               <p className="card-meta">
                 Avec le CSV, une seule commande suffit depuis ce dossier :
               </p>
-              <pre
-                className="mono"
-                style={{
-                  background: 'var(--surface)',
-                  padding: 11,
-                  borderRadius: 'var(--radius-sm)',
-                  overflowX: 'auto',
-                  fontSize: '0.8rem',
-                  margin: '8px 0',
-                }}
-              >
-                exiftool -csv={baseName}-exiftool.csv .
-              </pre>
+              <pre className="code">exiftool -csv={baseName}-exiftool.csv .</pre>
               <p className="card-meta">
                 Les noms de fichiers du CSV doivent correspondre exactement à ceux de vos
                 scans : ajustez le motif ci-dessus, ou renommez les fichiers. Les vues

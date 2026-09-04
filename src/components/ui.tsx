@@ -1,28 +1,38 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
+import { IconChevronLeft } from './icons';
 
-/** En-tête d'écran : titre, sous-titre facultatif et zone d'action à droite. */
+/**
+ * En-tête d'écran.
+ *
+ * Le `eyebrow` reprend les mentions imprimées sur une boîte de film : en
+ * capitales monospace largement interlettrées, il porte le contexte chiffré
+ * (« 135 · 36 POSES · ISO 400 ») et laisse au titre toute sa place.
+ */
 export function ScreenHeader({
+  eyebrow,
   title,
   subtitle,
   action,
   back,
 }: {
+  eyebrow?: ReactNode;
   title: string;
   subtitle?: ReactNode;
   action?: ReactNode;
-  /** Cible du lien de retour. Omis, aucun lien n'est affiché. */
   back?: { to: string; label?: string };
 }) {
   return (
     <>
       {back && (
         <Link className="back-link" to={back.to}>
-          ‹ {back.label ?? 'Retour'}
+          <IconChevronLeft size={15} />
+          {back.label ?? 'Retour'}
         </Link>
       )}
       <header className="screen-header">
-        <div>
+        <div style={{ minWidth: 0 }}>
+          {eyebrow && <p className="eyebrow">{eyebrow}</p>}
           <h1 className="screen-title">{title}</h1>
           {subtitle && <p className="screen-subtitle">{subtitle}</p>}
         </div>
@@ -44,10 +54,17 @@ export function Section({
   return (
     <section className="section">
       {title && (
-        <div className="card-row" style={{ marginBottom: 9 }}>
-          <h2 className="section-title" style={{ margin: 0 }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 12,
+          }}
+        >
+          <p className="eyebrow" style={{ flex: 1 }}>
             {title}
-          </h2>
+          </p>
           {action}
         </div>
       )}
@@ -67,7 +84,7 @@ export function Field({
 }) {
   return (
     <div className="field">
-      <label className="field-label">{label}</label>
+      {label && <label className="field-label">{label}</label>}
       {children}
       {hint && <p className="field-hint">{hint}</p>}
     </div>
@@ -79,25 +96,26 @@ export function EmptyState({
   title,
   children,
 }: {
-  icon: string;
+  icon: ReactNode;
   title: string;
   children?: ReactNode;
 }) {
   return (
     <div className="empty">
-      <span className="empty-icon" aria-hidden="true">
-        {icon}
-      </span>
-      <p style={{ fontWeight: 620, color: 'var(--text)', margin: '0 0 6px' }}>{title}</p>
+      <span className="empty-icon">{icon}</span>
+      <p className="empty-title">{title}</p>
       {children}
     </div>
   );
 }
 
 /**
- * Rangée de valeurs à faire défiler horizontalement. Sert aux graduations de
- * vitesse et d'ouverture : le geste reprend celui d'une bague d'objectif, et
- * toutes les valeurs restent atteignables d'un pouce.
+ * Graduation à faire défiler horizontalement.
+ *
+ * Reprend le geste d'une bague d'objectif : les valeurs passent sous le pouce,
+ * chaque cran est séparé d'un filet, et la valeur retenue se bloque en ambre.
+ * On garde la graduation complète du boîtier plutôt que de l'enfermer dans un
+ * menu déroulant — c'est plus rapide, et cela reste lisible au soleil.
  */
 export function Dial<T extends string | number>({
   values,
@@ -176,4 +194,9 @@ export function Note({
   variant?: 'info' | 'warning';
 }) {
   return <div className={`note${variant === 'warning' ? ' note--warning' : ''}`}>{children}</div>;
+}
+
+/** Bande de perforations, utilisée comme séparateur thématique. */
+export function Sprockets({ dim }: { dim?: boolean }) {
+  return <div className={`sprockets${dim ? ' sprockets--dim' : ''}`} aria-hidden="true" />;
 }
