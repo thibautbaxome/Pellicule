@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      # Le parcours de bout en bout tourne sur le build réel, servi comme en
+      # production : c'est le seul moyen de vérifier le service worker.
+      - name: Installer Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Démarrer le serveur
+        run: npm run preview -- --port 4173 --host 127.0.0.1 &
+
+      - name: Attendre le serveur
+        run: npx wait-on http://127.0.0.1:4173 --timeout 30000
+
+      - name: Parcours de bout en bout
+        run: npm run smoke
+
+      - name: Vérification hors ligne
+        run: node tools/offline-check.mjs
+
+      - name: Conserver les captures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: captures
+          path: captures/
+          if-no-files-found: ignore

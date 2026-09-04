@@ -83,6 +83,27 @@ Régénérer les icônes après modification du motif :
 python3 tools/make-icons.py
 ```
 
+## Déploiement
+
+L'application est un site statique : `npm run build` produit `dist/`, qu'il
+suffit de servir en HTTPS. Aucune base, aucune API, rien à configurer côté
+serveur — l'hébergement ne livre que le code, jamais les données.
+
+Le plus simple est **Cloudflare Pages** connecté au dépôt : commande de build
+`npm run build`, dossier de sortie `dist`, chaque poussée redéploie. Netlify et
+Vercel fonctionnent à l'identique. Le fichier `public/_headers` règle déjà les
+en-têtes de cache — le service worker ne doit jamais être mis en cache, faute
+de quoi les appareils déjà installés se figent sur une vieille version.
+
+GitHub Pages convient aussi, mais publie le site en clair et exige un abonnement
+payant pour un dépôt privé.
+
+Pour restreindre l'accès, Cloudflare Access place le site derrière un code reçu
+par courriel. À n'activer qu'en connaissance de cause : une page protégée par
+authentification se marie mal avec l'installation sur l'écran d'accueil et le
+fonctionnement hors ligne. Comme aucune donnée personnelle ne transite par
+l'hébergeur, laisser l'URL accessible n'expose que le code source.
+
 ## Installation sur l'iPhone
 
 1. Ouvrir l'adresse du site **dans Safari** (Chrome iOS ne sait pas installer
