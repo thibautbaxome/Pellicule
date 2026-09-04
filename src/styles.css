@@ -1,0 +1,848 @@
+/* ==========================================================================
+   Pellicule — feuille de style unique.
+
+   Conçue pour un iPhone tenu à une main, en extérieur : contrastes élevés,
+   cibles tactiles d'au moins 44 px, et un mode chambre noire entièrement
+   rouge pour ne pas voiler le papier pendant un tirage.
+   ========================================================================== */
+
+:root {
+  --bg: #100f12;
+  --surface: #1a191e;
+  --surface-2: #26242b;
+  --surface-3: #33303a;
+  --border: #3a3742;
+  --text: #f4f1ec;
+  --text-dim: #a09b93;
+  --text-faint: #6f6a64;
+  --accent: #e8a33d;
+  --accent-dim: #8a6224;
+  --accent-text: #1a1206;
+  --danger: #e05c56;
+  --success: #59b98a;
+  --info: #6ea8d8;
+
+  --radius: 14px;
+  --radius-sm: 9px;
+  --tap: 44px;
+
+  --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+  --mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace;
+
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --tabbar-height: 56px;
+
+  color-scheme: dark;
+}
+
+:root[data-theme='light'] {
+  --bg: #f6f4f0;
+  --surface: #ffffff;
+  --surface-2: #eceae5;
+  --surface-3: #dedbd4;
+  --border: #d3cfc7;
+  --text: #1c1a17;
+  --text-dim: #605b54;
+  --text-faint: #8d8880;
+  --accent: #b4761a;
+  --accent-dim: #e3c390;
+  --accent-text: #ffffff;
+  --danger: #c0392b;
+  --success: #2f855a;
+  --info: #2b6cb0;
+  color-scheme: light;
+}
+
+/* Mode chambre noire : uniquement du rouge sombre, qui ne voile pas le
+   papier photosensible et préserve la vision nocturne. */
+:root[data-theme='darkroom'] {
+  --bg: #000000;
+  --surface: #150404;
+  --surface-2: #220606;
+  --surface-3: #300a0a;
+  --border: #4a1010;
+  --text: #ff5a4a;
+  --text-dim: #b83a30;
+  --text-faint: #7d2822;
+  --accent: #ff7a5a;
+  --accent-dim: #6a1c14;
+  --accent-text: #000000;
+  --danger: #ff8a7a;
+  --success: #ff7a5a;
+  --info: #d04a3a;
+  color-scheme: dark;
+}
+
+:root[data-theme='darkroom'] img,
+:root[data-theme='darkroom'] video {
+  filter: grayscale(1) sepia(1) hue-rotate(-30deg) saturate(4) brightness(0.6);
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.45;
+  /* Empêche iOS de gonfler le texte en paysage. */
+  -webkit-text-size-adjust: 100%;
+  overscroll-behavior-y: none;
+}
+
+#root {
+  min-height: 100%;
+}
+
+/* --------------------------------------------------------------------------
+   Mise en page générale
+   -------------------------------------------------------------------------- */
+
+.app {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.screen {
+  flex: 1;
+  padding: calc(var(--safe-top) + 8px) 16px
+    calc(var(--tabbar-height) + var(--safe-bottom) + 24px);
+  max-width: 720px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* Écran sans barre d'onglets (saisie de vue, formulaires plein écran). */
+.screen--full {
+  padding-bottom: calc(var(--safe-bottom) + 24px);
+}
+
+.screen-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 4px 0 18px;
+}
+
+.screen-title {
+  font-size: 1.7rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.screen-subtitle {
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  margin: 2px 0 0;
+}
+
+.section {
+  margin-bottom: 26px;
+}
+
+.section-title {
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--text-faint);
+  margin: 0 0 9px 2px;
+}
+
+/* --------------------------------------------------------------------------
+   Barre d'onglets
+   -------------------------------------------------------------------------- */
+
+.tabbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  display: flex;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-top: 1px solid var(--border);
+  padding-bottom: var(--safe-bottom);
+}
+
+.tabbar a {
+  flex: 1;
+  height: var(--tabbar-height);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  text-decoration: none;
+  color: var(--text-faint);
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.tabbar a.active {
+  color: var(--accent);
+}
+
+.tabbar .tab-icon {
+  font-size: 1.24rem;
+  line-height: 1;
+}
+
+/* --------------------------------------------------------------------------
+   Cartes et listes
+   -------------------------------------------------------------------------- */
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  margin-bottom: 10px;
+}
+
+a.card,
+button.card {
+  display: block;
+  width: 100%;
+  text-align: left;
+  color: inherit;
+  text-decoration: none;
+  font: inherit;
+  cursor: pointer;
+}
+
+a.card:active,
+button.card:active {
+  background: var(--surface-2);
+}
+
+.card-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.card-title {
+  font-weight: 650;
+  font-size: 1.02rem;
+  margin: 0;
+}
+
+.card-meta {
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  margin: 3px 0 0;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.empty {
+  text-align: center;
+  padding: 42px 20px;
+  color: var(--text-dim);
+}
+
+.empty-icon {
+  font-size: 2.6rem;
+  display: block;
+  margin-bottom: 10px;
+  opacity: 0.6;
+}
+
+/* --------------------------------------------------------------------------
+   Badges
+   -------------------------------------------------------------------------- */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  background: var(--surface-2);
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.badge--accent {
+  background: var(--accent-dim);
+  color: var(--accent);
+  border-color: transparent;
+}
+
+.badge--success {
+  background: color-mix(in srgb, var(--success) 22%, transparent);
+  color: var(--success);
+  border-color: transparent;
+}
+
+.badge--danger {
+  background: color-mix(in srgb, var(--danger) 22%, transparent);
+  color: var(--danger);
+  border-color: transparent;
+}
+
+.badge--info {
+  background: color-mix(in srgb, var(--info) 22%, transparent);
+  color: var(--info);
+  border-color: transparent;
+}
+
+.badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* --------------------------------------------------------------------------
+   Boutons
+   -------------------------------------------------------------------------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: var(--tap);
+  padding: 0 18px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  font: inherit;
+  font-weight: 620;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.12s ease;
+}
+
+.btn:active {
+  background: var(--surface-3);
+}
+
+.btn:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+}
+
+.btn--primary {
+  background: var(--accent);
+  color: var(--accent-text);
+  border-color: transparent;
+}
+
+.btn--primary:active {
+  background: color-mix(in srgb, var(--accent) 82%, black);
+}
+
+.btn--ghost {
+  background: transparent;
+}
+
+.btn--danger {
+  color: var(--danger);
+  border-color: color-mix(in srgb, var(--danger) 45%, transparent);
+  background: transparent;
+}
+
+.btn--block {
+  width: 100%;
+}
+
+.btn--sm {
+  min-height: 36px;
+  padding: 0 12px;
+  font-size: 0.85rem;
+}
+
+.btn-row {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-row > * {
+  flex: 1;
+}
+
+/* Bouton d'action flottant, au-dessus de la barre d'onglets. */
+.fab {
+  position: fixed;
+  right: 16px;
+  bottom: calc(var(--tabbar-height) + var(--safe-bottom) + 16px);
+  z-index: 40;
+  min-height: 56px;
+  padding: 0 22px;
+  border-radius: 28px;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.45);
+  font-size: 1rem;
+}
+
+/* --------------------------------------------------------------------------
+   Formulaires
+   -------------------------------------------------------------------------- */
+
+.field {
+  margin-bottom: 14px;
+}
+
+.field-label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 650;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+}
+
+.field-hint {
+  font-size: 0.78rem;
+  color: var(--text-faint);
+  margin-top: 5px;
+  line-height: 1.4;
+}
+
+input[type='text'],
+input[type='number'],
+input[type='date'],
+input[type='datetime-local'],
+input[type='search'],
+select,
+textarea {
+  width: 100%;
+  min-height: var(--tap);
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  /* 16 px minimum, sinon iOS zoome à la mise au point du champ. */
+  font-size: 16px;
+  font-family: inherit;
+}
+
+textarea {
+  min-height: 84px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+}
+
+select {
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
+    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: calc(100% - 17px) 50%, calc(100% - 12px) 50%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  padding-right: 34px;
+}
+
+.field-inline {
+  display: flex;
+  gap: 10px;
+}
+
+.field-inline > * {
+  flex: 1;
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: var(--tap);
+  cursor: pointer;
+}
+
+.checkbox input {
+  width: 22px;
+  height: 22px;
+  accent-color: var(--accent);
+  flex-shrink: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Sélecteurs de valeurs (vitesse, ouverture)
+   -------------------------------------------------------------------------- */
+
+/* Rangée défilante horizontalement : on garde la graduation complète du
+   boîtier sous le pouce sans l'écraser dans un menu déroulant. */
+.dial {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 3px 0 9px;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.dial::-webkit-scrollbar {
+  display: none;
+}
+
+.dial-item {
+  flex: 0 0 auto;
+  min-width: 62px;
+  min-height: 50px;
+  padding: 0 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-dim);
+  font-family: var(--mono);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  scroll-snap-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dial-item[aria-pressed='true'] {
+  background: var(--accent);
+  color: var(--accent-text);
+  border-color: transparent;
+}
+
+.dial-item--wide {
+  min-width: 78px;
+}
+
+/* --------------------------------------------------------------------------
+   Grille de vues
+   -------------------------------------------------------------------------- */
+
+.frame-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  gap: 8px;
+}
+
+.frame-cell {
+  aspect-ratio: 3 / 2;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 7px 8px;
+  font: inherit;
+  cursor: pointer;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.frame-cell--empty {
+  border-style: dashed;
+  color: var(--text-faint);
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+}
+
+.frame-cell--reject {
+  opacity: 0.5;
+}
+
+.frame-cell--keep {
+  border-color: var(--accent);
+}
+
+.frame-number {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-faint);
+}
+
+.frame-settings {
+  font-family: var(--mono);
+  font-size: 0.76rem;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.frame-subject {
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.frame-thumb {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.32;
+}
+
+/* --------------------------------------------------------------------------
+   Jauge de progression du rouleau
+   -------------------------------------------------------------------------- */
+
+.gauge {
+  height: 7px;
+  border-radius: 4px;
+  background: var(--surface-3);
+  overflow: hidden;
+  margin: 9px 0 4px;
+}
+
+.gauge-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 4px;
+  transition: width 0.25s ease;
+}
+
+/* --------------------------------------------------------------------------
+   Tableaux de résultats (calculateurs, statistiques)
+   -------------------------------------------------------------------------- */
+
+.result {
+  background: var(--surface-2);
+  border-radius: var(--radius);
+  padding: 15px;
+  margin-top: 6px;
+}
+
+.result-value {
+  font-family: var(--mono);
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1.15;
+}
+
+.result-label {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  font-weight: 650;
+}
+
+.kv {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.kv:last-child {
+  border-bottom: none;
+}
+
+.kv-key {
+  color: var(--text-dim);
+  font-size: 0.88rem;
+}
+
+.kv-value {
+  font-family: var(--mono);
+  font-weight: 640;
+  text-align: right;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+th {
+  color: var(--text-faint);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+td.num,
+th.num {
+  text-align: right;
+  font-family: var(--mono);
+}
+
+/* --------------------------------------------------------------------------
+   Divers
+   -------------------------------------------------------------------------- */
+
+.note {
+  background: var(--surface-2);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  padding: 11px 13px;
+  font-size: 0.86rem;
+  color: var(--text-dim);
+  line-height: 1.5;
+  margin: 10px 0;
+}
+
+.note--warning {
+  border-left-color: var(--danger);
+}
+
+.segmented {
+  display: flex;
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  padding: 3px;
+  gap: 3px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.segmented::-webkit-scrollbar {
+  display: none;
+}
+
+.segmented button {
+  flex: 1;
+  min-width: max-content;
+  min-height: 38px;
+  padding: 0 13px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--text-dim);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 620;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.segmented button[aria-pressed='true'] {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.92rem;
+  font-weight: 620;
+  min-height: 38px;
+  margin-bottom: 2px;
+}
+
+.mono {
+  font-family: var(--mono);
+}
+
+.dim {
+  color: var(--text-dim);
+}
+
+.faint {
+  color: var(--text-faint);
+}
+
+.center {
+  text-align: center;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.spacer {
+  height: 16px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Barre d'actions collée en bas des formulaires plein écran. */
+.action-bar {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  gap: 8px;
+  padding: 12px 0 calc(var(--safe-bottom) + 12px);
+  background: linear-gradient(to top, var(--bg) 62%, transparent);
+  margin-top: 20px;
+}
+
+.action-bar > * {
+  flex: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
