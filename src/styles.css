@@ -75,8 +75,12 @@
   color-scheme: dark;
 }
 
+/* Images et emoji compris : la moindre pastille bleue dans une chambre noire
+   suffit à voiler du papier et à casser la vision nocturne. */
 :root[data-theme='darkroom'] img,
-:root[data-theme='darkroom'] video {
+:root[data-theme='darkroom'] video,
+:root[data-theme='darkroom'] .tab-icon,
+:root[data-theme='darkroom'] .empty-icon {
   filter: grayscale(1) sepia(1) hue-rotate(-30deg) saturate(4) brightness(0.6);
 }
 
