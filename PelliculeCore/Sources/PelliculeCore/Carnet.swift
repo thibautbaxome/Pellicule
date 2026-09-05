@@ -148,13 +148,21 @@ public final class Carnet {
         _ existing: [T], _ incoming: [T],
         by id: KeyPath<T, String>, date: KeyPath<T, String>
     ) -> [T] {
-        var byID = Dictionary(existing.map { ($0[keyPath: id], $0) }, uniquingKeysWith: { a, _ in a })
+        // L'ordre d'ajout est conservé : un dictionnaire remettrait le
+        // matériel dans un ordre différent à chaque import, et l'écran le suit.
+        var result = existing
+        var position = Dictionary(
+            existing.enumerated().map { ($1[keyPath: id], $0) }, uniquingKeysWith: { a, _ in a })
         for item in incoming {
             let key = item[keyPath: id]
-            if let current = byID[key], current[keyPath: date] >= item[keyPath: date] { continue }
-            byID[key] = item
+            if let index = position[key] {
+                if result[index][keyPath: date] < item[keyPath: date] { result[index] = item }
+            } else {
+                position[key] = result.count
+                result.append(item)
+            }
         }
-        return Array(byID.values)
+        return result
     }
 
     // MARK: - Lectures

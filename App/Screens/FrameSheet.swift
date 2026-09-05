@@ -31,6 +31,13 @@ struct FrameSheet: View {
     /// fichier effacé.
     @State private var draftPhotoIds: [String] = []
     @State private var photosToDeleteOnSave: [String] = []
+    /// Photos en cours d'encodage : tant qu'il en reste, la vue ne s'enregistre
+    /// pas, sans quoi elle partirait sans sa photo.
+    @State private var pendingPhotos = 0
+    /// La feuille est fermée : une photo qui arriverait encore n'a plus de vue
+    /// à rejoindre et repart aussitôt du disque.
+    @State private var isGone = false
+    @State private var photoError: String?
 
     private var roll: Model.Roll? { carnet.roll(id: frame.rollId) }
     private var camera: Model.Camera? { roll.flatMap { carnet.camera(id: $0.cameraId) } }
@@ -77,7 +84,9 @@ struct FrameSheet: View {
                             }
                         }
                     }
-                    if !mountableLenses.isEmpty {
+                    // Dès que le boîtier accepte des objectifs : sans objectif
+                    // déclaré, c'est justement ici qu'on doit pouvoir l'ajouter.
+                    if let camera, camera.fixedLens == nil {
                         lensField
                     }
                     FieldRow(label: "Sujet") {
@@ -125,8 +134,7 @@ struct FrameSheet: View {
                         Button("Supprimer cette vue", role: .destructive) {
                             isConfirmingDeletion = true
                         }
-                        .buttonStyle(SecondaryButtonStyle(palette: palette))
-                        .foregroundStyle(palette.danger)
+                        .buttonStyle(SecondaryButtonStyle(palette: palette, tint: palette.danger))
                         .padding(.top, 16)
                     }
                 }
@@ -136,7 +144,7 @@ struct FrameSheet: View {
             .navigationTitle("Vue \(frame.number)")
             .navigationBarTitleDisplayMode(.inline)
             .safeAreaInset(edge: .bottom) {
-                Button("Enregistrer") {
+                Button(pendingPhotos > 0 ? "Photo en cours d’enregistrement…" : "Enregistrer") {
                     frame.updatedAt = Carnet.timestamp(Date())
                     carnet.save(frame)
                     photosToDeleteOnSave.forEach(PhotoStore.delete)
@@ -144,6 +152,7 @@ struct FrameSheet: View {
                     dismiss()
                 }
                 .buttonStyle(PrimaryButtonStyle(palette: palette))
+                .disabled(pendingPhotos > 0)
                 .padding(16)
                 .background(palette.bg)
                 // Le retour haptique confirme l'enregistrement sans qu'on ait
@@ -168,13 +177,19 @@ struct FrameSheet: View {
                 if let relevé, frame.location == nil { frame.location = relevé }
             }
             .onAppear {
-                if let id = frame.refPhotoId { referencePhoto = PhotoStore.load(id) }
+                // Relue une seule fois : la caméra plein écran fait réapparaître
+                // la feuille à chaque retour.
+                if referencePhoto == nil, let id = frame.refPhotoId {
+                    referencePhoto = PhotoStore.load(id)
+                }
             }
             // Fermée sans enregistrer — « Annuler », ou un glissement vers le
             // bas — la feuille ne laisse pas derrière elle les photos du
-            // brouillon. Les feuilles présentées par-dessus ne la font pas
-            // disparaître : ceci ne joue qu'à la vraie fermeture.
+            // brouillon. La caméra plein écran fait aussi « disparaître » la
+            // feuille : ce n'est pas une fermeture, isTakingPhoto le dit.
             .onDisappear {
+                guard !isTakingPhoto else { return }
+                isGone = true
                 if !didSave { draftPhotoIds.forEach(PhotoStore.delete) }
             }
             .onChange(of: pickedPhoto) { _, item in
@@ -294,10 +309,11 @@ struct FrameSheet: View {
     }
 
     private func focalChoices(from lens: Model.Lens) -> [Double] {
-        // Les graduations gravées sur une bague de zoom, ni plus ni moins.
+        // Les graduations gravées sur une bague de zoom, et toujours ses deux
+        // bouts : ce sont les positions où l'on se trouve le plus souvent.
         let marks: [Double] = [24, 28, 35, 50, 70, 85, 105, 135, 200, 300]
-        let inRange = marks.filter { $0 >= lens.focalMin && $0 <= lens.focalMax }
-        return inRange.isEmpty ? [lens.focalMin, lens.focalMax] : inRange
+        let inRange = marks.filter { $0 > lens.focalMin && $0 < lens.focalMax }
+        return Array(Set(inRange + [lens.focalMin, lens.focalMax])).sorted()
     }
 
     /// Où la vue a été prise. C'est ce qui permettra, des mois plus tard, de
@@ -383,7 +399,20 @@ struct FrameSheet: View {
                         .transition(.opacity.combined(with: .scale(scale: 0.97)))
                     Button("Retirer la photo") { detachPhoto() }
                         .buttonStyle(SecondaryButtonStyle(palette: palette))
+                } else if pendingPhotos > 0 {
+                    HStack(spacing: 8) {
+                        ProgressView().tint(palette.accent)
+                        Text("Photo en cours d’enregistrement…")
+                            .font(Typo.caption)
+                            .foregroundStyle(palette.textDim)
+                    }
                 } else {
+                    if let photoError {
+                        Text(photoError)
+                            .font(Typo.caption)
+                            .foregroundStyle(palette.danger)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
                     HStack(spacing: 10) {
                         if CameraCapture.isAvailable {
                             Button {
@@ -415,10 +444,23 @@ struct FrameSheet: View {
         // Réduire et encoder une photo de douze mégapixels prend un moment
         // perceptible : pas sur le fil de l'interface, au moment précis où
         // l'on veut passer à la vue suivante.
+        pendingPhotos += 1
+        photoError = nil
         Task.detached(priority: .userInitiated) {
-            guard let id = PhotoStore.save(image) else { return }
-            let loaded = PhotoStore.load(id)
+            let saved = PhotoStore.save(image)
+            let loaded = saved.flatMap { PhotoStore.load($0) }
             await MainActor.run {
+                pendingPhotos -= 1
+                guard let id = saved else {
+                    photoError = "La photo n’a pas pu être enregistrée. Réessayez."
+                    return
+                }
+                // La feuille s'est refermée entre-temps : la photo n'a plus de
+                // vue à rejoindre.
+                if isGone {
+                    PhotoStore.delete(id)
+                    return
+                }
                 releasePhoto(frame.refPhotoId)
                 frame.refPhotoId = id
                 draftPhotoIds.append(id)
@@ -486,8 +528,7 @@ struct FrameSheet: View {
 
     private func filterCost(_ filter: Model.Frame.Filter) -> String {
         guard filter.factorStops >= 0.05 else { return "Sans coût en lumière" }
-        let stops = String(format: "%.1f", filter.factorStops)
-        return "Coûte \(stops) diaphragme\(filter.factorStops >= 2 ? "s" : "")"
+        return "Coûte \(Fmt.stops(filter.factorStops)) diaphragme\(filter.factorStops >= 2 ? "s" : "")"
     }
 
     private var flashAndDistance: some View {
@@ -504,7 +545,7 @@ struct FrameSheet: View {
 
             FieldRow(label: "Distance de mise au point") {
                 ScaleDial(
-                    values: [0.5, 0.7, 1, 1.5, 2, 3, 5, 10, 20] as [Double],
+                    values: [0.5, 0.7, 1, 1.5, 2, 3, 5, 10, 20, 50] as [Double],
                     label: { $0 < 1 ? "\(Int($0 * 100)) cm" : "\(trimmed($0)) m" },
                     selection: $frame.focusDistance)
             }
@@ -546,13 +587,13 @@ struct FrameSheet: View {
         FieldRow(label: "Correction d’exposition") {
             ScaleDial(
                 values: [-2, -1.5, -1, -0.5, 0, 0.5, 1, 1.5, 2] as [Double],
-                label: { $0 > 0 ? "+\(trimmed($0))" : trimmed($0) },
+                label: { Fmt.signedStops($0) },
                 selection: $frame.exposureComp)
         }
     }
 
     private var statusField: some View {
-        FieldRow(label: "Sort de la vue") {
+        FieldRow(label: "État de la vue") {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
                     ForEach(Model.FrameStatus.allCases, id: \.self) { status in

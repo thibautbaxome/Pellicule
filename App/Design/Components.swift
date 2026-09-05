@@ -72,19 +72,52 @@ struct PrimaryButtonStyle: ButtonStyle {
 }
 
 /// Bouton secondaire : contour seul, pour ne pas concurrencer le principal.
+/// Une action destructrice passe `tint: palette.danger` — un `.foregroundStyle`
+/// posé à l'extérieur du bouton ne traverse pas le style.
 struct SecondaryButtonStyle: ButtonStyle {
     let palette: Palette
+    var tint: Color? = nil
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(Typo.ui(16, .medium))
-            .foregroundStyle(palette.text)
+            .foregroundStyle(tint ?? palette.text)
             .frame(maxWidth: .infinity, minHeight: 50)
             .background(configuration.isPressed ? palette.raised : palette.surface)
             .overlay(
                 RoundedRectangle(cornerRadius: 6, style: .continuous)
                     .strokeBorder(palette.lineStrong, lineWidth: 1))
             .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
+    }
+}
+
+/// Mise en forme des nombres à la française, partagée par tous les écrans :
+/// une virgule décimale, et pas de « 1.0 » là où « 1 » suffit. Les ouvertures
+/// restent écrites comme sur la bague — « f/5.6 » —, ce sont des noms.
+enum Fmt {
+    /// Un écart en diaphragmes : « 0,5 », « 1 », « 1,5 ».
+    static func stops(_ value: Double) -> String {
+        let rounded = (value * 10).rounded() / 10
+        if rounded == rounded.rounded() { return String(Int(rounded)) }
+        return String(format: "%.1f", rounded).replacingOccurrences(of: ".", with: ",")
+    }
+
+    /// Un écart signé : « +1 », « −0,5 », « 0 ».
+    static func signedStops(_ value: Double) -> String {
+        if abs(value) < 0.05 { return "0" }
+        return (value > 0 ? "+" : "−") + stops(abs(value))
+    }
+
+    /// Un montant dans la devise du carnet : « 12,50 € ».
+    static func money(_ value: Double, currency: String) -> String {
+        value.formatted(.currency(code: currency).locale(Locale(identifier: "fr_FR")))
+    }
+
+    /// Une graduation qui contient à coup sûr la valeur courante : une bague
+    /// dont la position actuelle ne serait pas gravée n'afficherait rien.
+    static func including<T: Comparable & Hashable>(_ current: T?, in values: [T]) -> [T] {
+        guard let current, !values.contains(current) else { return values }
+        return (values + [current]).sorted()
     }
 }
 

@@ -58,6 +58,9 @@ final class LightMeter {
                 status = .permissionDenied
                 return
             }
+            // La feuille a pu se refermer pendant la demande : démarrer
+            // maintenant laisserait la caméra tourner sans personne pour l'arrêter.
+            guard !Task.isCancelled else { return }
         case .denied, .restricted:
             status = .permissionDenied
             return
@@ -126,6 +129,17 @@ final class LightMeter {
         if camera.isExposurePointOfInterestSupported {
             camera.exposurePointOfInterest = CGPoint(x: 0.5, y: 0.5)
         }
+        // L'exposition automatique ne dépasse jamais la durée d'une trame :
+        // à 30 images par seconde, elle plafonne à 1/30 s et compense en
+        // montant la sensibilité. On lui laisse la trame la plus longue que le
+        // format accepte, pour mesurer plus bas avant de toucher la borne.
+        if let longest = camera.activeFormat.videoSupportedFrameRateRanges
+            .map(\.maxFrameDuration)
+            .max(by: { CMTimeGetSeconds($0) < CMTimeGetSeconds($1) }) {
+            camera.activeVideoMaxFrameDuration = longest
+            camera.activeMaxExposureDuration = CMTimeMinimum(
+                longest, camera.activeFormat.maxExposureDuration)
+        }
         camera.unlockForConfiguration()
     }
 
@@ -141,9 +155,12 @@ final class LightMeter {
             aperture: Double(device.lensAperture),
             durationSeconds: duration,
             iso: Double(device.iso),
+            // La borne longue est celle que l'exposition automatique peut
+            // vraiment atteindre, pas le maximum théorique du capteur : sinon
+            // la caméra à bout passerait pour une mesure.
             limits: Meter.DeviceLimits(
                 shortestDuration: CMTimeGetSeconds(format.minExposureDuration),
-                longestDuration: CMTimeGetSeconds(format.maxExposureDuration),
+                longestDuration: CMTimeGetSeconds(device.activeMaxExposureDuration),
                 lowestISO: Double(format.minISO),
                 highestISO: Double(format.maxISO)),
             calibrationStops: calibrationStops)

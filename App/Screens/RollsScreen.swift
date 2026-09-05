@@ -6,21 +6,30 @@ struct RollsScreen: View {
 
     @Environment(\.palette) private var palette
     @State private var isLoadingRoll = false
+    @State private var isPickingCamera = false
+
+    /// Un boîtier archivé ne reçoit plus de rouleau : c'est le même critère
+    /// que celui du chargement, sans quoi la feuille s'ouvrirait sur rien.
+    private var hasUsableCamera: Bool { carnet.cameras.contains { !$0.archived } }
 
     var body: some View {
         NavigationStack {
             Group {
                 if carnet.rolls.isEmpty {
-                    if carnet.cameras.isEmpty {
-                        EmptyState(
-                            title: "Aucun rouleau",
-                            message: "Déclarez d’abord un boîtier dans l’onglet Matériel, puis chargez votre première pellicule.")
-                    } else {
+                    if hasUsableCamera {
                         EmptyState(
                             title: "Aucun rouleau",
                             message: "Chargez une pellicule pour commencer à consigner vos vues.",
                             actionTitle: "Charger une pellicule",
                             action: { isLoadingRoll = true })
+                    } else {
+                        // Le premier écran d'un débutant : le geste qui manque
+                        // doit être sous le doigt, pas dans un autre onglet.
+                        EmptyState(
+                            title: "Aucun rouleau",
+                            message: "Commencez par déclarer le boîtier avec lequel vous photographiez ; vous chargerez ensuite votre première pellicule.",
+                            actionTitle: "Chercher mon boîtier",
+                            action: { isPickingCamera = true })
                     }
                 } else {
                     rollList
@@ -29,7 +38,7 @@ struct RollsScreen: View {
             .carnetBackground(palette)
             .navigationTitle("Rouleaux")
             .toolbar {
-                if !carnet.cameras.isEmpty {
+                if hasUsableCamera {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button {
                             isLoadingRoll = true
@@ -41,6 +50,17 @@ struct RollsScreen: View {
             }
             .sheet(isPresented: $isLoadingRoll) {
                 LoadRollSheet(carnet: carnet)
+            }
+            .sheet(isPresented: $isPickingCamera) {
+                CameraPickerSheet { entry in
+                    carnet.save(carnet.makeCamera(from: entry))
+                }
+            }
+            // Une destination par valeur : le rouleau ouvert change de section
+            // quand on le marque terminé, et un lien à destination fermée serait
+            // retiré avec sa section — l'écran se refermerait sous le doigt.
+            .navigationDestination(for: String.self) { rollId in
+                RollScreen(carnet: carnet, rollId: rollId)
             }
         }
     }
@@ -65,22 +85,31 @@ struct RollsScreen: View {
             MicroLabel(title)
                 .padding(.top, 6)
             ForEach(rolls) { roll in
-                NavigationLink {
-                    RollScreen(carnet: carnet, rollId: roll.id)
-                } label: {
+                let count = carnet.frames(ofRoll: roll.id).count
+                NavigationLink(value: roll.id) {
                     RollCard(carnet: carnet, roll: roll)
                 }
                 .buttonStyle(PressableCardStyle())
                 .accessibilityLabel(roll.label ?? carnet.film(id: roll.filmStockId)?.displayName ?? "Rouleau")
-                .accessibilityHint("\(carnet.frames(ofRoll: roll.id).count) vues sur \(roll.exposures), \(roll.status.label)")
+                .accessibilityHint("\(count) vue\(count > 1 ? "s" : "") sur \(roll.exposures), \(roll.status.label)")
                 .transition(.opacity.combined(with: .move(edge: .top)))
             }
         }
     }
 }
 
+extension Model.Roll {
+    /// L'écart à la sensibilité de la boîte, dit comme au laboratoire :
+    /// « Poussée +1 », « Retenue −0,5 ». Le même libellé partout.
+    func pushPullLabel(boxIso: Double) -> String? {
+        let stops = pushPullStops(boxIso: boxIso)
+        guard abs(stops) > 0.05 else { return nil }
+        return (stops > 0 ? "Poussée " : "Retenue ") + Fmt.signedStops(stops)
+    }
+}
+
 /// Carte de rouleau, traitée comme l'étiquette d'une boîte de film : un liseré
-/// coloré par type d'émulsion, la mention du format en capitales, et le
+/// coloré par type d'émulsion, la mention de l'émulsion en capitales, et le
 /// compteur de poses en cadran.
 struct RollCard: View {
     let carnet: Carnet
@@ -101,18 +130,6 @@ struct RollCard: View {
         case .slide: Color(hex: 0x6E93C4)
         case nil: palette.line
         }
-    }
-
-    private var pushPull: String? {
-        guard let film else { return nil }
-        let stops = roll.pushPullStops(boxIso: film.iso)
-        guard abs(stops) > 0.01 else { return nil }
-        let rounded = (stops * 10).rounded() / 10
-        return stops > 0 ? "PUSH +\(trimmed(rounded))" : "PULL \(trimmed(rounded))"
-    }
-
-    private func trimmed(_ value: Double) -> String {
-        value == value.rounded() ? String(Int(value)) : String(value)
     }
 
     var body: some View {
@@ -137,15 +154,18 @@ struct RollCard: View {
                 }
 
                 HStack(spacing: 10) {
-                    MicroLabel("135")
+                    if let film {
+                        MicroLabel(film.type.label)
+                    }
                     ValueText(
                         text: "\(Int(roll.shotIso)) ISO", size: 13, colour: palette.textDim)
-                    if let pushPull {
+                    if let film, let pushPull = roll.pushPullLabel(boxIso: film.iso) {
                         MicroLabel(pushPull, colour: palette.accent)
                     }
                     Spacer()
                     ValueText(
-                        text: "\(shotCount)/\(roll.exposures)", size: 16, weight: .bold)
+                        text: "\(shotCount)/\(roll.exposures)", size: 16, weight: .bold,
+                        colour: shotCount > roll.exposures ? palette.accent : palette.text)
                 }
 
                 if let camera {

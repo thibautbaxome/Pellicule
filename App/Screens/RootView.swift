@@ -35,9 +35,11 @@ struct RootView: View {
         // forcer l'apparence réécrirait la valeur qu'on lit justement pour la
         // suivre, et le thème resterait figé sur son premier état.
         .preferredColorScheme(theme == .system ? nil : palette.scheme)
-        .overlay(alignment: .top) {
+        // En encart, pas en superposition : la bannière pousse l'écran au lieu
+        // de recouvrir sa barre de titre et ses boutons.
+        .safeAreaInset(edge: .top) {
             if let error = carnet.lastWriteError {
-                WriteErrorBanner(message: error, palette: palette)
+                WriteErrorBanner(message: error, palette: palette) { carnet.persist() }
             }
         }
     }
@@ -45,22 +47,33 @@ struct RootView: View {
 
 /// L'écriture a échoué : la saisie est toujours là, mais elle n'est pas encore
 /// sur le disque. Le dire tout de suite, plutôt que de le découvrir au
-/// redémarrage suivant.
+/// redémarrage suivant — et offrir de réessayer.
 private struct WriteErrorBanner: View {
     let message: String
     let palette: Palette
+    let retry: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            MicroLabel("Enregistrement impossible", colour: palette.accentInk)
-            Text("La saisie est conservée à l’écran mais n’a pas pu être écrite.")
-                .font(Typo.caption)
+        HStack(alignment: .center, spacing: 12) {
+            VStack(alignment: .leading, spacing: 4) {
+                MicroLabel("Enregistrement impossible", colour: palette.accentInk)
+                Text("La saisie est conservée à l’écran mais n’a pas pu être écrite.")
+                    .font(Typo.caption)
+                    .foregroundStyle(palette.accentInk)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer()
+            Button("Réessayer", action: retry)
+                .font(Typo.ui(14, .semibold))
                 .foregroundStyle(palette.accentInk)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .overlay(Capsule().strokeBorder(palette.accentInk, lineWidth: 1))
         }
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(palette.danger)
-        .padding(.horizontal, 12)
+        .accessibilityElement(children: .contain)
         .accessibilityLabel("Enregistrement impossible. \(message)")
     }
 }

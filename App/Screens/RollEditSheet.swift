@@ -30,7 +30,7 @@ struct RollEditSheet: View {
                     development
                     costs
                     FieldRow(label: "Notes") {
-                        TextField("Ce qu'il faudra se rappeler…",
+                        TextField("Ce qu’il faudra se rappeler…",
                                   text: optional($roll.notes), axis: .vertical)
                             .lineLimit(2...6)
                             .fieldStyle(palette)
@@ -39,11 +39,17 @@ struct RollEditSheet: View {
                 .padding(16)
             }
             .carnetBackground(palette)
-            .navigationTitle("Le rouleau")
+            .navigationTitle("Fiche du rouleau")
             .navigationBarTitleDisplayMode(.inline)
             .safeAreaInset(edge: .bottom) {
                 Button("Enregistrer") {
                     roll.updatedAt = Carnet.timestamp(Date())
+                    // Le jour du développement, faute de mieux : celui où on
+                    // l'a noté.
+                    if roll.development?.developedByOwner == true,
+                       roll.development?.developedAt == nil {
+                        roll.development?.developedAt = roll.updatedAt
+                    }
                     carnet.save(roll)
                     dismiss()
                 }
@@ -127,18 +133,23 @@ struct RollEditSheet: View {
 
             FieldRow(label: "Température du bain") {
                 ScaleDial(
-                    values: [16, 18, 20, 22, 24] as [Double],
+                    values: Fmt.including(roll.development?.tempC, in: temperatures),
                     label: { "\(Int($0)) °C" },
                     selection: developmentValue(\.tempC))
             }
 
             if let suggestion = suggestedTime {
                 suggestionCard(suggestion)
+            } else if hasUnknownDilution {
+                Text("Pas de temps publié pour cette dilution : la banque connaît \(knownDilutions).")
+                    .font(Typo.caption)
+                    .foregroundStyle(palette.textFaint)
+                    .fixedSize(horizontal: false, vertical: true)
             }
 
             FieldRow(label: "Temps effectif") {
                 ScaleDial(
-                    values: developmentTimes,
+                    values: Fmt.including(roll.development?.timeSec, in: developmentTimes),
                     label: { formatMinutes($0) },
                     selection: developmentValue(\.timeSec))
             }
@@ -165,6 +176,12 @@ struct RollEditSheet: View {
                                 Button {
                                     var current = roll.development ?? Self.emptyDevelopment
                                     current.developer = selected ? nil : developer
+                                    // La dilution publiée vient avec : sans elle,
+                                    // le temps suggéré n'aurait pas de sens.
+                                    if !selected, current.dilution == nil {
+                                        current.dilution = (film?.devTimes ?? [])
+                                            .first { $0.developer == developer }?.dilution
+                                    }
                                     roll.development = current
                                 } label: {
                                     Text(developer)
@@ -191,20 +208,47 @@ struct RollEditSheet: View {
     /// Le temps que la banque publie, corrigé de la température du bain et du
     /// push/pull du rouleau. Ce n'est pas une consigne : c'est un point de
     /// départ, et la notice du film reste l'autorité.
-    private var suggestedTime: Development.Result? {
-        guard let development = roll.development,
-              let developer = development.developer,
-              let entry = (film?.devTimes ?? []).first(where: {
-                  $0.developer == developer
-                      && (development.dilution == nil || $0.dilution == development.dilution)
-              })
+    /// L'entrée de la banque qui sert de base : ce révélateur, à cette
+    /// dilution. Une dilution écrite autrement ne trouve rien, et on le dit.
+    private var referenceEntry: Catalog.DevTime? {
+        guard let development = roll.development, let developer = development.developer
         else { return nil }
+        return (film?.devTimes ?? []).first {
+            $0.developer == developer
+                && (development.dilution == nil || normalised($0.dilution) == normalised(development.dilution ?? ""))
+        }
+    }
 
+    /// « 1:1 », « 1 + 1 » et « 1+1 » désignent la même dilution.
+    private func normalised(_ dilution: String) -> String {
+        dilution.lowercased().replacingOccurrences(of: ":", with: "+")
+            .replacingOccurrences(of: " ", with: "")
+    }
+
+    private var suggestedTime: Development.Result? {
+        guard let entry = referenceEntry else { return nil }
         return Development.time(
             base: entry.timeSec,
-            temperature: development.tempC ?? entry.tempC,
+            temperature: roll.development?.tempC ?? entry.tempC,
             reference: entry.tempC,
             pushPullStops: pushPull)
+    }
+
+    private var knownDilutions: String {
+        let developer = roll.development?.developer
+        return (film?.devTimes ?? [])
+            .filter { $0.developer == developer }
+            .map(\.dilution)
+            .joined(separator: ", ")
+    }
+
+    /// Le chip d'un révélateur connu est choisi mais la dilution saisie ne
+    /// correspond à aucun temps publié.
+    private var hasUnknownDilution: Bool {
+        guard let development = roll.development, let developer = development.developer,
+              development.dilution != nil, referenceEntry == nil
+        else { return false }
+        return (film?.devTimes ?? []).contains { $0.developer == developer }
     }
 
     private func suggestionCard(_ suggestion: Development.Result) -> some View {
@@ -217,7 +261,9 @@ struct RollEditSheet: View {
                     Spacer()
                     Button("Adopter") {
                         var current = roll.development ?? Self.emptyDevelopment
-                        current.timeSec = suggestion.correctedSeconds
+                        // Au cran de la minuterie, sans quoi le barillet ne
+                        // saurait pas montrer la valeur adoptée.
+                        current.timeSec = (suggestion.correctedSeconds / 15).rounded() * 15
                         roll.development = current
                     }
                     .font(Typo.ui(14, .semibold))
@@ -238,7 +284,8 @@ struct RollEditSheet: View {
     }
 
     private func explanation(_ suggestion: Development.Result) -> String {
-        var parts = ["Base publiée : \(formatMinutes(suggestion.baseSeconds))"]
+        let source = referenceEntry.map { "\($0.developer) \($0.dilution) à \(Int($0.tempC)) °C" } ?? "banque"
+        var parts = ["Base publiée (\(source)) : \(formatMinutes(suggestion.baseSeconds))"]
         if abs(suggestion.temperatureFactor - 1) > 0.01 {
             parts.append(suggestion.temperatureFactor > 1
                 ? "allongé par un bain plus froid"
@@ -252,10 +299,22 @@ struct RollEditSheet: View {
         return parts.joined(separator: ", ") + ". La notice du film reste l’autorité."
     }
 
-    /// Une graduation de temps, de trois à vingt minutes, au demi-quart de
-    /// minute : c'est la finesse d'une minuterie de laboratoire.
+    /// Une graduation de temps au quart de minute jusqu'à vingt minutes — la
+    /// finesse d'une minuterie de laboratoire — puis à la demi-minute jusqu'à
+    /// une heure : un film poussé de deux diaphragmes dépasse les vingt minutes.
     private var developmentTimes: [Double] {
         stride(from: 180.0, through: 1_200.0, by: 15).map { $0 }
+            + stride(from: 1_230.0, through: 3_600.0, by: 30).map { $0 }
+    }
+
+    /// Le noir et blanc se traite autour de 20 °C ; les procédés couleur C-41
+    /// et E-6 à 38 °C. Proposer l'un pour l'autre serait un piège.
+    private var temperatures: [Double] {
+        let process = film?.process.uppercased() ?? ""
+        if process.contains("C-41") || process.contains("E-6") || process.contains("C41") || process.contains("E6") {
+            return [30, 33, 36, 37, 38, 39, 40]
+        }
+        return [16, 18, 20, 22, 24]
     }
 
     // MARK: - Coûts
@@ -268,20 +327,20 @@ struct RollEditSheet: View {
                 costField("Numérisation", \.scan)
                 costField("Tirages", \.prints)
 
-                if let total = roll.costs?.total, total > 0 {
-                    HStack {
-                        MicroLabel("Total")
-                        Spacer()
-                        ValueText(
-                            text: String(format: "%.2f €", total), size: 16, weight: .bold,
-                            colour: palette.accent)
-                    }
-                    .padding(.top, 4)
+                HStack {
+                    MicroLabel("Total")
+                    Spacer()
+                    ValueText(
+                        text: Fmt.money(roll.costs?.total ?? 0, currency: carnet.settings.currency),
+                        size: 16, weight: .bold, colour: palette.accent)
                 }
+                .padding(.top, 4)
             }
         }
     }
 
+    /// Le champ est lié à la valeur, pas à un texte reformaté à chaque frappe :
+    /// sinon la virgule tapée disparaissait sous le doigt.
     private func costField(
         _ label: String, _ keyPath: WritableKeyPath<Model.Roll.Costs, Double?>
     ) -> some View {
@@ -290,21 +349,35 @@ struct RollEditSheet: View {
                 .font(Typo.body)
                 .foregroundStyle(palette.textDim)
             Spacer()
-            TextField("—", text: Binding(
-                get: {
-                    guard let value = roll.costs?[keyPath: keyPath] else { return "" }
-                    return String(format: "%g", value)
-                },
-                set: { text in
-                    var current = roll.costs ?? Model.Roll.Costs(
-                        film: nil, development: nil, scan: nil, prints: nil)
-                    current[keyPath: keyPath] = Double(text.replacingOccurrences(of: ",", with: "."))
-                    roll.costs = current
-                }))
+            TextField(
+                "—",
+                value: Binding<Double?>(
+                    get: { roll.costs?[keyPath: keyPath] },
+                    set: { value in
+                        var current = roll.costs ?? Model.Roll.Costs(
+                            film: nil, development: nil, scan: nil, prints: nil)
+                        // Un montant infini ou négatif n'est pas un montant, et
+                        // casserait l'enregistrement du carnet.
+                        current[keyPath: keyPath] = value.flatMap { $0.isFinite && $0 >= 0 ? $0 : nil }
+                        roll.costs = current
+                    }),
+                format: .number.precision(.fractionLength(0...2)))
                 .keyboardType(.decimalPad)
                 .multilineTextAlignment(.trailing)
                 .frame(width: 90)
                 .fieldStyle(palette)
+            Text(currencySymbol)
+                .font(Typo.caption)
+                .foregroundStyle(palette.textFaint)
+        }
+    }
+
+    private var currencySymbol: String {
+        switch carnet.settings.currency.uppercased() {
+        case "EUR": "€"
+        case "USD": "$"
+        case "GBP": "£"
+        default: carnet.settings.currency
         }
     }
 

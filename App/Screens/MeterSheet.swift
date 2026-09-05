@@ -20,8 +20,8 @@ struct MeterSheet: View {
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.palette) private var palette
-    // Sans valeur par défaut : elle serait construite — session de capture
-    // comprise — puis aussitôt jetée par l'init, à chaque réévaluation.
+    // Construit dans l'init pour recevoir la correction ; SwiftUI ne garde que
+    // le premier, les suivants sont jetés sans avoir démarré de session.
     @State private var meter: LightMeter
 
     init(
@@ -56,7 +56,7 @@ struct MeterSheet: View {
                     "Cet appareil n’a pas de caméra utilisable. C’est le cas d’un simulateur.")
                 case .permissionDenied: unavailable(
                     "Accès refusé",
-                    "Autorisez l’accès à la caméra dans Réglages → Pellicule pour mesurer la lumière.")
+                    "Autorisez l’accès à l’appareil photo dans Réglages → Pellicule pour mesurer la lumière.")
                 case .failed(let reason): unavailable("Mesure impossible", reason)
                 case .idle: ProgressView().tint(palette.accent)
                 }
@@ -99,7 +99,7 @@ struct MeterSheet: View {
 
                 if let reading = meter.reading {
                     verdict(reading)
-                    if reading.isAtLimit { limitWarning }
+                    if reading.isAtLimit { limitWarning(reading) }
                     comparison(reading)
                     calibration
                 } else {
@@ -150,13 +150,20 @@ struct MeterSheet: View {
     /// Quand la caméra est au bout de ce qu'elle sait faire, la mesure n'en est
     /// plus une : c'est une borne. L'employer ferait sous-exposer sans le
     /// savoir, ce qui est exactement ce qu'un posemètre doit éviter.
-    private var limitWarning: some View {
-        AdviceCard(advice: Assistant.Advice(
+    private func limitWarning(_ reading: Meter.Reading) -> some View {
+        // Côté sombre, la sensibilité est poussée ; côté clair, elle est au
+        // plancher. C'est ce qui dit de quel côté la borne a été touchée.
+        let dark = reading.iso > 200
+        return AdviceCard(advice: Assistant.Advice(
             level: .danger,
             title: "La caméra est à bout",
-            detail: "L’appareil a poussé sa sensibilité et son temps de pose au maximum : "
-                + "la scène est au moins aussi sombre que ce chiffre, peut-être davantage. "
-                + "Cette mesure ne doit pas être employée telle quelle."))
+            detail: dark
+                ? "Le téléphone a poussé sa sensibilité et son temps de pose au maximum : "
+                    + "la scène est au moins aussi sombre que ce chiffre, peut-être davantage. "
+                    + "Cette mesure ne doit pas être employée telle quelle."
+                : "Le téléphone est à sa sensibilité la plus basse et à son temps de pose le plus court : "
+                    + "la scène est au moins aussi claire que ce chiffre, peut-être davantage. "
+                    + "Cette mesure ne doit pas être employée telle quelle."))
     }
 
     /// L'écart entre l'estimation et la mesure : le seul chiffre de cet écran
@@ -183,8 +190,7 @@ struct MeterSheet: View {
 
     private func comparisonText(drift: Double, magnitude: Double) -> String {
         guard magnitude >= 0.5 else {
-            return "Vous ne vous êtes pas trompé : votre estimation tombe juste, "
-                + "à moins d’un demi-diaphragme près."
+            return "Estimation juste : elle tombe à moins d’un demi-diaphragme de la mesure."
         }
         let stops = oneDecimal(magnitude)
         return drift > 0
@@ -231,7 +237,7 @@ struct MeterSheet: View {
     }
 
     private func oneDecimal(_ value: Double) -> String {
-        String(format: "%.1f", value)
+        String(format: "%.1f", value).replacingOccurrences(of: ".", with: ",")
     }
 
     private func trimmed(_ value: Double) -> String {

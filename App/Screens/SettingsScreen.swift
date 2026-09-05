@@ -10,7 +10,10 @@ struct SettingsScreen: View {
     /// Construit au moment d'exporter, jamais dans `body` : encoder le carnet
     /// — et ses photos — à chaque frappe dans un champ serait absurde.
     @State private var exportDocument: CarnetDocument?
+    @State private var isPreparingExport = false
     @State private var isImporting = false
+    /// Le fichier choisi, en attente du choix « compléter » ou « remplacer ».
+    @State private var pendingImport: URL?
     @State private var importOutcome: ImportOutcome?
     @State private var includePhotos = false
 
@@ -36,14 +39,49 @@ struct SettingsScreen: View {
                 document: exportDocument,
                 contentType: .json,
                 defaultFilename: "pellicule-\(dateStamp()).json"
-            ) { _ in
+            ) { result in
                 exportDocument = nil
+                if case .failure = result {
+                    importOutcome = ImportOutcome(
+                        title: "Export impossible",
+                        message: "Le fichier n’a pas pu être enregistré à cet endroit.")
+                }
             }
             .fileImporter(
                 isPresented: $isImporting,
                 allowedContentTypes: [.json]
             ) { result in
-                Task { importOutcome = await restore(from: result) }
+                guard let url = try? result.get() else { return }
+                // Un carnet vide n'a rien à fusionner : on prend le fichier tel
+                // quel, sans poser de question.
+                if carnet.rolls.isEmpty && carnet.cameras.isEmpty && carnet.frames.isEmpty {
+                    Task { importOutcome = await restore(from: url, mode: .replace) }
+                } else {
+                    pendingImport = url
+                }
+            }
+            .confirmationDialog(
+                "Comment reprendre cette sauvegarde ?",
+                isPresented: Binding(
+                    get: { pendingImport != nil },
+                    set: { if !$0 { pendingImport = nil } }),
+                titleVisibility: .visible
+            ) {
+                Button("Compléter le carnet") {
+                    if let url = pendingImport {
+                        Task { importOutcome = await restore(from: url, mode: .merge) }
+                    }
+                    pendingImport = nil
+                }
+                Button("Remplacer tout le carnet", role: .destructive) {
+                    if let url = pendingImport {
+                        Task { importOutcome = await restore(from: url, mode: .replace) }
+                    }
+                    pendingImport = nil
+                }
+                Button("Annuler", role: .cancel) { pendingImport = nil }
+            } message: {
+                Text("Compléter ajoute ce qui manque et garde la version la plus récente de chaque fiche. Remplacer revient à la sauvegarde telle qu’elle est — exportez d’abord le carnet actuel si vous voulez pouvoir y revenir.")
             }
             .alert(
                 importOutcome?.title ?? "",
@@ -173,18 +211,19 @@ struct SettingsScreen: View {
                 }
                 .tint(palette.accent)
 
-                Button("Exporter le carnet") {
-                    exportDocument = CarnetDocument(carnet: carnet, includePhotos: includePhotos)
-                    isExporting = true
+                Button(isPreparingExport ? "Préparation…" : "Exporter le carnet") {
+                    prepareExport()
                 }
                 .buttonStyle(SecondaryButtonStyle(palette: palette))
+                .disabled(isPreparingExport)
 
                 Button("Importer un carnet") { isImporting = true }
                     .buttonStyle(SecondaryButtonStyle(palette: palette))
 
-                Text("L’import complète le carnet existant sans rien effacer : à fiche identique, la version modifiée le plus récemment l’emporte.")
+                Text("L’import propose de compléter le carnet — à fiche identique, la version modifiée le plus récemment l’emporte — ou de le remplacer entièrement par la sauvegarde.")
                     .font(Typo.caption)
                     .foregroundStyle(palette.textFaint)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }
     }
@@ -219,6 +258,32 @@ struct SettingsScreen: View {
         }
     }
 
+    // MARK: - Export
+
+    /// Le document se construit hors du fil de l'interface : avec les photos,
+    /// c'est des dizaines de mégaoctets à lire et à encoder, et l'écran ne
+    /// doit pas se figer pendant ce temps.
+    private func prepareExport() {
+        isPreparingExport = true
+        let frames = carnet.frames
+        let include = includePhotos
+        Task {
+            let attachments = await Task.detached(priority: .userInitiated) {
+                include ? PhotoStore.attachments(for: frames) : []
+            }.value
+            let data = try? carnet.backup(includingPhotos: include, attachments: attachments).encoded()
+            isPreparingExport = false
+            guard let data else {
+                importOutcome = ImportOutcome(
+                    title: "Export impossible",
+                    message: "Le carnet n’a pas pu être encodé. Vérifiez qu’aucun montant saisi n’est aberrant.")
+                return
+            }
+            exportDocument = CarnetDocument(data: data)
+            isExporting = true
+        }
+    }
+
     // MARK: - Import
 
     /// La lecture et le décodage se font hors du fil de l'interface : une
@@ -226,9 +291,8 @@ struct SettingsScreen: View {
     /// doit pas se figer le temps de la relire. Seule la fusion dans le carnet
     /// revient sur le fil principal.
     @MainActor
-    private func restore(from result: Result<URL, Error>) async -> ImportOutcome {
+    private func restore(from url: URL, mode: Carnet.RestoreMode) async -> ImportOutcome {
         do {
-            let url = try result.get()
             let backup = try await Task.detached(priority: .userInitiated) {
                 // Un fichier choisi hors du bac à sable de l'application n'est
                 // lisible qu'après cette demande explicite.
@@ -236,15 +300,18 @@ struct SettingsScreen: View {
                 defer { if accessed { url.stopAccessingSecurityScopedResource() } }
                 return try Backup.decode(from: Data(contentsOf: url))
             }.value
-            carnet.restore(backup, mode: .merge)
-            let attachments = backup.data.attachments
+            carnet.restore(backup, mode: mode)
+            // Seules les photos que le carnet désigne encore : une vue écartée
+            // par la fusion ne doit pas laisser sa photo orpheline sur le disque.
+            let referenced = Set(carnet.frames.compactMap(\.refPhotoId))
+            let attachments = backup.data.attachments.filter { referenced.contains($0.id) }
             let photos = await Task.detached(priority: .userInitiated) {
                 PhotoStore.restore(attachments)
             }.value
             let summary = backup.summary
             return ImportOutcome(
-                title: "Carnet importé",
-                message: "\(summary.rolls) rouleau\(summary.rolls > 1 ? "x" : ""), "
+                title: mode == .replace ? "Carnet remplacé" : "Carnet complété",
+                message: "La sauvegarde contenait \(summary.rolls) rouleau\(summary.rolls > 1 ? "x" : ""), "
                     + "\(summary.frames) vue\(summary.frames > 1 ? "s" : ""), "
                     + "\(summary.cameras) boîtier\(summary.cameras > 1 ? "s" : "")"
                     + (photos > 0 ? ", \(photos) photo\(photos > 1 ? "s" : "")." : "."))
@@ -277,10 +344,9 @@ struct CarnetDocument: FileDocument {
 
     private let data: Data
 
-    init(carnet: Carnet, includePhotos: Bool) {
-        let attachments = includePhotos ? PhotoStore.attachments(for: carnet.frames) : []
-        data = (try? carnet.backup(
-            includingPhotos: includePhotos, attachments: attachments).encoded()) ?? Data()
+    /// Le contenu est encodé par l'appelant, hors du fil de l'interface.
+    init(data: Data) {
+        self.data = data
     }
 
     init(configuration: ReadConfiguration) throws {

@@ -44,13 +44,16 @@ public enum Statistics {
 
         // Le coût par vue ne se calcule que sur les rouleaux chiffrés : diviser
         // le total par toutes les vues, y compris celles des rouleaux sans
-        // coût, donnerait un chiffre faussement bas.
+        // coût, donnerait un chiffre faussement bas. Un rouleau encore dans le
+        // boîtier compte pour ses poses annoncées, pas pour les vues déjà
+        // notées : sinon le chiffre baisserait à chaque déclenchement.
         var costedFrames = 0
         var totalCost = 0.0
         for roll in rolls {
             guard let costs = roll.costs, costs.total > 0 else { continue }
             totalCost += costs.total
-            costedFrames += framesByRoll[roll.id]?.count ?? 0
+            let noted = framesByRoll[roll.id]?.count ?? 0
+            costedFrames += roll.status.isOpen ? max(noted, roll.exposures) : noted
         }
 
         var usage: [String: (rolls: Int, frames: Int)] = [:]

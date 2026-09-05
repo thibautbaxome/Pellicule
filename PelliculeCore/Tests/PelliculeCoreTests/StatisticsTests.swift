@@ -46,13 +46,24 @@ final class StatisticsTests: XCTestCase {
     /// les vues donnerait un chiffre faussement bas.
     func testCostPerFrameIgnoresUncostedRolls() {
         _ = makeRoll(film: "kodak-tri-x-400", frames: 10,
-                     costs: Model.Roll.Costs(film: 8, development: 12, scan: nil, prints: nil))
+                     costs: Model.Roll.Costs(film: 8, development: 12, scan: nil, prints: nil),
+                     status: .developed)
         _ = makeRoll(film: "kodak-tri-x-400", frames: 10)
 
         let s = summary
         XCTAssertEqual(s.totalCost, 20, accuracy: 1e-9)
         XCTAssertEqual(s.costPerFrame ?? 0, 2, accuracy: 1e-9, "20 € sur les 10 vues chiffrées")
         XCTAssertEqual(s.frames, 20)
+    }
+
+    /// Un rouleau encore dans le boîtier compte pour ses poses annoncées : le
+    /// coût par vue ne doit pas fondre à chaque déclenchement.
+    func testOpenRollCountsItsAnnouncedExposures() {
+        _ = makeRoll(film: "kodak-tri-x-400", frames: 3,
+                     costs: Model.Roll.Costs(film: 9, development: nil, scan: nil, prints: nil),
+                     status: .shooting)
+        let s = summary
+        XCTAssertEqual(s.costPerFrame ?? 0, 9.0 / 36.0, accuracy: 1e-9)
     }
 
     func testFilmsAreRankedByFramesShot() {

@@ -148,6 +148,14 @@ struct LensPickerSheet: View {
         return Catalog.searchLenses(query, mount: filter, limit: 60)
     }
 
+    private var manualAction: (() -> Void)? {
+        guard let onManual else { return nil }
+        return {
+            dismiss()
+            onManual()
+        }
+    }
+
     private var emptyMessage: String {
         if let usableMount, !allMounts {
             return "Aucun objectif en monture \(usableMount) ne correspond. Élargissez à toutes les montures, ou cherchez autrement."
@@ -163,7 +171,7 @@ struct LensPickerSheet: View {
                         title: "Rien à proposer",
                         message: emptyMessage + (onManual == nil ? "" : " Vous pouvez aussi le déclarer à la main."),
                         actionTitle: onManual == nil ? nil : "Déclarer à la main",
-                        action: onManual.map { manual in { dismiss(); manual() } })
+                        action: manualAction)
                 } else {
                     List(results) { lens in
                         Button {
@@ -190,7 +198,7 @@ struct LensPickerSheet: View {
                 }
             }
             .carnetBackground(palette)
-            .searchable(text: $query, prompt: "50mm, Nikkor, 35-70…")
+            .searchable(text: $query, prompt: "50 mm, Nikkor, 35-70…")
             .navigationTitle(usableMount.map { "Objectifs \($0)" } ?? "Objectif")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -257,7 +265,7 @@ struct FilterPickerSheet: View {
                                         ValueText(
                                             text: preset.stops < 0.05
                                                 ? "gratuit"
-                                                : "+\(String(format: "%.1f", preset.stops)) IL",
+                                                : "+\(Fmt.stops(preset.stops)) diaph.",
                                             size: 13, colour: palette.accent)
                                     }
                                     Text(preset.effect)

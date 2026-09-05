@@ -87,6 +87,30 @@ final class ParcoursTests: XCTestCase {
         capture("04b-boitier-edition")
         tap(button: "Annuler")
 
+        // Un objectif de la banque : la liste est filtrée par la monture du
+        // boîtier déclaré, et l'objectif choisi s'ouvre à son tour.
+        tap(button: "Ajouter")
+        tap(button: "Objectif de la banque")
+        let lensSearch = app.searchFields.firstMatch
+        XCTAssertTrue(lensSearch.waitForExistence(timeout: 10), "la banque d’objectifs doit être cherchable")
+        lensSearch.tap()
+        lensSearch.typeText("md 50")
+        let md50 = app.staticTexts["Minolta MD 50mm f/1.7"]
+        XCTAssertTrue(
+            md50.waitForExistence(timeout: 10),
+            "« md 50 » doit trouver le MD 50 mm f/1.7, en monture Minolta SR")
+        capture("04c-banque-objectifs")
+        md50.tap()
+        XCTAssertTrue(
+            app.staticTexts["Minolta MD 50mm f/1.7"].waitForExistence(timeout: 10),
+            "l’objectif choisi doit apparaître dans le matériel")
+        tap(button: "Minolta MD 50mm f/1.7")
+        XCTAssertTrue(
+            app.staticTexts["Ouverture la plus grande"].waitForExistence(timeout: 10),
+            "la fiche de l’objectif doit exposer son ouverture")
+        capture("04d-objectif-edition")
+        tap(button: "Annuler")
+
         // MARK: Charger une pellicule
         tapTab("Rouleaux")
         tap(button: "Charger une pellicule")
@@ -100,6 +124,7 @@ final class ParcoursTests: XCTestCase {
 
         let triX = app.staticTexts["Kodak Tri-X 400"]
         XCTAssertTrue(triX.waitForExistence(timeout: 10))
+        capture("05b-banque-pellicules")
         triX.tap()
 
         XCTAssertTrue(
@@ -134,9 +159,11 @@ final class ParcoursTests: XCTestCase {
         XCTAssertTrue(
             app.staticTexts["Vitesse"].waitForExistence(timeout: 10),
             "la saisie doit commencer par la vitesse")
-        // Provoque le passage du moniteur d'interruption si la demande de
-        // position est affichée, pour capturer l'écran et non la boîte.
-        app.swipeUp(); app.swipeDown()
+        // Une interaction sans effet provoque le passage du moniteur
+        // d'interruption si la demande de position est affichée : on capture
+        // l'écran, pas la boîte. Un glissement, lui, pourrait fermer la feuille.
+        app.staticTexts["Vitesse"].tap()
+        XCTAssertTrue(app.staticTexts["Vitesse"].exists, "la feuille de saisie doit rester ouverte")
         capture("10-vue-vierge")
 
         // Les graduations sont bornées par le matériel : le X-300 plafonne à
@@ -156,7 +183,7 @@ final class ParcoursTests: XCTestCase {
         XCTAssertTrue(
             app.staticTexts["Filtre"].waitForExistence(timeout: 10),
             "les détails doivent proposer le filtre")
-        app.swipeUp()
+        scrollUntilHittable(app.buttons["Aucun"])
         capture("11b-vue-details")
         tap(button: "Aucun")
         XCTAssertTrue(
@@ -174,9 +201,23 @@ final class ParcoursTests: XCTestCase {
             "la vue enregistrée doit s’afficher avec son couple")
         capture("12-rouleau-une-vue")
 
+        // Changer le statut ne doit pas faire sortir de l'écran : le rouleau
+        // change de section dans la liste, la navigation doit y survivre.
+        scrollUntilHittable(app.buttons["Terminé"])
+        app.buttons["Terminé"].tap()
+        XCTAssertTrue(
+            app.staticTexts["Où en est ce rouleau"].waitForExistence(timeout: 5),
+            "marquer un rouleau terminé ne doit pas quitter l’écran")
+        XCTAssertTrue(
+            app.staticTexts["Rouleau terminé"].waitForExistence(timeout: 5),
+            "un rouleau terminé doit dire pourquoi on ne note plus de vue")
+        capture("12a-rouleau-termine")
+        app.buttons["En cours"].tap()
+        XCTAssertTrue(app.buttons["Noter une vue"].waitForExistence(timeout: 5))
+
         // La fiche du rouleau : archive, laboratoire, développement, coûts.
         tap(button: "Actions")
-        tap(button: "Le rouleau")
+        tap(button: "Fiche du rouleau")
         XCTAssertTrue(
             app.staticTexts["Référence d’archive"].waitForExistence(timeout: 10),
             "la fiche du rouleau doit exposer la référence d’archive")
@@ -191,7 +232,7 @@ final class ParcoursTests: XCTestCase {
 
         // Vers les scans : sans fichier choisi, l'écran explique et attend.
         tap(button: "Actions")
-        tap(button: "Vers les scans")
+        tap(button: "Inscrire dans les scans")
         XCTAssertTrue(
             app.buttons["Choisir les fichiers"].waitForExistence(timeout: 10),
             "l’export doit commencer par le choix des scans")
@@ -219,9 +260,25 @@ final class ParcoursTests: XCTestCase {
         capture("13b-posemetre-sans-camera")
         tap(button: "Fermer")
 
-        // Changer d’intention doit changer le conseil, pas seulement l’étiquette.
+        // Changer d’intention doit changer le conseil, pas seulement l’étiquette :
+        // le portrait a une distance de sujet, le paysage fait le point à
+        // l'hyperfocale et n'en a pas.
+        XCTAssertTrue(
+            app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH 'Distance du sujet'"))
+                .firstMatch.exists,
+            "un portrait se règle sur la distance du sujet")
         tap(button: "Paysage")
+        XCTAssertTrue(
+            app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH 'Faites le point à'"))
+                .firstMatch.waitForExistence(timeout: 10),
+            "un paysage doit dire où faire le point")
+        XCTAssertFalse(
+            app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH 'Distance du sujet'"))
+                .firstMatch.exists,
+            "à l’hyperfocale, la distance du sujet n’a pas de sens")
         capture("14-assistant-paysage")
+        // La septième pastille est hors champ : la rangée défile d'abord.
+        app.buttons["Paysage"].firstMatch.swipeLeft()
         tap(button: "Pose longue")
         capture("15-assistant-pose-longue")
 
@@ -263,6 +320,21 @@ final class ParcoursTests: XCTestCase {
             button.waitForExistence(timeout: 10), "bouton « \(label) » introuvable",
             file: file, line: line)
         button.tap()
+    }
+
+    /// Fait défiler jusqu'à ce que l'élément soit touchable, sans compter sur
+    /// un glissement à l'aveugle dont la course dépend de l'appareil.
+    private func scrollUntilHittable(
+        _ element: XCUIElement, file: StaticString = #filePath, line: UInt = #line
+    ) {
+        var attempts = 0
+        while !(element.exists && element.isHittable), attempts < 6 {
+            app.swipeUp(velocity: .slow)
+            attempts += 1
+        }
+        XCTAssertTrue(
+            element.exists && element.isHittable, "élément introuvable après défilement",
+            file: file, line: line)
     }
 
     /// Les captures survivent au succès du test : ce sont elles qu'on regarde,

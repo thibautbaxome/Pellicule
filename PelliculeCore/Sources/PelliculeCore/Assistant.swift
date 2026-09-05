@@ -203,7 +203,8 @@ public enum Assistant {
                     "À \(formatAperture(input.aperture)), la pose dépasserait la vitesse la plus "
                         + "lente du boîtier. Ouvrez à \(formatAperture($0))."
                 } ?? "Même à pleine ouverture, il faudrait poser plus longtemps que le boîtier "
-                    + "ne le permet. Passez en pose B sur trépied, ou chargez un film plus sensible."))
+                    + "ne le permet. Passez en pose B sur trépied — l’obturateur reste ouvert "
+                    + "tant que vous appuyez —, ou chargez un film plus sensible."))
         }
 
         // Seulement quand la pose tient dans la plage du boîtier : hors plage,
@@ -255,7 +256,7 @@ public enum Assistant {
                 level: .info,
                 title: "Exposition arrondie",
                 detail: "La graduation du boîtier tombe à "
-                    + "\(abs((snapError * 10).rounded() / 10)) IL de l’exposition idéale. "
+                    + "\(formatStops(abs(snapError))) diaphragme de l’exposition idéale. "
                     + "Sans conséquence sur un négatif, à surveiller sur une diapositive."))
         }
 
@@ -284,7 +285,7 @@ public enum Assistant {
                 level: .good,
                 title: "Ce réglage tient",
                 detail: "\(shutter) à \(formatAperture(input.aperture)) : le boîtier sait le "
-                    + "faire, et rien dans la scène ne s'y oppose."
+                    + "faire, et rien dans la scène ne s’y oppose."
                     + (dof.map { " Net de \(formatMetres($0.near)) à "
                         + ($0.isFarInfinite ? "l’infini." : "\(formatMetres($0.far)).") } ?? "")),
                 at: 0)
@@ -403,9 +404,9 @@ public enum Assistant {
         }
         let missing = "Il manque \(filter.stops) diaphragme\(filter.stops > 1 ? "s" : "")"
         guard let name = filter.name else {
-            return "\(missing), soit plus qu'aucun filtre du commerce ne retire. "
+            return "\(missing), soit plus qu’aucun filtre du commerce ne retire. "
                 + "À cette lumière, cette intention est hors de portée : "
-                + "revenez à l'aube ou au crépuscule."
+                + "revenez à l’aube ou au crépuscule."
         }
         return "\(missing) : un filtre gris neutre \(name) les retire. "
             + "Sinon, attendez que la lumière baisse."
@@ -417,5 +418,12 @@ public enum Assistant {
 
     private static func formatMetres(_ value: Double) -> String {
         value < 1 ? "\(Int((value * 100).rounded())) cm" : "\((value * 10).rounded() / 10) m"
+    }
+
+    /// Un écart en diaphragmes, au dixième, à la française : « 0,5 », « 1 ».
+    private static func formatStops(_ value: Double) -> String {
+        let rounded = (value * 10).rounded() / 10
+        if rounded == rounded.rounded() { return String(Int(rounded)) }
+        return String(format: "%.1f", rounded).replacingOccurrences(of: ".", with: ",")
     }
 }

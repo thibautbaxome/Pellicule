@@ -173,6 +173,9 @@ jobs:
             CODE_SIGNING_ALLOWED=NO | xcbeautify
           xcrun simctl install "${{ steps.device.outputs.udid }}" \
             build-sim/Build/Products/Debug-iphonesimulator/Pellicule.app
+          # La position est accordée d'avance : la boîte de dialogue du système
+          # n'a rien à faire sur les captures. Le moniteur du parcours reste en filet.
+          xcrun simctl privacy "${{ steps.device.outputs.udid }}" grant location app.pellicule.carnet || true
           xcrun simctl launch "${{ steps.device.outputs.udid }}" app.pellicule.carnet
           sleep 6
           mkdir -p captures

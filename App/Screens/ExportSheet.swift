@@ -28,6 +28,10 @@ struct ExportSheet: View {
     @State private var tagged: [URL] = []
     @State private var problems: [String] = []
     @State private var isWorking = false
+    @State private var isSavingCopies = false
+    /// Chaque écriture repart d'un dossier neuf ; le précédent est effacé, sans
+    /// quoi trente TIFF de scanner par essai de décalage s'empileraient.
+    @State private var outputDirectory: URL?
 
     private var roll: Model.Roll? { carnet.roll(id: rollId) }
     private var frames: [Model.Frame] { carnet.frames(ofRoll: rollId) }
@@ -92,10 +96,29 @@ struct ExportSheet: View {
                         $0.lastPathComponent.localizedStandardCompare($1.lastPathComponent)
                             == .orderedAscending
                     }
-                tagged = []
-                problems = []
+                discardOutput()
             }
+            // Directement dans Fichiers, à côté des originaux : une feuille de
+            // partage ferait deviner « Enregistrer dans Fichiers » à un débutant.
+            .fileExporter(
+                isPresented: $isSavingCopies,
+                items: tagged,
+                contentTypes: [.image]
+            ) { _ in }
+            .onDisappear { discardOutput() }
         }
+    }
+
+    /// Les copies déjà écrites ne valent plus rien dès que la sélection ou le
+    /// décalage change : l'aperçu montrerait un rapprochement, le bouton en
+    /// livrerait un autre.
+    private func discardOutput() {
+        tagged = []
+        problems = []
+        if let outputDirectory {
+            try? FileManager.default.removeItem(at: outputDirectory)
+        }
+        outputDirectory = nil
     }
 
     private var intro: some View {
@@ -112,6 +135,7 @@ struct ExportSheet: View {
                     isPicking = true
                 }
                 .buttonStyle(SecondaryButtonStyle(palette: palette))
+                .disabled(isWorking)
 
                 if !files.isEmpty {
                     ValueText(
@@ -124,7 +148,7 @@ struct ExportSheet: View {
 
     /// Le décalage entre la numérotation du laboratoire et celle du carnet.
     private var offsetPicker: some View {
-        FieldRow(label: "Vues perdues à l’amorce") {
+        FieldRow(label: "Poses perdues à l’amorce") {
             VStack(alignment: .leading, spacing: 8) {
                 ScaleDial(
                     values: ExifExport.plausibleOffsets(
@@ -132,8 +156,13 @@ struct ExportSheet: View {
                     label: { $0 == 0 ? "aucune" : "\($0)" },
                     selection: Binding<Int?>(
                         get: { offset },
-                        set: { offset = $0 ?? 0 }))
-                Text("Les premières poses d’un rouleau sont souvent voilées, et le laboratoire ne les numérise pas. Réglez jusqu’à ce que les sujets ci-dessous correspondent à vos images.")
+                        set: { value in
+                            guard let value, value != offset else { return }
+                            offset = value
+                            discardOutput()
+                        }))
+                .disabled(isWorking)
+                Text("Les premières poses d’un rouleau sont souvent voilées, et le laboratoire ne les numérise pas. Réglez jusqu’à ce que les sujets ci-dessous correspondent à vos images. Si ce sont les premiers scans qui n’ont pas de vue, ne les sélectionnez pas.")
                     .font(Typo.caption)
                     .foregroundStyle(palette.textFaint)
                     .fixedSize(horizontal: false, vertical: true)
@@ -146,7 +175,7 @@ struct ExportSheet: View {
     private var preview: some View {
         FieldRow(label: "Ce qui sera inscrit") {
             VStack(spacing: 6) {
-                ForEach(pairings) { pairing in
+                ForEach(Array(pairings.enumerated()), id: \.offset) { _, pairing in
                     HStack(alignment: .top, spacing: 10) {
                         ValueText(
                             text: pairing.fileName, size: 12,
@@ -183,7 +212,7 @@ struct ExportSheet: View {
                 .buttonStyle(PrimaryButtonStyle(palette: palette))
                 .disabled(isWorking || pairings.allSatisfy(\.isOrphan))
 
-            Text("Vos fichiers d’origine ne sont jamais modifiés : l’application en produit des copies annotées, que vous enregistrez où vous voulez.")
+            Text("Vos fichiers d’origine ne sont jamais modifiés : l’application en produit des copies annotées, nommées « \(reference)-01 », « \(reference)-02 »…, que vous enregistrez où vous voulez.")
                 .font(Typo.caption)
                 .foregroundStyle(palette.textFaint)
                 .fixedSize(horizontal: false, vertical: true)
@@ -194,17 +223,20 @@ struct ExportSheet: View {
         Card {
             VStack(alignment: .leading, spacing: 10) {
                 MicroLabel("Prêt", colour: palette.ok)
-                Text("\(tagged.count) scan\(tagged.count > 1 ? "s" : "") annoté\(tagged.count > 1 ? "s" : ""). Enregistrez-les à côté de vos originaux.")
+                Text("\(tagged.count) scan\(tagged.count > 1 ? "s" : "") annoté\(tagged.count > 1 ? "s" : ""). Choisissez le dossier de vos scans : les copies s’y rangeront à côté des originaux.")
                     .font(Typo.body)
                     .foregroundStyle(palette.text)
                     .fixedSize(horizontal: false, vertical: true)
+                Button("Enregistrer dans Fichiers") { isSavingCopies = true }
+                    .buttonStyle(PrimaryButtonStyle(palette: palette))
                 ShareLink(items: tagged) {
-                    Text("Enregistrer les fichiers")
-                        .font(Typo.ui(16, .semibold))
-                        .foregroundStyle(palette.accentInk)
+                    Text("Ou partager autrement")
+                        .font(Typo.ui(16, .medium))
+                        .foregroundStyle(palette.text)
                         .frame(maxWidth: .infinity, minHeight: 50)
-                        .background(palette.accent)
-                        .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 6, style: .continuous)
+                                .strokeBorder(palette.lineStrong, lineWidth: 1))
                 }
             }
         }
@@ -226,7 +258,7 @@ struct ExportSheet: View {
             let rows = ExifExport.rows(for: context, pattern: pattern)
             FieldRow(label: "Autrement") {
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("Un tableau et un script pour exiftool, à employer sur un ordinateur — pour les formats que l’application ne sait pas annoter, ou pour vérifier avant d’écrire.")
+                    Text("Un tableau et un script pour exiftool, à employer sur un ordinateur — pour les fichiers bruts (DNG, RAW) que l’application ne sait pas annoter, ou pour vérifier avant d’écrire.")
                         .font(Typo.caption)
                         .foregroundStyle(palette.textDim)
                         .fixedSize(horizontal: false, vertical: true)
@@ -263,16 +295,18 @@ struct ExportSheet: View {
         }
     }
 
+    /// La référence d'archive, rendue sûre pour un nom de fichier : elle est
+    /// saisie librement, et « 2026/014 » ne peut pas nommer un fichier.
     private var reference: String {
-        roll?.archiveRef ?? roll?.label ?? "rouleau"
+        ExifExport.fileToken(roll?.archiveRef ?? roll?.label ?? "rouleau")
     }
 
     // MARK: - Écriture
 
     private func tagFiles() {
         guard let context else { return }
+        discardOutput()
         isWorking = true
-        problems = []
 
         let pairings = pairings
         let pattern = pattern
@@ -281,18 +315,26 @@ struct ExportSheet: View {
         let sources = Dictionary(
             files.map { ($0.lastPathComponent, $0) },
             uniquingKeysWith: { first, _ in first })
+        let directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("scans-\(UUID().uuidString)")
+        outputDirectory = directory
 
         // Ré-encoder trente scans n'a rien à faire sur le fil de l'interface :
         // le bouton dit « Écriture… », il faut qu'on ait le temps de le lire.
         Task.detached(priority: .userInitiated) {
-            let directory = FileManager.default.temporaryDirectory
-                .appendingPathComponent("scans-\(UUID().uuidString)")
             try? FileManager.default.createDirectory(
                 at: directory, withIntermediateDirectories: true)
             let outcome = ScanTagger.tag(
                 pairings: pairings, sources: sources, context: context,
                 pattern: pattern, into: directory)
             await MainActor.run {
+                // La sélection a changé pendant l'écriture : ce résultat ne
+                // décrit plus ce que l'écran montre.
+                guard outputDirectory == directory else {
+                    try? FileManager.default.removeItem(at: directory)
+                    isWorking = false
+                    return
+                }
                 tagged = outcome.written
                 problems = outcome.failures
                 isWorking = false

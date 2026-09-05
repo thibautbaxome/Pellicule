@@ -38,10 +38,10 @@ struct RollScreen: View {
             if roll != nil {
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
-                        Button("Le rouleau", systemImage: "info.circle") {
+                        Button("Fiche du rouleau", systemImage: "info.circle") {
                             isEditingRoll = true
                         }
-                        Button("Vers les scans", systemImage: "square.and.arrow.up") {
+                        Button("Inscrire dans les scans", systemImage: "square.and.arrow.up") {
                             isExporting = true
                         }
                     } label: {
@@ -100,6 +100,17 @@ struct RollScreen: View {
                 .buttonStyle(PrimaryButtonStyle(palette: palette))
                 .padding(16)
                 .background(palette.bg)
+            } else {
+                // Le bouton disparaît ; dire pourquoi, et comment le retrouver.
+                VStack(spacing: 2) {
+                    MicroLabel("Rouleau terminé")
+                    Text("Repassez-le « En cours » pour noter une vue.")
+                        .font(Typo.caption)
+                        .foregroundStyle(palette.textFaint)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(12)
+                .background(palette.bg)
             }
         }
     }
@@ -122,22 +133,25 @@ struct RollScreen: View {
                     }
                     Spacer()
                     VStack(alignment: .trailing, spacing: 2) {
-                        ValueText(text: "\(frames.count)", size: 30, weight: .bold)
+                        // Au-delà des poses annoncées, le compteur change de
+                        // couleur : le rouleau est plus long que prévu, ou une
+                        // vue a été notée deux fois.
+                        ValueText(
+                            text: "\(frames.count)", size: 30, weight: .bold,
+                            colour: frames.count > roll.exposures ? palette.accent : palette.text)
                             .contentTransition(.numericText())
                             .animation(.snappy, value: frames.count)
-                        MicroLabel("sur \(roll.exposures)")
+                        MicroLabel(frames.count > 1 ? "vues sur \(roll.exposures)" : "vue sur \(roll.exposures)")
                     }
                 }
 
                 HStack(spacing: 12) {
-                    MicroLabel("135")
-                    ValueText(text: "\(Int(roll.shotIso)) ISO", size: 13, colour: palette.accent)
                     if let film {
-                        let stops = roll.pushPullStops(boxIso: film.iso)
-                        if abs(stops) > 0.01 {
-                            MicroLabel(
-                                stops > 0 ? "Poussée" : "Retenue", colour: palette.accent)
-                        }
+                        MicroLabel(film.type.label)
+                    }
+                    ValueText(text: "\(Int(roll.shotIso)) ISO", size: 13, colour: palette.accent)
+                    if let film, let pushPull = roll.pushPullLabel(boxIso: film.iso) {
+                        MicroLabel(pushPull, colour: palette.accent)
                     }
                 }
             }
@@ -150,12 +164,20 @@ struct RollScreen: View {
         FieldRow(label: "Où en est ce rouleau") {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
-                    ForEach(Model.RollStatus.allCases, id: \.self) { status in
+                    // « Chargé » est l'état d'un rouleau sans vue ; dès qu'il en
+                    // porte une, il n'a plus de sens à côté de « En cours ».
+                    let statuses = Model.RollStatus.allCases.filter {
+                        $0 != .loaded || frames.isEmpty || roll.status == .loaded
+                    }
+                    ForEach(statuses, id: \.self) { status in
                         Button {
                             var updated = roll
                             updated.status = status
                             updated.updatedAt = Carnet.timestamp(Date())
-                            if !status.isOpen, updated.finishedAt == nil {
+                            if status.isOpen {
+                                // Rouvert : la date de fin n'est plus vraie.
+                                updated.finishedAt = nil
+                            } else if updated.finishedAt == nil {
                                 updated.finishedAt = updated.updatedAt
                             }
                             carnet.save(updated)
@@ -182,11 +204,12 @@ struct RollScreen: View {
         Button("Supprimer ce rouleau", role: .destructive) {
             isConfirmingDeletion = true
         }
-        .buttonStyle(SecondaryButtonStyle(palette: palette))
-        .foregroundStyle(palette.danger)
+        .buttonStyle(SecondaryButtonStyle(palette: palette, tint: palette.danger))
         .padding(.top, 20)
         .confirmationDialog(
-            "Supprimer ce rouleau et ses \(frames.count) vue\(frames.count > 1 ? "s" : "") ?",
+            frames.isEmpty
+                ? "Supprimer ce rouleau ?"
+                : "Supprimer ce rouleau et ses \(frames.count) vue\(frames.count > 1 ? "s" : "") ?",
             isPresented: $isConfirmingDeletion,
             titleVisibility: .visible
         ) {
@@ -197,7 +220,9 @@ struct RollScreen: View {
             }
             Button("Annuler", role: .cancel) {}
         } message: {
-            Text("Les vues notées disparaîtront avec lui. C’est sans retour.")
+            Text(frames.isEmpty
+                ? "C’est sans retour."
+                : "Les vues notées disparaîtront avec lui. C’est sans retour.")
         }
     }
 }

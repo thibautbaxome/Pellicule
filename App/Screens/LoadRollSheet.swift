@@ -18,13 +18,16 @@ struct LoadRollSheet: View {
     @State private var shotIso: Double?
     @State private var exposures: Int?
     @State private var isPickingFilm = false
+    @State private var isPickingCamera = false
 
     private var availableCameras: [Model.Camera] {
         carnet.cameras.filter { !$0.archived }
     }
 
+    /// Parmi les boîtiers proposés seulement : un boîtier archivé ne doit pas
+    /// recevoir de rouleau, même s'il était le boîtier par défaut.
     private var selectedCamera: Model.Camera? {
-        cameraId.flatMap { carnet.camera(id: $0) }
+        availableCameras.first { $0.id == cameraId }
     }
 
     private var canLoad: Bool { selectedCamera != nil && film != nil }
@@ -66,9 +69,19 @@ struct LoadRollSheet: View {
                     exposures = chosen.defaultExposures
                 }
             }
+            .sheet(isPresented: $isPickingCamera) {
+                CameraPickerSheet { entry in
+                    let camera = carnet.makeCamera(from: entry)
+                    carnet.save(camera)
+                    cameraId = camera.id
+                }
+            }
             .onAppear {
-                if cameraId == nil {
-                    cameraId = carnet.settings.defaultCameraId ?? availableCameras.first?.id
+                if selectedCamera == nil {
+                    let preferred = carnet.settings.defaultCameraId.flatMap { id in
+                        availableCameras.first { $0.id == id }
+                    }
+                    cameraId = (preferred ?? availableCameras.first)?.id
                 }
             }
         }
@@ -80,15 +93,32 @@ struct LoadRollSheet: View {
                 ForEach(availableCameras) { camera in
                     SelectableRow(
                         title: camera.name,
-                        detail: camera.availableShutters.isEmpty
-                            ? camera.mount
-                            : "\(camera.availableShutters.last ?? "") – \(camera.availableShutters.first ?? "")",
+                        detail: cameraDetail(camera),
                         isSelected: camera.id == cameraId
                     ) {
                         cameraId = camera.id
                     }
                 }
+                if availableCameras.isEmpty {
+                    Text("Aucun boîtier disponible : les vôtres sont archivés, ou aucun n’est déclaré.")
+                        .font(Typo.caption)
+                        .foregroundStyle(palette.textDim)
+                        .fixedSize(horizontal: false, vertical: true)
+                    Button("Chercher mon boîtier") { isPickingCamera = true }
+                        .buttonStyle(SecondaryButtonStyle(palette: palette))
+                }
             }
+        }
+    }
+
+    /// La plage telle qu'elle est déclarée, jamais complétée par la graduation :
+    /// un boîtier saisi à la main n'a pas « 30s – 1/8000 ».
+    private func cameraDetail(_ camera: Model.Camera) -> String? {
+        switch (camera.shutterSlowest, camera.shutterFastest) {
+        case let (slowest?, fastest?): return "\(slowest) – \(fastest)"
+        case let (nil, fastest?): return "jusqu’au \(fastest)"
+        case let (slowest?, nil): return "à partir de \(slowest)"
+        case (nil, nil): return camera.mount
         }
     }
 
@@ -152,24 +182,37 @@ struct LoadRollSheet: View {
     }
 
     private func pushPullExplanation(stops: Double) -> String {
-        let magnitude = abs(stops) == abs(stops).rounded()
-            ? String(Int(abs(stops)))
-            : String((abs(stops) * 10).rounded() / 10)
+        // Au demi-diaphragme : un ISO 50 exposé à 12 fait bien deux
+        // diaphragmes, pas « 2,1 » à cause de l'arrondi des sensibilités.
+        let magnitude = (abs(stops) * 2).rounded() / 2
+        let plural = magnitude >= 2 ? "s" : ""
         return stops > 0
-            ? "Poussée de \(magnitude) diaph : le développement devra être allongé."
-            : "Retenue de \(magnitude) diaph : le développement devra être raccourci."
+            ? "Poussée de \(Fmt.stops(magnitude)) diaphragme\(plural) : le développement devra être allongé."
+            : "Retenue de \(Fmt.stops(magnitude)) diaphragme\(plural) : le développement devra être raccourci."
     }
 
+    /// L'échelle normalisée des sensibilités, au tiers de diaphragme.
+    private static let isoScale: [Double] = [
+        6, 8, 10, 12, 16, 20, 25, 32, 40, 50, 64, 80, 100, 125, 160, 200, 250, 320, 400, 500, 640,
+        800, 1000, 1250, 1600, 2000, 2500, 3200, 4000, 5000, 6400, 8000, 10000, 12800,
+    ]
+
     /// La graduation des sensibilités, bornée à deux diaphragmes de part et
-    /// d'autre de la boîte : au-delà, on ne pousse plus, on abîme.
+    /// d'autre de la boîte : au-delà, on ne pousse plus, on abîme. Les valeurs
+    /// sont celles de l'échelle normalisée — 12, 32, 64 — et non un calcul
+    /// arrondi qui donnerait 13, 31 ou 63.
     private func isoChoices(around boxIso: Double) -> [Double] {
-        (-2...2).map { (boxIso * pow(2, Double($0))).rounded() }
+        let raw = (-2...2).map { boxIso * pow(2, Double($0)) }
+        let snapped = raw.map { target in
+            Self.isoScale.min { abs($0 - target) < abs($1 - target) } ?? target
+        }
+        return Array(Set(snapped + [boxIso])).sorted()
     }
 
     private func exposuresField(film: Catalog.Film) -> some View {
         FieldRow(label: "Nombre de poses") {
             ScaleDial(
-                values: [12, 24, 36] as [Int],
+                values: Array(Set([12, 24, 36, film.defaultExposures, carnet.settings.defaultExposures])).sorted(),
                 label: { "\($0)" },
                 selection: Binding<Int?>(
                     get: { exposures ?? film.defaultExposures },
@@ -187,12 +230,13 @@ struct LoadRollSheet: View {
 
     private func load() {
         guard let camera = selectedCamera, let film else { return }
+        let trimmed = label.trimmingCharacters(in: .whitespacesAndNewlines)
         let roll = carnet.loadRoll(
             film: film,
             camera: camera,
             shotIso: shotIso,
             exposures: exposures,
-            label: label.trimmingCharacters(in: .whitespaces).isEmpty ? nil : label)
+            label: trimmed.isEmpty ? nil : trimmed)
         carnet.save(roll)
         dismiss()
     }

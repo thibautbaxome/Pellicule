@@ -52,6 +52,19 @@ final class ScanPairingTests: XCTestCase {
         XCTAssertFalse(pairs.contains(where: \.isOrphan))
     }
 
+    /// Une vue supprimée au milieu du rouleau laisse un trou dans la
+    /// numérotation : son scan doit rester orphelin, pas hériter de la vue
+    /// précédente en décalant toutes les suivantes.
+    func testAMissingFrameLeavesItsScanOrphan() {
+        let (_, frames) = roll(frames: 4)
+        let remaining = frames.filter { $0.number != 3 }
+        let pairs = ExifExport.pair(files: files(4), with: remaining, offset: 0)
+
+        XCTAssertEqual(pairs[1].frame?.number, 2)
+        XCTAssertTrue(pairs[2].isOrphan, "la vue 3 n'existe plus : son scan n'a pas de vue")
+        XCTAssertEqual(pairs[3].frame?.number, 4)
+    }
+
     /// Plus de fichiers que de vues restantes : les derniers n'ont pas de vue,
     /// et cela doit se voir plutôt que de s'attribuer n'importe quoi.
     func testExtraFilesAreLeftOrphanRatherThanMisassigned() {

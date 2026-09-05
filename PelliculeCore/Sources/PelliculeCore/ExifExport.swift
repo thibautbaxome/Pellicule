@@ -194,6 +194,10 @@ public enum ExifExport {
         value == value.rounded() ? String(Int(value)) : String(value)
     }
 
+    /// Un nom de fichier sûr, tiré d'une référence d'archive ou d'un nom de
+    /// rouleau saisis librement : « 2026/014 » ne peut pas nommer un fichier.
+    public static func fileToken(_ value: String) -> String { slug(value) }
+
     private static func slug(_ value: String) -> String {
         let folded = value.folding(options: [.diacriticInsensitive], locale: nil).lowercased()
         let cleaned = folded.map { $0.isLetter || $0.isNumber ? $0 : "-" }
@@ -235,16 +239,20 @@ public extension ExifExport {
     ///
     /// Un décalage de 2 signifie que le premier fichier du laboratoire
     /// correspond à la troisième vue du carnet.
+    ///
+    /// L'appariement suit les numéros de vue, pas les rangs : une vue jamais
+    /// notée — ou supprimée — laisse son scan orphelin au lieu de décaler tous
+    /// les suivants d'un cran, ce qui donnerait à chaque photo les réglages de
+    /// la précédente sans que rien ne le signale.
     static func pair(
         files: [String],
         with frames: [Model.Frame],
         offset: Int
     ) -> [Pairing] {
-        let ordered = frames.sorted { $0.number < $1.number }
+        let byNumber = Dictionary(frames.map { ($0.number, $0) }, uniquingKeysWith: { a, _ in a })
+        let first = frames.map(\.number).min() ?? 1
         return files.enumerated().map { index, name in
-            let position = index + offset
-            let frame = ordered.indices.contains(position) ? ordered[position] : nil
-            return Pairing(fileName: name, frame: frame)
+            Pairing(fileName: name, frame: byNumber[first + index + offset])
         }
     }
 
