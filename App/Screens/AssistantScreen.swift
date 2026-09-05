@@ -37,22 +37,18 @@ struct AssistantScreen: View {
         return declared.isEmpty ? Exposure.fullShutters : declared
     }
 
-    /// Ouvertures de l'objectif employé sur ce rouleau, à défaut la graduation
-    /// complète. Un conseil hors de portée de l'objectif ne sert à rien.
-    private var availableApertures: [Double] {
-        let lens = carnet.lenses.first { lens in
-            guard let mount = camera?.mount else { return true }
-            return lens.mount == nil || lens.mount == mount
-        }
-        let widest = lens?.maxAperture ?? camera?.fixedLens?.maxAperture
-        let narrowest = lens?.minAperture ?? camera?.fixedLens?.minAperture
-        let scale = Exposure.fullApertures.filter { value in
-            if let widest, value < widest - 0.01 { return false }
-            if let narrowest, value > narrowest + 0.01 { return false }
-            return true
-        }
-        return scale.isEmpty ? Exposure.fullApertures : scale
+    /// Premier objectif montable sur le boîtier du rouleau, s'il y en a un.
+    private var mountedLens: Model.Lens? {
+        camera.flatMap { carnet.lenses(forCamera: $0).first }
     }
+
+    /// Un conseil hors de portée de l'objectif ne sert à rien — et faute
+    /// d'objectif déclaré, un conseil à f/1 encore moins.
+    private var apertureRange: Carnet.ApertureRange {
+        carnet.apertureRange(forCamera: camera, lensId: mountedLens?.id)
+    }
+
+    private var availableApertures: [Double] { apertureRange.values }
 
     private var workingAperture: Double {
         aperture ?? Assistant.startingAperture(
@@ -187,12 +183,20 @@ struct AssistantScreen: View {
 
     private var aperturePicker: some View {
         FieldRow(label: "Ouverture") {
-            ScaleDial(
-                values: availableApertures,
-                label: { "f/\(trimmed($0))" },
-                selection: Binding<Double?>(
-                    get: { workingAperture },
-                    set: { aperture = $0 }))
+            VStack(alignment: .leading, spacing: 6) {
+                ScaleDial(
+                    values: availableApertures,
+                    label: { "f/\(trimmed($0))" },
+                    selection: Binding<Double?>(
+                        get: { workingAperture },
+                        set: { aperture = $0 }))
+                if apertureRange.isAssumed {
+                    Text("Aucun objectif déclaré : le conseil suppose un objectif courant. Ajoutez le vôtre dans Matériel pour qu’il soit juste.")
+                        .font(Typo.caption)
+                        .foregroundStyle(palette.textFaint)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
         }
     }
 

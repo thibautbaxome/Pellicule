@@ -30,16 +30,10 @@ struct FrameSheet: View {
         return Array((available.isEmpty ? Exposure.fullShutters : available).reversed())
     }
 
-    /// De même pour les ouvertures, bornées par l'objectif employé.
-    private var apertures: [Double] {
-        let lens = frame.lensId.flatMap { carnet.lens(id: $0) }
-        let widest = lens?.maxAperture ?? camera?.fixedLens?.maxAperture
-        let narrowest = lens?.minAperture ?? camera?.fixedLens?.minAperture
-        return Exposure.fullApertures.filter { value in
-            if let widest, value < widest - 0.01 { return false }
-            if let narrowest, value > narrowest + 0.01 { return false }
-            return true
-        }
+    /// De même pour les ouvertures, bornées par l'objectif employé — ou, à
+    /// défaut, par ce qu'un objectif courant permet à coup sûr.
+    private var apertureRange: Carnet.ApertureRange {
+        carnet.apertureRange(forCamera: camera, lensId: frame.lensId)
     }
 
     private var mountableLenses: [Model.Lens] {
@@ -55,9 +49,18 @@ struct FrameSheet: View {
                         ScaleDial(values: shutters, label: { $0 }, selection: $frame.shutter)
                     }
                     FieldRow(label: "Ouverture") {
-                        ScaleDial(
-                            values: apertures, label: { "f/\(trimmed($0))" },
-                            selection: $frame.aperture)
+                        VStack(alignment: .leading, spacing: 6) {
+                            ScaleDial(
+                                values: apertureRange.values,
+                                label: { "f/\(trimmed($0))" },
+                                selection: $frame.aperture)
+                            if apertureRange.isAssumed {
+                                Text("Aucun objectif déclaré : la graduation s’arrête à ce qu’un objectif courant permet.")
+                                    .font(Typo.caption)
+                                    .foregroundStyle(palette.textFaint)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                        }
                     }
                     if !mountableLenses.isEmpty {
                         lensField
@@ -138,17 +141,33 @@ struct FrameSheet: View {
     /// qu'on vérifie avant de déclencher.
     private var exposureSummary: some View {
         Card {
-            HStack(alignment: .firstTextBaseline, spacing: 14) {
-                ValueText(
-                    text: frame.shutter ?? "—", size: 32, weight: .bold,
-                    colour: frame.shutter == nil ? palette.textFaint : palette.text)
-                Text("·")
-                    .font(Typo.hero)
-                    .foregroundStyle(palette.line)
-                ValueText(
-                    text: frame.aperture.map { "f/\(trimmed($0))" } ?? "—", size: 32, weight: .bold,
-                    colour: frame.aperture == nil ? palette.textFaint : palette.text)
-                Spacer()
+            // Deux tirets isolés au milieu d'une carte vide se lisent comme un
+            // défaut d'affichage, pas comme une invitation. Tant que rien n'est
+            // choisi, la carte dit ce qu'elle attend.
+            Group {
+                if frame.shutter == nil && frame.aperture == nil {
+                    VStack(alignment: .leading, spacing: 6) {
+                        MicroLabel("Réglages employés")
+                        Text("Choisissez la vitesse et l’ouverture avec lesquelles vous avez déclenché.")
+                            .font(Typo.body)
+                            .foregroundStyle(palette.textDim)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                } else {
+                    HStack(alignment: .firstTextBaseline, spacing: 14) {
+                        ValueText(
+                            text: frame.shutter ?? "?", size: 32, weight: .bold,
+                            colour: frame.shutter == nil ? palette.textFaint : palette.text)
+                        Text("·")
+                            .font(Typo.hero)
+                            .foregroundStyle(palette.line)
+                        ValueText(
+                            text: frame.aperture.map { "f/\(trimmed($0))" } ?? "?",
+                            size: 32, weight: .bold,
+                            colour: frame.aperture == nil ? palette.textFaint : palette.text)
+                        Spacer()
+                    }
+                }
             }
         }
     }

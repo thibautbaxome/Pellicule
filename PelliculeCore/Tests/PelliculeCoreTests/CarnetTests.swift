@@ -390,3 +390,51 @@ extension CarnetTests {
         XCTAssertEqual(try String(contentsOf: fileURL, encoding: .utf8), "ceci n'est pas un carnet")
     }
 }
+
+// MARK: - Graduation des ouvertures
+
+extension CarnetTests {
+
+    /// Sans objectif déclaré, la graduation complète descendrait à f/1 : une
+    /// ouverture que trois objectifs au monde atteignent, et que l'application
+    /// proposerait avec la même assurance que les autres.
+    func testUndeclaredLensDoesNotOfferImpossibleApertures() {
+        let carnet = makeCarnet()
+        let camera = carnet.makeCamera(from: x300)
+        carnet.save(camera)
+
+        let range = carnet.apertureRange(forCamera: camera, lensId: nil)
+        XCTAssertTrue(range.isAssumed, "l’absence d’objectif doit être signalée comme telle")
+        XCTAssertEqual(range.values.first, 2.8)
+        XCTAssertFalse(range.values.contains(1), "f/1 ne doit jamais être proposé par défaut")
+        XCTAssertEqual(range.values.last, 22)
+    }
+
+    /// Un objectif déclaré borne réellement la graduation.
+    func testDeclaredLensBoundsTheScale() {
+        let carnet = makeCarnet()
+        let camera = carnet.makeCamera(from: x300)
+        carnet.save(camera)
+        let lens = carnet.makeLens(from: Catalog.lenses.first { $0.id == "minolta-md-50mm-f-1-7" }!)
+        carnet.save(lens)
+
+        let range = carnet.apertureRange(forCamera: camera, lensId: lens.id)
+        XCTAssertFalse(range.isAssumed)
+        // f/1,7 n'est pas sur la graduation normalisée mais est gravé sur la
+        // bague : la taire coûterait un tiers de diaphragme.
+        XCTAssertEqual(range.values.first, 1.7)
+        XCTAssertTrue(range.values.contains(2))
+        XCTAssertEqual(range.values.last, 16, "le MD 50 mm ferme à f/16")
+    }
+
+    /// Un compact à objectif solidaire porte ses bornes sur le boîtier.
+    func testFixedLensCameraBoundsTheScale() {
+        let carnet = makeCarnet()
+        let trip = carnet.makeCamera(from: Catalog.cameras.first { $0.id == "olympus-trip-35" }!)
+        carnet.save(trip)
+
+        let range = carnet.apertureRange(forCamera: trip, lensId: nil)
+        XCTAssertFalse(range.isAssumed, "l’objectif solidaire est une déclaration")
+        XCTAssertEqual(range.values.first, 2.8)
+    }
+}

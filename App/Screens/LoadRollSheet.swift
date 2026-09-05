@@ -236,5 +236,10 @@ struct SelectableRow: View {
                     .strokeBorder(isSelected ? palette.accent : palette.line, lineWidth: 1))
         }
         .buttonStyle(.plain)
+        // Sans cela, une ligne portant une explication s'annonce en récitant
+        // les deux textes d'affilée : le nom du choix se perd dans la phrase.
+        .accessibilityLabel(title)
+        .accessibilityHint(detail ?? "")
+        .accessibilityAddTraits(isSelected ? [.isSelected] : [])
     }
 }

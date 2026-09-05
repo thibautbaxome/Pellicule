@@ -194,6 +194,46 @@ public final class Carnet {
         return available.filter { $0.mount == nil || $0.mount == mount }
     }
 
+    /// Graduation d'ouvertures proposable, et si ses bornes sont une hypothèse.
+    public struct ApertureRange: Sendable, Equatable {
+        public let values: [Double]
+        /// Vrai quand aucun objectif déclaré ne borne l'ouverture, et que la
+        /// graduation repose donc sur une supposition.
+        public let isAssumed: Bool
+    }
+
+    /// La plus grande ouverture qu'on suppose à un objectif inconnu.
+    ///
+    /// La graduation complète descend à f/1, que trois objectifs au monde
+    /// atteignent. La proposer à quelqu'un qui n'a pas déclaré son objectif
+    /// serait un conseil faux donné avec l'assurance des autres — exactement ce
+    /// que ce projet refuse. f/2,8 est ce qu'un objectif courant permet à coup
+    /// sûr, et l'interface a de quoi dire que c'est une hypothèse.
+    public static let assumedWidestAperture = 2.8
+    public static let assumedNarrowestAperture = 22.0
+
+    public func apertureRange(forCamera camera: Model.Camera?, lensId: String?) -> ApertureRange {
+        let lens = lensId.flatMap { self.lens(id: $0) }
+        let declaredWidest = lens?.maxAperture ?? camera?.fixedLens?.maxAperture
+        let declaredNarrowest = lens?.minAperture ?? camera?.fixedLens?.minAperture
+
+        let widest = declaredWidest ?? Self.assumedWidestAperture
+        let narrowest = declaredNarrowest ?? Self.assumedNarrowestAperture
+
+        var values = Exposure.fullApertures.filter {
+            $0 >= widest - 0.01 && $0 <= narrowest + 0.01
+        }
+        // Une ouverture maximale hors graduation — f/1,7, f/3,5 — est gravée
+        // sur la bague : la taire ferait perdre un tiers de diaphragme au
+        // photographe qui l'a précisément achetée pour cela.
+        if let declaredWidest, !values.contains(where: { abs($0 - declaredWidest) < 0.01 }) {
+            values.insert(declaredWidest, at: 0)
+        }
+        return ApertureRange(
+            values: values.isEmpty ? [widest] : values,
+            isAssumed: declaredWidest == nil)
+    }
+
     public func nextFrameNumber(inRoll rollId: String) -> Int {
         (frames(ofRoll: rollId).map(\.number).max() ?? 0) + 1
     }
