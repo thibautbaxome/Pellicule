@@ -96,6 +96,18 @@ sont pas des captures de la sortie courante : elles viennent des tables des
 fabricants et de l'arithmétique de l'exposition. Un test qu'on ajuste jusqu'à ce
 qu'il passe ne vérifie plus rien.
 
+### L'application
+
+`App/` ne contient que des écrans SwiftUI ; toute logique va dans le noyau, où
+elle est testable. Le projet Xcode n'est pas versionné : `xcodegen generate`
+le reconstitue depuis `project.yml`.
+
+`UITests/ParcoursTests.swift` traverse l'application dans le simulateur, à
+chaque poussée, et publie une capture de chaque écran sur la branche
+`captures`. **Un nouvel écran doit y être ajouté** : c'est le seul regard que
+l'intégration continue porte sur l'interface, et un écran qu'on ne peut pas
+atteindre par ce chemin ne l'est pas davantage par un photographe.
+
 ## Conventions
 
 - **Français** dans l'interface, les commentaires et les messages de commit.

@@ -20,6 +20,7 @@ struct SettingsScreen: View {
                     statsLink
                     themeField
                     locationField
+                    labField
                     backupSection
                     aboutSection
                 }
@@ -121,6 +122,21 @@ struct SettingsScreen: View {
                     .foregroundStyle(palette.textFaint)
                     .fixedSize(horizontal: false, vertical: true)
             }
+        }
+    }
+
+    /// Le laboratoire habituel, repris à chaque nouveau rouleau : on en change
+    /// rarement, et le ressaisir à chaque fois finit par ne plus être saisi.
+    private var labField: some View {
+        FieldRow(label: "Laboratoire habituel") {
+            TextField("Proposé à chaque nouveau rouleau", text: Binding(
+                get: { carnet.settings.defaultLab ?? "" },
+                set: { value in
+                    var updated = carnet.settings
+                    updated.defaultLab = value.isEmpty ? nil : value
+                    carnet.save(updated)
+                }))
+                .fieldStyle(palette)
         }
     }
 

@@ -88,12 +88,24 @@ struct FrameSheet: View {
                             flashAndDistance
                             locationField
                             meteringField
+                            FieldRow(label: "Mots-clés") {
+                                VStack(alignment: .leading, spacing: 6) {
+                                    TextField("bretagne, phare, brume", text: tagsBinding)
+                                        .textInputAutocapitalization(.never)
+                                        .fieldStyle(palette)
+                                    Text("Séparés par des virgules. Ils partent dans les métadonnées du scan et le rendent cherchable dans une photothèque.")
+                                        .font(Typo.caption)
+                                        .foregroundStyle(palette.textFaint)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                }
+                            }
                             FieldRow(label: "Notes") {
                                 TextField("Mesure, lumière, intention…", text: notesBinding, axis: .vertical)
                                     .lineLimit(2...5)
                                     .fieldStyle(palette)
                             }
                             statusField
+                            ratingField
                         }
                         .padding(.top, 14)
                     } label: {
@@ -516,7 +528,40 @@ struct FrameSheet: View {
         }
     }
 
+    /// La note se pose au retour du laboratoire, planche contact en main :
+    /// c'est elle qui, des mois plus tard, dit quelles vues valaient la peine.
+    private var ratingField: some View {
+        FieldRow(label: "Note") {
+            HStack(spacing: 6) {
+                ForEach(1...5, id: \.self) { star in
+                    Button {
+                        frame.rating = frame.rating == star ? nil : star
+                    } label: {
+                        Image(systemName: (frame.rating ?? 0) >= star ? "star.fill" : "star")
+                            .font(.system(size: 22))
+                            .foregroundStyle((frame.rating ?? 0) >= star ? palette.accent : palette.textFaint)
+                            .frame(width: 40, height: 40)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("\(star) étoile\(star > 1 ? "s" : "")")
+                }
+                Spacer()
+            }
+            .sensoryFeedback(.selection, trigger: frame.rating)
+        }
+    }
+
     // MARK: - Liaisons
+
+    private var tagsBinding: Binding<String> {
+        Binding(
+            get: { frame.tags.joined(separator: ", ") },
+            set: { text in
+                frame.tags = text.split(separator: ",")
+                    .map { $0.trimmingCharacters(in: .whitespaces) }
+                    .filter { !$0.isEmpty }
+            })
+    }
 
     /// Un champ de texte vide vaut « rien noté », pas une chaîne vide : c'est
     /// ce que l'export attend pour ne pas écrire de balise creuse.

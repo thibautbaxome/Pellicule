@@ -7,18 +7,26 @@ Format pris en charge : **135 (24×36)**.
 
 ## État du projet
 
-**Première version installable.** De quoi tenir un rouleau de bout en bout —
-déclarer un boîtier, charger une pellicule, noter ses vues, suivre le rouleau
-jusqu'à l'archive, exporter le carnet.
+**Version 0.2.** De quoi tenir un rouleau de bout en bout et récupérer ses
+scans : déclarer et corriger son matériel, charger une pellicule, noter ses
+vues avec leur filtre, leur position et une photo de repérage, mesurer la
+lumière avec la caméra, suivre le rouleau jusqu'à l'archive, tenir son journal
+de développement et ses coûts, puis inscrire tout cela dans les scans du
+laboratoire.
 
 | | |
 |---|---|
-| Calculs argentiques, banques de matériel, assistant | **fait**, 79 tests |
+| Calculs argentiques, banques de matériel, assistant | **fait**, 146 tests |
 | Stockage du carnet, import et export | **fait** |
-| Écrans : rouleaux, vues, matériel, réglages | **fait** |
-| Écran d'assistance à la prise de vue | à venir |
-| Posemètre par la caméra | à venir |
-| Rapprochement des scans du laboratoire | à venir |
+| Écrans : rouleaux, vues, matériel, réglages, statistiques | **fait** |
+| Assistant de prise de vue | **fait** |
+| Posemètre par la caméra | **fait** — à valider sur appareil |
+| Rapprochement des scans et écriture des métadonnées | **fait** |
+| Photo de repérage, position | **fait** |
+
+Chaque poussée compile l'application pour l'appareil et la fait tourner dans un
+simulateur, où un parcours automatisé traverse tous les écrans et publie une
+capture de chacun sur la branche `captures`.
 
 L'installation passe par SideStore, et non par l'App Store : voir
 [INSTALLATION.md](INSTALLATION.md), qui dit aussi ce que ça coûte.
@@ -44,8 +52,7 @@ du boîtier, les ouvertures celles de l'objectif monté — proposer un 1/4000 s
 un boîtier qui plafonne à 1/1000, c'est offrir de consigner un réglage qui n'a
 jamais existé. D'une vue à l'autre les réglages sont repris, le sujet non.
 
-**Assistant de prise de vue** *(le moteur est écrit et testé, l'écran reste à
-faire)*. Le cœur de l'aide à la décision. On déclare une intention — portrait,
+**Assistant de prise de vue.** Le cœur de l'aide à la décision. On déclare une intention — portrait,
 paysage, rue, mouvement, filé, basse lumière, pose longue — et une condition de
 lumière ; l'application en déduit le couple vitesse/ouverture, la zone de
 netteté et l'hyperfocale.
@@ -56,14 +63,23 @@ correction applicable et explique ce qui coince — un film trop rapide pour la
 lumière, un besoin de filtre gris neutre, un risque de flou de bougé au regard
 de la règle du 1/focale.
 
-**Développement** *(à venir dans l'application)*. Révélateur, dilution, temps,
+**Développement.** Révélateur, dilution, temps,
 température, agitation. Le temps se déduit des données du film, de la
 température du bain et du push/pull du rouleau.
 
-**Métadonnées des scans** *(à venir dans l'application)*. Un scan de laboratoire
-arrive nu : ni date de prise de vue, ni boîtier, ni réglages. Le carnet sait
-reconstituer tout cela et l'écrire dans les fichiers, qui se comportent dès lors
-comme des photos numériques dans n'importe quelle photothèque.
+**Métadonnées des scans.** Un scan de laboratoire arrive nu : ni date de prise
+de vue, ni boîtier, ni réglages. L'application reconstitue tout cela depuis le
+carnet et l'écrit dans des copies des fichiers — jamais dans les originaux —,
+qui se comportent dès lors comme des photos numériques dans n'importe quelle
+photothèque. Le décalage entre la numérotation du laboratoire et celle du
+carnet, dû aux vues gâchées à l'amorce, se règle à la main avec un aperçu du
+résultat : c'est le photographe qui reconnaît ses images, pas un algorithme.
+
+**Posemètre.** La caméra du téléphone, en exposition automatique, choisit une
+vitesse et une sensibilité ; les lire, c'est lire la lumière. L'application
+signale quand l'appareil est au bout de ce qu'il sait mesurer, compare la
+mesure à l'estimation faite à l'œil, et se calibre une fois pour toutes contre
+une cellule de confiance.
 
 **Sauvegarde.** Le carnet *est* un fichier JSON lisible, et il appartient au
 photographe. Il n'y a pas de base de données à côté : exporter revient à en
