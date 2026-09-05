@@ -10,7 +10,9 @@
     "preview": "vite preview",
     "smoke": "node tools/smoke.mjs",
     "icons": "python3 tools/make-icons.py",
-    "deploy": "npm run build && wrangler deploy"
+    "deploy": "npm run build && wrangler deploy",
+    "catalogs": "node tools/export-catalogs.mjs",
+    "fixture": "node tools/make-backup-fixture.mjs"
   },
   "dependencies": {
     "dexie": "^4.4.5",

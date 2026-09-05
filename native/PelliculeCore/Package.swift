@@ -10,7 +10,19 @@ let package = Package(
         .library(name: "PelliculeCore", targets: ["PelliculeCore"])
     ],
     targets: [
-        .target(name: "PelliculeCore"),
-        .testTarget(name: "PelliculeCoreTests", dependencies: ["PelliculeCore"]),
+        .target(
+            name: "PelliculeCore",
+            // Les banques de matériel sont engendrées depuis les sources
+            // TypeScript par tools/export-catalogs.mjs, puis empaquetées ici.
+            resources: [.process("Resources")]
+        ),
+        .testTarget(
+            name: "PelliculeCoreTests",
+            dependencies: ["PelliculeCore"],
+            // Une sauvegarde réelle, produite par la version web via
+            // tools/make-backup-fixture.mjs : écrite à la main, elle dériverait
+            // du format sans qu'on s'en aperçoive.
+            resources: [.copy("Fixtures")]
+        ),
     ]
 )

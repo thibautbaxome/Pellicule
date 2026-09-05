@@ -51,6 +51,21 @@ L'exposant de réciprocité vient de la notice du fabricant quand elle le
 publie — Ilford donne directement `t_c = t^p` — ou de l'interpolation de ses
 tables de correction. Citez votre source dans la pull request.
 
+### Après avoir modifié une banque
+
+Les trois catalogues sont aussi lus par la version native, qui les décode
+depuis une projection JSON. Régénérez-la et versionnez-la avec votre
+modification :
+
+```sh
+npm run catalogs
+```
+
+Les fichiers TypeScript restent la source de vérité — ils portent les
+commentaires et les regroupements que JSON ne sait pas contenir. La commande
+échoue si deux entrées partagent un identifiant, ce qui en ferait disparaître
+une silencieusement.
+
 ## Le code
 
 ```sh
@@ -68,6 +83,20 @@ vérifie que l'application reste utilisable réseau coupé — c'est une promess
 projet, pas un bonus.
 
 Faites tourner les deux avant d'ouvrir une pull request.
+
+### Le noyau natif
+
+`native/PelliculeCore/` contient les calculs argentiques portés en Swift, pour
+l'application iOS en préparation. Aucune dépendance aux SDK Apple : ils se
+compilent et se testent sur Linux comme sur macOS.
+
+```sh
+cd native/PelliculeCore && swift test
+```
+
+Toute modification d'un calcul doit l'être des deux côtés, avec le même test de
+part et d'autre. C'est cette redondance qui a permis de repérer un conseil
+contradictoire que la version web donnait depuis des semaines.
 
 ## Conventions
 

@@ -1,0 +1,1720 @@
+[
+  {
+    "id": "minolta-sr-t-101",
+    "brand": "Minolta",
+    "model": "SR-T 101",
+    "mount": "Minolta SR",
+    "type": "slr",
+    "years": "1966–1975",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "1s"
+  },
+  {
+    "id": "minolta-sr-t-100",
+    "brand": "Minolta",
+    "model": "SR-T 100",
+    "mount": "Minolta SR",
+    "type": "slr",
+    "years": "1971–1976",
+    "shutterFastest": "1/500",
+    "shutterSlowest": "1s"
+  },
+  {
+    "id": "minolta-sr-t-super",
+    "brand": "Minolta",
+    "model": "SR-T Super",
+    "mount": "Minolta SR",
+    "type": "slr",
+    "years": "1973–1976",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "1s"
+  },
+  {
+    "id": "minolta-xe-1",
+    "brand": "Minolta",
+    "model": "XE-1",
+    "mount": "Minolta SR",
+    "type": "slr",
+    "years": "1974–1977",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "4s"
+  },
+  {
+    "id": "minolta-xd-7",
+    "brand": "Minolta",
+    "model": "XD-7",
+    "mount": "Minolta SR",
+    "type": "slr",
+    "years": "1977–1984",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "1s",
+    "notes": "Premier reflex à double priorité. Vendu XD-11 aux États-Unis."
+  },
+  {
+    "id": "minolta-x-300",
+    "brand": "Minolta",
+    "model": "X-300",
+    "mount": "Minolta SR",
+    "type": "slr",
+    "years": "1984–1990",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "1s",
+    "notes": "Priorité ouverture et manuel. Vendu X-370 aux États-Unis."
+  },
+  {
+    "id": "minolta-x-300s",
+    "brand": "Minolta",
+    "model": "X-300s",
+    "mount": "Minolta SR",
+    "type": "slr",
+    "years": "1990–1999",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "1s"
+  },
+  {
+    "id": "minolta-x-500",
+    "brand": "Minolta",
+    "model": "X-500",
+    "mount": "Minolta SR",
+    "type": "slr",
+    "years": "1983–1990",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "4s",
+    "notes": "Vendu X-570 aux États-Unis."
+  },
+  {
+    "id": "minolta-x-700",
+    "brand": "Minolta",
+    "model": "X-700",
+    "mount": "Minolta SR",
+    "type": "slr",
+    "years": "1981–1999",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "4s",
+    "notes": "Le haut de gamme grand public de Minolta, mode programme inclus."
+  },
+  {
+    "id": "minolta-x-7a",
+    "brand": "Minolta",
+    "model": "X-7A",
+    "mount": "Minolta SR",
+    "type": "slr",
+    "years": "1980–1985",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "4s"
+  },
+  {
+    "id": "minolta-xg-1",
+    "brand": "Minolta",
+    "model": "XG-1",
+    "mount": "Minolta SR",
+    "type": "slr",
+    "years": "1979–1982",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "1s"
+  },
+  {
+    "id": "minolta-xg-9",
+    "brand": "Minolta",
+    "model": "XG-9",
+    "mount": "Minolta SR",
+    "type": "slr",
+    "years": "1979–1981",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "4s"
+  },
+  {
+    "id": "minolta-xg-m",
+    "brand": "Minolta",
+    "model": "XG-M",
+    "mount": "Minolta SR",
+    "type": "slr",
+    "years": "1981–1983",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "4s"
+  },
+  {
+    "id": "minolta-dynax-7000-maxxum-7000",
+    "brand": "Minolta",
+    "model": "Dynax 7000 (Maxxum 7000)",
+    "mount": "Minolta A",
+    "type": "slr",
+    "years": "1985–1988",
+    "shutterFastest": "1/2000",
+    "shutterSlowest": "30s",
+    "notes": "Premier reflex autofocus à moteur intégré."
+  },
+  {
+    "id": "minolta-dynax-9000",
+    "brand": "Minolta",
+    "model": "Dynax 9000",
+    "mount": "Minolta A",
+    "type": "slr",
+    "years": "1985–1989",
+    "shutterFastest": "1/4000",
+    "shutterSlowest": "30s"
+  },
+  {
+    "id": "minolta-dynax-7",
+    "brand": "Minolta",
+    "model": "Dynax 7",
+    "mount": "Minolta A",
+    "type": "slr",
+    "years": "2000–2004",
+    "shutterFastest": "1/8000",
+    "shutterSlowest": "30s"
+  },
+  {
+    "id": "minolta-dynax-9",
+    "brand": "Minolta",
+    "model": "Dynax 9",
+    "mount": "Minolta A",
+    "type": "slr",
+    "years": "1998–2003",
+    "shutterFastest": "1/12000",
+    "shutterSlowest": "30s"
+  },
+  {
+    "id": "minolta-cle",
+    "brand": "Minolta",
+    "model": "CLE",
+    "mount": "Leica M",
+    "type": "rangefinder",
+    "years": "1980–1985",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "4s"
+  },
+  {
+    "id": "minolta-hi-matic-7s",
+    "brand": "Minolta",
+    "model": "Hi-Matic 7s",
+    "mount": "Fixe",
+    "type": "rangefinder",
+    "years": "1966–1970",
+    "shutterFastest": "1/500",
+    "shutterSlowest": "1/4",
+    "fixedLens": {
+      "focal": 45,
+      "maxAperture": 1.8
+    }
+  },
+  {
+    "id": "minolta-hi-matic-af2",
+    "brand": "Minolta",
+    "model": "Hi-Matic AF2",
+    "mount": "Fixe",
+    "type": "compact",
+    "years": "1981",
+    "fixedLens": {
+      "focal": 38,
+      "maxAperture": 2.8
+    }
+  },
+  {
+    "id": "minolta-tc-1",
+    "brand": "Minolta",
+    "model": "TC-1",
+    "mount": "Fixe",
+    "type": "compact",
+    "years": "1996–2005",
+    "shutterFastest": "1/750",
+    "fixedLens": {
+      "focal": 28,
+      "maxAperture": 3.5
+    },
+    "notes": "Compact de luxe en titane, diaphragme à ouvertures circulaires."
+  },
+  {
+    "id": "canon-ae-1",
+    "brand": "Canon",
+    "model": "AE-1",
+    "mount": "Canon FD",
+    "type": "slr",
+    "years": "1976–1984",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "2s",
+    "notes": "Priorité vitesse. Le reflex le plus vendu de son époque."
+  },
+  {
+    "id": "canon-ae-1-program",
+    "brand": "Canon",
+    "model": "AE-1 Program",
+    "mount": "Canon FD",
+    "type": "slr",
+    "years": "1981–1987",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "2s"
+  },
+  {
+    "id": "canon-a-1",
+    "brand": "Canon",
+    "model": "A-1",
+    "mount": "Canon FD",
+    "type": "slr",
+    "years": "1978–1985",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "30s",
+    "notes": "Tous les modes d’exposition, affichage LED rouge dans le viseur."
+  },
+  {
+    "id": "canon-av-1",
+    "brand": "Canon",
+    "model": "AV-1",
+    "mount": "Canon FD",
+    "type": "slr",
+    "years": "1979–1984",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "2s"
+  },
+  {
+    "id": "canon-at-1",
+    "brand": "Canon",
+    "model": "AT-1",
+    "mount": "Canon FD",
+    "type": "slr",
+    "years": "1977–1985",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "2s"
+  },
+  {
+    "id": "canon-al-1",
+    "brand": "Canon",
+    "model": "AL-1",
+    "mount": "Canon FD",
+    "type": "slr",
+    "years": "1982–1985",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "2s"
+  },
+  {
+    "id": "canon-ftb",
+    "brand": "Canon",
+    "model": "FTb",
+    "mount": "Canon FD",
+    "type": "slr",
+    "years": "1971–1976",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "1s"
+  },
+  {
+    "id": "canon-f-1",
+    "brand": "Canon",
+    "model": "F-1",
+    "mount": "Canon FD",
+    "type": "slr",
+    "years": "1971–1976",
+    "shutterFastest": "1/2000",
+    "shutterSlowest": "1s"
+  },
+  {
+    "id": "canon-new-f-1",
+    "brand": "Canon",
+    "model": "New F-1",
+    "mount": "Canon FD",
+    "type": "slr",
+    "years": "1981–1992",
+    "shutterFastest": "1/2000",
+    "shutterSlowest": "8s"
+  },
+  {
+    "id": "canon-t70",
+    "brand": "Canon",
+    "model": "T70",
+    "mount": "Canon FD",
+    "type": "slr",
+    "years": "1984–1986",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "2s"
+  },
+  {
+    "id": "canon-t90",
+    "brand": "Canon",
+    "model": "T90",
+    "mount": "Canon FD",
+    "type": "slr",
+    "years": "1986–1991",
+    "shutterFastest": "1/4000",
+    "shutterSlowest": "30s",
+    "notes": "Dessiné par Luigi Colani, ancêtre du dessin des EOS."
+  },
+  {
+    "id": "canon-eos-650",
+    "brand": "Canon",
+    "model": "EOS 650",
+    "mount": "Canon EF",
+    "type": "slr",
+    "years": "1987–1989",
+    "shutterFastest": "1/2000",
+    "shutterSlowest": "30s",
+    "notes": "Premier boîtier de la monture EF."
+  },
+  {
+    "id": "canon-eos-1",
+    "brand": "Canon",
+    "model": "EOS-1",
+    "mount": "Canon EF",
+    "type": "slr",
+    "years": "1989–1994",
+    "shutterFastest": "1/8000",
+    "shutterSlowest": "30s"
+  },
+  {
+    "id": "canon-eos-1n",
+    "brand": "Canon",
+    "model": "EOS-1N",
+    "mount": "Canon EF",
+    "type": "slr",
+    "years": "1994–2000",
+    "shutterFastest": "1/8000",
+    "shutterSlowest": "30s"
+  },
+  {
+    "id": "canon-eos-1v",
+    "brand": "Canon",
+    "model": "EOS-1V",
+    "mount": "Canon EF",
+    "type": "slr",
+    "years": "2000–2018",
+    "shutterFastest": "1/8000",
+    "shutterSlowest": "30s",
+    "notes": "Le dernier reflex argentique professionnel de Canon."
+  },
+  {
+    "id": "canon-eos-3",
+    "brand": "Canon",
+    "model": "EOS 3",
+    "mount": "Canon EF",
+    "type": "slr",
+    "years": "1998–2007",
+    "shutterFastest": "1/8000",
+    "shutterSlowest": "30s",
+    "notes": "Mise au point commandée par le regard."
+  },
+  {
+    "id": "canon-eos-5-a2e",
+    "brand": "Canon",
+    "model": "EOS 5 (A2E)",
+    "mount": "Canon EF",
+    "type": "slr",
+    "years": "1992–1998",
+    "shutterFastest": "1/8000",
+    "shutterSlowest": "30s"
+  },
+  {
+    "id": "canon-eos-300",
+    "brand": "Canon",
+    "model": "EOS 300",
+    "mount": "Canon EF",
+    "type": "slr",
+    "years": "1999–2002",
+    "shutterFastest": "1/2000",
+    "shutterSlowest": "30s"
+  },
+  {
+    "id": "canon-eos-300v",
+    "brand": "Canon",
+    "model": "EOS 300V",
+    "mount": "Canon EF",
+    "type": "slr",
+    "years": "2002–2004",
+    "shutterFastest": "1/4000",
+    "shutterSlowest": "30s"
+  },
+  {
+    "id": "canon-eos-500n",
+    "brand": "Canon",
+    "model": "EOS 500N",
+    "mount": "Canon EF",
+    "type": "slr",
+    "years": "1996–1999",
+    "shutterFastest": "1/2000",
+    "shutterSlowest": "30s"
+  },
+  {
+    "id": "canon-canonet-ql17-giii",
+    "brand": "Canon",
+    "model": "Canonet QL17 GIII",
+    "mount": "Fixe",
+    "type": "rangefinder",
+    "years": "1972–1982",
+    "shutterFastest": "1/500",
+    "shutterSlowest": "4s",
+    "fixedLens": {
+      "focal": 40,
+      "maxAperture": 1.7
+    },
+    "notes": "Priorité vitesse, très compact. Une référence du télémétrique abordable."
+  },
+  {
+    "id": "canon-canonet-28",
+    "brand": "Canon",
+    "model": "Canonet 28",
+    "mount": "Fixe",
+    "type": "rangefinder",
+    "years": "1971–1976",
+    "shutterFastest": "1/600",
+    "fixedLens": {
+      "focal": 40,
+      "maxAperture": 2.8
+    }
+  },
+  {
+    "id": "canon-sure-shot-af35m-autoboy",
+    "brand": "Canon",
+    "model": "Sure Shot AF35M (Autoboy)",
+    "mount": "Fixe",
+    "type": "compact",
+    "years": "1979–1983",
+    "fixedLens": {
+      "focal": 38,
+      "maxAperture": 2.8
+    }
+  },
+  {
+    "id": "canon-prima-mini-ii-sure-shot",
+    "brand": "Canon",
+    "model": "Prima Mini II (Sure Shot)",
+    "mount": "Fixe",
+    "type": "compact",
+    "years": "1993",
+    "fixedLens": {
+      "focal": 32,
+      "maxAperture": 3.5
+    }
+  },
+  {
+    "id": "canon-p-populaire",
+    "brand": "Canon",
+    "model": "P (Populaire)",
+    "mount": "Leica M39",
+    "type": "rangefinder",
+    "years": "1959–1961",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "1s"
+  },
+  {
+    "id": "nikon-f",
+    "brand": "Nikon",
+    "model": "F",
+    "mount": "Nikon F",
+    "type": "slr",
+    "years": "1959–1973",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "1s"
+  },
+  {
+    "id": "nikon-f2",
+    "brand": "Nikon",
+    "model": "F2",
+    "mount": "Nikon F",
+    "type": "slr",
+    "years": "1971–1980",
+    "shutterFastest": "1/2000",
+    "shutterSlowest": "10s"
+  },
+  {
+    "id": "nikon-f3",
+    "brand": "Nikon",
+    "model": "F3",
+    "mount": "Nikon F",
+    "type": "slr",
+    "years": "1980–2001",
+    "shutterFastest": "1/2000",
+    "shutterSlowest": "8s"
+  },
+  {
+    "id": "nikon-f4",
+    "brand": "Nikon",
+    "model": "F4",
+    "mount": "Nikon F",
+    "type": "slr",
+    "years": "1988–1997",
+    "shutterFastest": "1/8000",
+    "shutterSlowest": "30s"
+  },
+  {
+    "id": "nikon-f5",
+    "brand": "Nikon",
+    "model": "F5",
+    "mount": "Nikon F",
+    "type": "slr",
+    "years": "1996–2004",
+    "shutterFastest": "1/8000",
+    "shutterSlowest": "30s"
+  },
+  {
+    "id": "nikon-f6",
+    "brand": "Nikon",
+    "model": "F6",
+    "mount": "Nikon F",
+    "type": "slr",
+    "years": "2004–2020",
+    "shutterFastest": "1/8000",
+    "shutterSlowest": "30s",
+    "notes": "Le dernier reflex argentique produit par Nikon."
+  },
+  {
+    "id": "nikon-fm",
+    "brand": "Nikon",
+    "model": "FM",
+    "mount": "Nikon F",
+    "type": "slr",
+    "years": "1977–1982",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "1s"
+  },
+  {
+    "id": "nikon-fm2n",
+    "brand": "Nikon",
+    "model": "FM2n",
+    "mount": "Nikon F",
+    "type": "slr",
+    "years": "1984–2001",
+    "shutterFastest": "1/4000",
+    "shutterSlowest": "1s",
+    "notes": "Entièrement mécanique, synchro flash au 1/250."
+  },
+  {
+    "id": "nikon-fm3a",
+    "brand": "Nikon",
+    "model": "FM3A",
+    "mount": "Nikon F",
+    "type": "slr",
+    "years": "2001–2006",
+    "shutterFastest": "1/4000",
+    "shutterSlowest": "1s",
+    "notes": "Obturateur hybride : mécanique sur toute la plage, plus priorité ouverture."
+  },
+  {
+    "id": "nikon-fe",
+    "brand": "Nikon",
+    "model": "FE",
+    "mount": "Nikon F",
+    "type": "slr",
+    "years": "1978–1983",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "8s"
+  },
+  {
+    "id": "nikon-fe2",
+    "brand": "Nikon",
+    "model": "FE2",
+    "mount": "Nikon F",
+    "type": "slr",
+    "years": "1983–1987",
+    "shutterFastest": "1/4000",
+    "shutterSlowest": "8s"
+  },
+  {
+    "id": "nikon-fa",
+    "brand": "Nikon",
+    "model": "FA",
+    "mount": "Nikon F",
+    "type": "slr",
+    "years": "1983–1988",
+    "shutterFastest": "1/4000",
+    "shutterSlowest": "1s",
+    "notes": "Première mesure matricielle."
+  },
+  {
+    "id": "nikon-em",
+    "brand": "Nikon",
+    "model": "EM",
+    "mount": "Nikon F",
+    "type": "slr",
+    "years": "1979–1984",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "1s"
+  },
+  {
+    "id": "nikon-fg",
+    "brand": "Nikon",
+    "model": "FG",
+    "mount": "Nikon F",
+    "type": "slr",
+    "years": "1982–1986",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "1s"
+  },
+  {
+    "id": "nikon-f301-n2000",
+    "brand": "Nikon",
+    "model": "F301 (N2000)",
+    "mount": "Nikon F",
+    "type": "slr",
+    "years": "1985–1987",
+    "shutterFastest": "1/2000",
+    "shutterSlowest": "1s"
+  },
+  {
+    "id": "nikon-f801-n8008",
+    "brand": "Nikon",
+    "model": "F801 (N8008)",
+    "mount": "Nikon F",
+    "type": "slr",
+    "years": "1988–1991",
+    "shutterFastest": "1/8000",
+    "shutterSlowest": "30s"
+  },
+  {
+    "id": "nikon-f90x-n90s",
+    "brand": "Nikon",
+    "model": "F90X (N90s)",
+    "mount": "Nikon F",
+    "type": "slr",
+    "years": "1994–2001",
+    "shutterFastest": "1/8000",
+    "shutterSlowest": "30s"
+  },
+  {
+    "id": "nikon-f100",
+    "brand": "Nikon",
+    "model": "F100",
+    "mount": "Nikon F",
+    "type": "slr",
+    "years": "1999–2006",
+    "shutterFastest": "1/8000",
+    "shutterSlowest": "30s"
+  },
+  {
+    "id": "nikon-f80-n80",
+    "brand": "Nikon",
+    "model": "F80 (N80)",
+    "mount": "Nikon F",
+    "type": "slr",
+    "years": "2000–2006",
+    "shutterFastest": "1/4000",
+    "shutterSlowest": "30s"
+  },
+  {
+    "id": "nikon-f65-n65",
+    "brand": "Nikon",
+    "model": "F65 (N65)",
+    "mount": "Nikon F",
+    "type": "slr",
+    "years": "2001–2006",
+    "shutterFastest": "1/2000",
+    "shutterSlowest": "30s"
+  },
+  {
+    "id": "nikon-l35af-pikaichi",
+    "brand": "Nikon",
+    "model": "L35AF (Pikaichi)",
+    "mount": "Fixe",
+    "type": "compact",
+    "years": "1983–1986",
+    "fixedLens": {
+      "focal": 35,
+      "maxAperture": 2.8
+    }
+  },
+  {
+    "id": "nikon-35ti",
+    "brand": "Nikon",
+    "model": "35Ti",
+    "mount": "Fixe",
+    "type": "compact",
+    "years": "1993–1998",
+    "shutterFastest": "1/500",
+    "fixedLens": {
+      "focal": 35,
+      "maxAperture": 2.8
+    },
+    "notes": "Cadrans à aiguilles sur le capot, boîtier titane."
+  },
+  {
+    "id": "nikon-28ti",
+    "brand": "Nikon",
+    "model": "28Ti",
+    "mount": "Fixe",
+    "type": "compact",
+    "years": "1994–2000",
+    "shutterFastest": "1/500",
+    "fixedLens": {
+      "focal": 28,
+      "maxAperture": 2.8
+    }
+  },
+  {
+    "id": "nikon-nikonos-v",
+    "brand": "Nikon",
+    "model": "Nikonos V",
+    "mount": "Nikonos",
+    "type": "viewfinder",
+    "years": "1984–2001",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "1/30",
+    "notes": "Étanche sans caisson jusqu’à 50 mètres."
+  },
+  {
+    "id": "pentax-spotmatic-sp",
+    "brand": "Pentax",
+    "model": "Spotmatic SP",
+    "mount": "M42",
+    "type": "slr",
+    "years": "1964–1973",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "1s"
+  },
+  {
+    "id": "pentax-spotmatic-f",
+    "brand": "Pentax",
+    "model": "Spotmatic F",
+    "mount": "M42",
+    "type": "slr",
+    "years": "1973–1976",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "1s"
+  },
+  {
+    "id": "pentax-k1000",
+    "brand": "Pentax",
+    "model": "K1000",
+    "mount": "Pentax K",
+    "type": "slr",
+    "years": "1976–1997",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "1s",
+    "notes": "Tout mécanique, sans automatisme. Le boîtier d’apprentissage par excellence."
+  },
+  {
+    "id": "pentax-kx",
+    "brand": "Pentax",
+    "model": "KX",
+    "mount": "Pentax K",
+    "type": "slr",
+    "years": "1975–1977",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "1s"
+  },
+  {
+    "id": "pentax-mx",
+    "brand": "Pentax",
+    "model": "MX",
+    "mount": "Pentax K",
+    "type": "slr",
+    "years": "1976–1985",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "1s"
+  },
+  {
+    "id": "pentax-me-super",
+    "brand": "Pentax",
+    "model": "ME Super",
+    "mount": "Pentax K",
+    "type": "slr",
+    "years": "1979–1984",
+    "shutterFastest": "1/2000",
+    "shutterSlowest": "4s"
+  },
+  {
+    "id": "pentax-mg",
+    "brand": "Pentax",
+    "model": "MG",
+    "mount": "Pentax K",
+    "type": "slr",
+    "years": "1982–1985",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "1s"
+  },
+  {
+    "id": "pentax-super-a-super-program",
+    "brand": "Pentax",
+    "model": "Super A (Super Program)",
+    "mount": "Pentax K",
+    "type": "slr",
+    "years": "1983–1987",
+    "shutterFastest": "1/2000",
+    "shutterSlowest": "15s"
+  },
+  {
+    "id": "pentax-lx",
+    "brand": "Pentax",
+    "model": "LX",
+    "mount": "Pentax K",
+    "type": "slr",
+    "years": "1980–2001",
+    "shutterFastest": "1/2000",
+    "shutterSlowest": "125s",
+    "notes": "Boîtier professionnel tropicalisé, mesure à la surface du film."
+  },
+  {
+    "id": "pentax-p30",
+    "brand": "Pentax",
+    "model": "P30",
+    "mount": "Pentax K",
+    "type": "slr",
+    "years": "1985–1988",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "1s"
+  },
+  {
+    "id": "pentax-mz-5n-zx-5n",
+    "brand": "Pentax",
+    "model": "MZ-5N (ZX-5N)",
+    "mount": "Pentax KAF",
+    "type": "slr",
+    "years": "1997–2001",
+    "shutterFastest": "1/2000",
+    "shutterSlowest": "30s"
+  },
+  {
+    "id": "pentax-mz-3",
+    "brand": "Pentax",
+    "model": "MZ-3",
+    "mount": "Pentax KAF",
+    "type": "slr",
+    "years": "1997–2001",
+    "shutterFastest": "1/4000",
+    "shutterSlowest": "30s"
+  },
+  {
+    "id": "pentax-espio-mini-uc-1",
+    "brand": "Pentax",
+    "model": "Espio Mini (UC-1)",
+    "mount": "Fixe",
+    "type": "compact",
+    "years": "1994–2000",
+    "fixedLens": {
+      "focal": 32,
+      "maxAperture": 3.5
+    }
+  },
+  {
+    "id": "pentax-17",
+    "brand": "Pentax",
+    "model": "17",
+    "mount": "Fixe",
+    "type": "compact",
+    "years": "2024–",
+    "shutterFastest": "1/350",
+    "fixedLens": {
+      "focal": 25,
+      "maxAperture": 3.5
+    },
+    "notes": "Demi-format : 72 vues sur un film de 36 poses."
+  },
+  {
+    "id": "olympus-om-1",
+    "brand": "Olympus",
+    "model": "OM-1",
+    "mount": "Olympus OM",
+    "type": "slr",
+    "years": "1972–1979",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "1s",
+    "notes": "Le reflex qui a lancé la mode des boîtiers compacts."
+  },
+  {
+    "id": "olympus-om-2n",
+    "brand": "Olympus",
+    "model": "OM-2n",
+    "mount": "Olympus OM",
+    "type": "slr",
+    "years": "1979–1984",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "120s",
+    "notes": "Mesure à la surface du film, y compris pendant la pose."
+  },
+  {
+    "id": "olympus-om-4ti",
+    "brand": "Olympus",
+    "model": "OM-4Ti",
+    "mount": "Olympus OM",
+    "type": "slr",
+    "years": "1986–2002",
+    "shutterFastest": "1/2000",
+    "shutterSlowest": "240s",
+    "notes": "Mesure spot multiple avec moyenne."
+  },
+  {
+    "id": "olympus-om-10",
+    "brand": "Olympus",
+    "model": "OM-10",
+    "mount": "Olympus OM",
+    "type": "slr",
+    "years": "1979–1987",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "2s",
+    "notes": "Mode manuel seulement avec l’adaptateur dédié."
+  },
+  {
+    "id": "olympus-om-20-om-g",
+    "brand": "Olympus",
+    "model": "OM-20 (OM-G)",
+    "mount": "Olympus OM",
+    "type": "slr",
+    "years": "1983–1987",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "1s"
+  },
+  {
+    "id": "olympus-om-40-om-pc",
+    "brand": "Olympus",
+    "model": "OM-40 (OM-PC)",
+    "mount": "Olympus OM",
+    "type": "slr",
+    "years": "1985–1987",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "1s"
+  },
+  {
+    "id": "olympus-trip-35",
+    "brand": "Olympus",
+    "model": "Trip 35",
+    "mount": "Fixe",
+    "type": "viewfinder",
+    "years": "1967–1984",
+    "fixedLens": {
+      "focal": 40,
+      "maxAperture": 2.8
+    },
+    "notes": "Cellule au sélénium, sans pile. Deux vitesses seulement."
+  },
+  {
+    "id": "olympus-xa",
+    "brand": "Olympus",
+    "model": "XA",
+    "mount": "Fixe",
+    "type": "rangefinder",
+    "years": "1979–1985",
+    "shutterFastest": "1/500",
+    "shutterSlowest": "10s",
+    "fixedLens": {
+      "focal": 35,
+      "maxAperture": 2.8
+    },
+    "notes": "Télémétrique de poche à capot coulissant."
+  },
+  {
+    "id": "olympus-xa2",
+    "brand": "Olympus",
+    "model": "XA2",
+    "mount": "Fixe",
+    "type": "compact",
+    "years": "1980–1986",
+    "fixedLens": {
+      "focal": 35,
+      "maxAperture": 3.5
+    }
+  },
+  {
+    "id": "olympus-mju-ii-stylus-epic",
+    "brand": "Olympus",
+    "model": "mju II (Stylus Epic)",
+    "mount": "Fixe",
+    "type": "compact",
+    "years": "1997–2004",
+    "shutterFastest": "1/1000",
+    "fixedLens": {
+      "focal": 35,
+      "maxAperture": 2.8
+    },
+    "notes": "Étanche aux projections, objectif très lumineux pour un compact."
+  },
+  {
+    "id": "olympus-mju-stylus",
+    "brand": "Olympus",
+    "model": "mju (Stylus)",
+    "mount": "Fixe",
+    "type": "compact",
+    "years": "1991–1996",
+    "fixedLens": {
+      "focal": 35,
+      "maxAperture": 3.5
+    }
+  },
+  {
+    "id": "olympus-35-rc",
+    "brand": "Olympus",
+    "model": "35 RC",
+    "mount": "Fixe",
+    "type": "rangefinder",
+    "years": "1970–1977",
+    "shutterFastest": "1/500",
+    "shutterSlowest": "1/15",
+    "fixedLens": {
+      "focal": 42,
+      "maxAperture": 2.8
+    }
+  },
+  {
+    "id": "olympus-35-sp",
+    "brand": "Olympus",
+    "model": "35 SP",
+    "mount": "Fixe",
+    "type": "rangefinder",
+    "years": "1969–1976",
+    "shutterFastest": "1/500",
+    "shutterSlowest": "1s",
+    "fixedLens": {
+      "focal": 42,
+      "maxAperture": 1.7
+    }
+  },
+  {
+    "id": "leica-m3",
+    "brand": "Leica",
+    "model": "M3",
+    "mount": "Leica M",
+    "type": "rangefinder",
+    "years": "1954–1966",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "1s"
+  },
+  {
+    "id": "leica-m2",
+    "brand": "Leica",
+    "model": "M2",
+    "mount": "Leica M",
+    "type": "rangefinder",
+    "years": "1957–1968",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "1s"
+  },
+  {
+    "id": "leica-m4",
+    "brand": "Leica",
+    "model": "M4",
+    "mount": "Leica M",
+    "type": "rangefinder",
+    "years": "1966–1975",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "1s"
+  },
+  {
+    "id": "leica-m6",
+    "brand": "Leica",
+    "model": "M6",
+    "mount": "Leica M",
+    "type": "rangefinder",
+    "years": "1984–2002",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "1s",
+    "notes": "Cellule à diodes dans le viseur, boîtier entièrement mécanique."
+  },
+  {
+    "id": "leica-m7",
+    "brand": "Leica",
+    "model": "M7",
+    "mount": "Leica M",
+    "type": "rangefinder",
+    "years": "2002–2018",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "32s"
+  },
+  {
+    "id": "leica-mp",
+    "brand": "Leica",
+    "model": "MP",
+    "mount": "Leica M",
+    "type": "rangefinder",
+    "years": "2003–",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "1s"
+  },
+  {
+    "id": "leica-m-a",
+    "brand": "Leica",
+    "model": "M-A",
+    "mount": "Leica M",
+    "type": "rangefinder",
+    "years": "2014–",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "1s",
+    "notes": "Aucun posemètre, aucune électronique."
+  },
+  {
+    "id": "leica-r6-2",
+    "brand": "Leica",
+    "model": "R6.2",
+    "mount": "Leica R",
+    "type": "slr",
+    "years": "1992–2002",
+    "shutterFastest": "1/2000",
+    "shutterSlowest": "1s"
+  },
+  {
+    "id": "leica-cl",
+    "brand": "Leica",
+    "model": "CL",
+    "mount": "Leica M",
+    "type": "rangefinder",
+    "years": "1973–1976",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "1/2"
+  },
+  {
+    "id": "leica-minilux",
+    "brand": "Leica",
+    "model": "Minilux",
+    "mount": "Fixe",
+    "type": "compact",
+    "years": "1995–2000",
+    "shutterFastest": "1/400",
+    "fixedLens": {
+      "focal": 40,
+      "maxAperture": 2.4
+    }
+  },
+  {
+    "id": "contax-rts",
+    "brand": "Contax",
+    "model": "RTS",
+    "mount": "Contax/Yashica",
+    "type": "slr",
+    "years": "1975–1982",
+    "shutterFastest": "1/2000",
+    "shutterSlowest": "4s"
+  },
+  {
+    "id": "contax-139-quartz",
+    "brand": "Contax",
+    "model": "139 Quartz",
+    "mount": "Contax/Yashica",
+    "type": "slr",
+    "years": "1979–1987",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "11s"
+  },
+  {
+    "id": "contax-s2",
+    "brand": "Contax",
+    "model": "S2",
+    "mount": "Contax/Yashica",
+    "type": "slr",
+    "years": "1992–1998",
+    "shutterFastest": "1/4000",
+    "shutterSlowest": "1s",
+    "notes": "Mécanique, mesure spot uniquement."
+  },
+  {
+    "id": "contax-aria",
+    "brand": "Contax",
+    "model": "Aria",
+    "mount": "Contax/Yashica",
+    "type": "slr",
+    "years": "1998–2005",
+    "shutterFastest": "1/4000",
+    "shutterSlowest": "16s"
+  },
+  {
+    "id": "contax-g2",
+    "brand": "Contax",
+    "model": "G2",
+    "mount": "Contax G",
+    "type": "rangefinder",
+    "years": "1996–2005",
+    "shutterFastest": "1/6000",
+    "shutterSlowest": "16s",
+    "notes": "Télémétrique autofocus, objectifs Zeiss interchangeables."
+  },
+  {
+    "id": "contax-t2",
+    "brand": "Contax",
+    "model": "T2",
+    "mount": "Fixe",
+    "type": "compact",
+    "years": "1990–1998",
+    "shutterFastest": "1/500",
+    "fixedLens": {
+      "focal": 38,
+      "maxAperture": 2.8
+    },
+    "notes": "Sonnar Zeiss, boîtier titane. Priorité ouverture disponible."
+  },
+  {
+    "id": "contax-t3",
+    "brand": "Contax",
+    "model": "T3",
+    "mount": "Fixe",
+    "type": "compact",
+    "years": "2001–2005",
+    "shutterFastest": "1/1200",
+    "fixedLens": {
+      "focal": 35,
+      "maxAperture": 2.8
+    }
+  },
+  {
+    "id": "yashica-fx-3-super-2000",
+    "brand": "Yashica",
+    "model": "FX-3 Super 2000",
+    "mount": "Contax/Yashica",
+    "type": "slr",
+    "years": "1986–2002",
+    "shutterFastest": "1/2000",
+    "shutterSlowest": "1s",
+    "notes": "Mécanique et léger, accepte les objectifs Zeiss en monture C/Y."
+  },
+  {
+    "id": "yashica-electro-35-gsn",
+    "brand": "Yashica",
+    "model": "Electro 35 GSN",
+    "mount": "Fixe",
+    "type": "rangefinder",
+    "years": "1973–1977",
+    "shutterFastest": "1/500",
+    "shutterSlowest": "30s",
+    "fixedLens": {
+      "focal": 45,
+      "maxAperture": 1.7
+    },
+    "notes": "Priorité ouverture, obturateur électronique très silencieux."
+  },
+  {
+    "id": "yashica-t4-t5",
+    "brand": "Yashica",
+    "model": "T4 (T5)",
+    "mount": "Fixe",
+    "type": "compact",
+    "years": "1990–1997",
+    "fixedLens": {
+      "focal": 35,
+      "maxAperture": 3.5
+    },
+    "notes": "Objectif Zeiss Tessar sur un boîtier de compact ordinaire."
+  },
+  {
+    "id": "konica-autoreflex-t3",
+    "brand": "Konica",
+    "model": "Autoreflex T3",
+    "mount": "Konica AR",
+    "type": "slr",
+    "years": "1973–1976",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "1s"
+  },
+  {
+    "id": "konica-hexar-af",
+    "brand": "Konica",
+    "model": "Hexar AF",
+    "mount": "Fixe",
+    "type": "compact",
+    "years": "1993–2003",
+    "shutterFastest": "1/250",
+    "shutterSlowest": "30s",
+    "fixedLens": {
+      "focal": 35,
+      "maxAperture": 2
+    },
+    "notes": "Mode silencieux redoutablement discret."
+  },
+  {
+    "id": "konica-c35",
+    "brand": "Konica",
+    "model": "C35",
+    "mount": "Fixe",
+    "type": "rangefinder",
+    "years": "1968–1971",
+    "fixedLens": {
+      "focal": 38,
+      "maxAperture": 2.8
+    }
+  },
+  {
+    "id": "ricoh-gr1v",
+    "brand": "Ricoh",
+    "model": "GR1v",
+    "mount": "Fixe",
+    "type": "compact",
+    "years": "2001–2005",
+    "shutterFastest": "1/500",
+    "shutterSlowest": "2s",
+    "fixedLens": {
+      "focal": 28,
+      "maxAperture": 2.8
+    },
+    "notes": "Ancêtre direct des GR numériques."
+  },
+  {
+    "id": "ricoh-gr1s",
+    "brand": "Ricoh",
+    "model": "GR1s",
+    "mount": "Fixe",
+    "type": "compact",
+    "years": "1998–2001",
+    "shutterFastest": "1/500",
+    "fixedLens": {
+      "focal": 28,
+      "maxAperture": 2.8
+    }
+  },
+  {
+    "id": "ricoh-xr-7",
+    "brand": "Ricoh",
+    "model": "XR-7",
+    "mount": "Pentax K",
+    "type": "slr",
+    "years": "1981–1984",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "16s"
+  },
+  {
+    "id": "fujifilm-klasse-w",
+    "brand": "Fujifilm",
+    "model": "Klasse W",
+    "mount": "Fixe",
+    "type": "compact",
+    "years": "2007–2013",
+    "shutterFastest": "1/500",
+    "fixedLens": {
+      "focal": 28,
+      "maxAperture": 2.8
+    }
+  },
+  {
+    "id": "fujifilm-natura-classica",
+    "brand": "Fujifilm",
+    "model": "Natura Classica",
+    "mount": "Fixe",
+    "type": "compact",
+    "years": "2006–2011",
+    "fixedLens": {
+      "focal": 28,
+      "maxAperture": 2.8
+    }
+  },
+  {
+    "id": "chinon-ce-4",
+    "brand": "Chinon",
+    "model": "CE-4",
+    "mount": "M42",
+    "type": "slr",
+    "years": "1979–1982",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "4s"
+  },
+  {
+    "id": "mamiya-ze",
+    "brand": "Mamiya",
+    "model": "ZE",
+    "mount": "Mamiya ZE",
+    "type": "slr",
+    "years": "1980–1983",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "4s"
+  },
+  {
+    "id": "topcon-re-super",
+    "brand": "Topcon",
+    "model": "RE Super",
+    "mount": "Exakta",
+    "type": "slr",
+    "years": "1963–1971",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "1s"
+  },
+  {
+    "id": "miranda-sensorex",
+    "brand": "Miranda",
+    "model": "Sensorex",
+    "mount": "Miranda",
+    "type": "slr",
+    "years": "1967–1972",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "1s"
+  },
+  {
+    "id": "petri-7s",
+    "brand": "Petri",
+    "model": "7S",
+    "mount": "Fixe",
+    "type": "rangefinder",
+    "years": "1963–1970",
+    "fixedLens": {
+      "focal": 45,
+      "maxAperture": 1.8
+    }
+  },
+  {
+    "id": "cosina-ct-1g",
+    "brand": "Cosina",
+    "model": "CT-1G",
+    "mount": "Pentax K",
+    "type": "slr",
+    "years": "1980s",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "1s"
+  },
+  {
+    "id": "vivitar-v3800n",
+    "brand": "Vivitar",
+    "model": "V3800N",
+    "mount": "Pentax K",
+    "type": "slr",
+    "years": "1990s–2000s",
+    "shutterFastest": "1/2000",
+    "shutterSlowest": "1s"
+  },
+  {
+    "id": "voigtlander-bessa-r2a",
+    "brand": "Voigtländer",
+    "model": "Bessa R2A",
+    "mount": "Leica M",
+    "type": "rangefinder",
+    "years": "2004–2007",
+    "shutterFastest": "1/2000",
+    "shutterSlowest": "1s"
+  },
+  {
+    "id": "voigtlander-bessa-r",
+    "brand": "Voigtländer",
+    "model": "Bessa R",
+    "mount": "Leica M39",
+    "type": "rangefinder",
+    "years": "2000–2002",
+    "shutterFastest": "1/2000",
+    "shutterSlowest": "1s"
+  },
+  {
+    "id": "rollei-35",
+    "brand": "Rollei",
+    "model": "35",
+    "mount": "Fixe",
+    "type": "viewfinder",
+    "years": "1966–1974",
+    "shutterFastest": "1/500",
+    "shutterSlowest": "1/2",
+    "fixedLens": {
+      "focal": 40,
+      "maxAperture": 3.5
+    },
+    "notes": "Objectif rétractable ; l’un des plus petits 24×36 jamais produits."
+  },
+  {
+    "id": "rollei-35s",
+    "brand": "Rollei",
+    "model": "35S",
+    "mount": "Fixe",
+    "type": "viewfinder",
+    "years": "1974–1980",
+    "shutterFastest": "1/500",
+    "shutterSlowest": "1/2",
+    "fixedLens": {
+      "focal": 40,
+      "maxAperture": 2.8
+    }
+  },
+  {
+    "id": "rollei-35af",
+    "brand": "Rollei",
+    "model": "35AF",
+    "mount": "Fixe",
+    "type": "compact",
+    "years": "2024–",
+    "shutterFastest": "1/500",
+    "fixedLens": {
+      "focal": 35,
+      "maxAperture": 2.8
+    }
+  },
+  {
+    "id": "praktica-mtl-5b",
+    "brand": "Praktica",
+    "model": "MTL 5B",
+    "mount": "M42",
+    "type": "slr",
+    "years": "1985–1989",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "1s"
+  },
+  {
+    "id": "praktica-ltl3",
+    "brand": "Praktica",
+    "model": "LTL3",
+    "mount": "M42",
+    "type": "slr",
+    "years": "1975–1978",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "1s"
+  },
+  {
+    "id": "exakta-varex-iia",
+    "brand": "Exakta",
+    "model": "Varex IIa",
+    "mount": "Exakta",
+    "type": "slr",
+    "years": "1956–1963",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "12s"
+  },
+  {
+    "id": "agfa-silette",
+    "brand": "Agfa",
+    "model": "Silette",
+    "mount": "Fixe",
+    "type": "viewfinder",
+    "years": "1953–1974",
+    "fixedLens": {
+      "focal": 45,
+      "maxAperture": 2.8
+    }
+  },
+  {
+    "id": "werra-werra-1",
+    "brand": "Werra",
+    "model": "Werra 1",
+    "mount": "Fixe",
+    "type": "viewfinder",
+    "years": "1954–1966",
+    "shutterFastest": "1/250",
+    "fixedLens": {
+      "focal": 50,
+      "maxAperture": 2.8
+    }
+  },
+  {
+    "id": "zenit-e",
+    "brand": "Zenit",
+    "model": "E",
+    "mount": "M42",
+    "type": "slr",
+    "years": "1965–1986",
+    "shutterFastest": "1/500",
+    "shutterSlowest": "1/30"
+  },
+  {
+    "id": "zenit-12xp",
+    "brand": "Zenit",
+    "model": "12XP",
+    "mount": "M42",
+    "type": "slr",
+    "years": "1983–1992",
+    "shutterFastest": "1/500",
+    "shutterSlowest": "1/30"
+  },
+  {
+    "id": "zorki-4",
+    "brand": "Zorki",
+    "model": "4",
+    "mount": "Leica M39",
+    "type": "rangefinder",
+    "years": "1956–1973",
+    "shutterFastest": "1/1000",
+    "shutterSlowest": "1s"
+  },
+  {
+    "id": "fed-5",
+    "brand": "FED",
+    "model": "5",
+    "mount": "Leica M39",
+    "type": "rangefinder",
+    "years": "1977–1990",
+    "shutterFastest": "1/500",
+    "shutterSlowest": "1s"
+  },
+  {
+    "id": "kiev-4",
+    "brand": "Kiev",
+    "model": "4",
+    "mount": "Contax RF",
+    "type": "rangefinder",
+    "years": "1957–1980",
+    "shutterFastest": "1/1250",
+    "shutterSlowest": "1/2"
+  },
+  {
+    "id": "lomo-lc-a",
+    "brand": "Lomo",
+    "model": "LC-A",
+    "mount": "Fixe",
+    "type": "compact",
+    "years": "1984–2005",
+    "fixedLens": {
+      "focal": 32,
+      "maxAperture": 2.8
+    },
+    "notes": "Vignetage et saturation caractéristiques, à l’origine du mouvement lomographique."
+  },
+  {
+    "id": "lomo-smena-8m",
+    "brand": "Lomo",
+    "model": "Smena 8M",
+    "mount": "Fixe",
+    "type": "viewfinder",
+    "years": "1970–1995",
+    "shutterFastest": "1/250",
+    "shutterSlowest": "1/15",
+    "fixedLens": {
+      "focal": 40,
+      "maxAperture": 4
+    }
+  },
+  {
+    "id": "lomography-lc-a",
+    "brand": "Lomography",
+    "model": "LC-A+",
+    "mount": "Fixe",
+    "type": "compact",
+    "years": "2006–",
+    "fixedLens": {
+      "focal": 32,
+      "maxAperture": 2.8
+    }
+  },
+  {
+    "id": "lomography-diana-mini",
+    "brand": "Lomography",
+    "model": "Diana Mini",
+    "mount": "Fixe",
+    "type": "viewfinder",
+    "years": "2009–",
+    "fixedLens": {
+      "focal": 24,
+      "maxAperture": 8
+    }
+  },
+  {
+    "id": "lomography-sprocket-rocket",
+    "brand": "Lomography",
+    "model": "Sprocket Rocket",
+    "mount": "Fixe",
+    "type": "viewfinder",
+    "years": "2010–",
+    "fixedLens": {
+      "focal": 30,
+      "maxAperture": 10.8
+    },
+    "notes": "Panoramique exposant jusqu’aux perforations."
+  },
+  {
+    "id": "holga-135bc",
+    "brand": "Holga",
+    "model": "135BC",
+    "mount": "Fixe",
+    "type": "viewfinder",
+    "years": "2000s",
+    "shutterFastest": "1/100",
+    "fixedLens": {
+      "focal": 47,
+      "maxAperture": 8
+    }
+  },
+  {
+    "id": "ilford-sprite-35-ii",
+    "brand": "Ilford",
+    "model": "Sprite 35-II",
+    "mount": "Fixe",
+    "type": "viewfinder",
+    "years": "2020–",
+    "shutterFastest": "1/120",
+    "fixedLens": {
+      "focal": 31,
+      "maxAperture": 9
+    }
+  },
+  {
+    "id": "kodak-m35",
+    "brand": "Kodak",
+    "model": "M35",
+    "mount": "Fixe",
+    "type": "viewfinder",
+    "years": "2019–",
+    "shutterFastest": "1/120",
+    "fixedLens": {
+      "focal": 31,
+      "maxAperture": 10
+    }
+  }
+]
