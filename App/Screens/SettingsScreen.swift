@@ -17,6 +17,7 @@ struct SettingsScreen: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 26) {
                     themeField
+                    locationField
                     backupSection
                     aboutSection
                 }
@@ -66,6 +67,33 @@ struct SettingsScreen: View {
                         carnet.save(updated)
                     }
                 }
+            }
+        }
+    }
+
+    /// Le relevé automatique se coupe : une autorisation qu'on ne peut pas
+    /// refuser sans désactiver la fonction n'en est pas une.
+    private var locationField: some View {
+        FieldRow(label: "Position") {
+            VStack(alignment: .leading, spacing: 8) {
+                Toggle(isOn: Binding(
+                    get: { carnet.settings.autoGeolocate },
+                    set: { value in
+                        var updated = carnet.settings
+                        updated.autoGeolocate = value
+                        carnet.save(updated)
+                    })
+                ) {
+                    Text("Relever la position à chaque vue")
+                        .font(Typo.body)
+                        .foregroundStyle(palette.text)
+                }
+                .tint(palette.accent)
+
+                Text("La position sert à retrouver un lieu des mois plus tard, et s’inscrit dans les métadonnées du scan. Elle ne quitte pas le téléphone. Décoché, elle reste relevable à la main sur chaque vue.")
+                    .font(Typo.caption)
+                    .foregroundStyle(palette.textFaint)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }
     }

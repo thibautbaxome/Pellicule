@@ -40,6 +40,16 @@ final class LightMeter {
     func start() async {
         guard status != .measuring else { return }
 
+        // L'appareil d'abord, l'autorisation ensuite. Réclamer l'accès à une
+        // caméra pour annoncer aussitôt qu'il n'y en a pas est une demande
+        // qu'on ne peut pas justifier — et c'est le simulateur qui l'a montré.
+        guard let camera = AVCaptureDevice.default(
+            .builtInWideAngleCamera, for: .video, position: .back)
+        else {
+            status = .noCamera
+            return
+        }
+
         switch AVCaptureDevice.authorizationStatus(for: .video) {
         case .authorized:
             break
@@ -53,13 +63,6 @@ final class LightMeter {
             return
         @unknown default:
             status = .permissionDenied
-            return
-        }
-
-        guard let camera = AVCaptureDevice.default(
-            .builtInWideAngleCamera, for: .video, position: .back)
-        else {
-            status = .noCamera
             return
         }
 

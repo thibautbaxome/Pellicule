@@ -14,6 +14,7 @@ struct FrameSheet: View {
     @Environment(\.palette) private var palette
 
     @State private var showsDetails = false
+    @State private var locator = Locator()
     @State private var isPickingLens = false
     @State private var isConfirmingDeletion = false
 
@@ -74,6 +75,7 @@ struct FrameSheet: View {
                     DisclosureGroup(isExpanded: $showsDetails) {
                         VStack(alignment: .leading, spacing: 18) {
                             focalField
+                            locationField
                             compensationField
                             FieldRow(label: "Notes") {
                                 TextField("Mesure, lumière, intention…", text: notesBinding, axis: .vertical)
@@ -116,6 +118,18 @@ struct FrameSheet: View {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Annuler") { dismiss() }
                 }
+            }
+            // Relever la position à l'ouverture d'une vue neuve, quand le
+            // réglage le demande : sur le terrain, personne ne pense à appuyer
+            // sur un bouton de plus avant de passer à la photo suivante.
+            .task {
+                guard !isExisting, frame.location == nil,
+                      carnet.settings.autoGeolocate
+                else { return }
+                locator.request()
+            }
+            .onChange(of: locator.location) { _, relevé in
+                if let relevé, frame.location == nil { frame.location = relevé }
             }
             .sheet(isPresented: $isPickingLens) {
                 LensPickerSheet(mount: camera?.mount) { entry in
@@ -211,6 +225,66 @@ struct FrameSheet: View {
         let marks: [Double] = [24, 28, 35, 50, 70, 85, 105, 135, 200, 300]
         let inRange = marks.filter { $0 >= lens.focalMin && $0 <= lens.focalMax }
         return inRange.isEmpty ? [lens.focalMin, lens.focalMax] : inRange
+    }
+
+    /// Où la vue a été prise. C'est ce qui permettra, des mois plus tard, de
+    /// retrouver l'endroit — et de l'inscrire dans les métadonnées du scan.
+    private var locationField: some View {
+        FieldRow(label: "Position") {
+            VStack(alignment: .leading, spacing: 8) {
+                if let location = frame.location {
+                    HStack(spacing: 8) {
+                        Image(systemName: "mappin.and.ellipse")
+                            .font(.system(size: 12))
+                            .foregroundStyle(palette.accent)
+                        ValueText(text: location.readable, size: 13)
+                        Spacer()
+                    }
+                    if let accuracy = location.accuracy {
+                        Text("À \(Int(accuracy)) m près.")
+                            .font(Typo.caption)
+                            .foregroundStyle(palette.textFaint)
+                    }
+                    Button("Oublier la position") {
+                        frame.location = nil
+                        locator.forget()
+                    }
+                    .buttonStyle(SecondaryButtonStyle(palette: palette))
+                } else {
+                    locationPrompt
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var locationPrompt: some View {
+        switch locator.status {
+        case .locating:
+            HStack(spacing: 8) {
+                ProgressView().tint(palette.accent)
+                Text("Relevé en cours…")
+                    .font(Typo.caption)
+                    .foregroundStyle(palette.textDim)
+            }
+        case .permissionDenied:
+            Text("Accès refusé. Autorisez la position dans Réglages → Pellicule pour l’inscrire dans les métadonnées du scan.")
+                .font(Typo.caption)
+                .foregroundStyle(palette.textFaint)
+                .fixedSize(horizontal: false, vertical: true)
+        case .servicesOff:
+            Text("La localisation est désactivée sur cet appareil.")
+                .font(Typo.caption)
+                .foregroundStyle(palette.textFaint)
+        case .failed(let reason):
+            Text("Position introuvable : \(reason)")
+                .font(Typo.caption)
+                .foregroundStyle(palette.textFaint)
+                .fixedSize(horizontal: false, vertical: true)
+        case .idle, .located:
+            Button("Relever la position") { locator.request() }
+                .buttonStyle(SecondaryButtonStyle(palette: palette))
+        }
     }
 
     private var compensationField: some View {
