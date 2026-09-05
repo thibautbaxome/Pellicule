@@ -75,7 +75,7 @@ struct ExportSheet: View {
                 .padding(16)
             }
             .carnetBackground(palette)
-            .navigationTitle("Vers les scans")
+            .navigationTitle("Inscrire dans les scans")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
