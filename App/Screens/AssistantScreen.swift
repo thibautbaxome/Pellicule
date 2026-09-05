@@ -16,7 +16,9 @@ struct AssistantScreen: View {
     @State private var intent: Assistant.Intent = .portrait
     @State private var conditionId = "sunny"
     @State private var aperture: Double?
-    @State private var distance: Double = 3
+    /// La distance du sujet, quand l'intention en a une — celle du portrait
+    /// au départ, puisque c'est l'intention de départ.
+    @State private var distance: Double = 2
     @State private var focal: Double = 50
     /// Lumière relevée à la caméra. Prime sur l'estimation à l'œil tant qu'on
     /// n'a pas repris la main en choisissant une condition.
@@ -68,6 +70,18 @@ struct AssistantScreen: View {
             availableShutters: availableShutters)
     }
 
+    /// Où l'on fait le point. Pour un paysage, ce n'est pas une distance qu'on
+    /// choisit mais l'hyperfocale, qui dépend de la focale et de l'ouverture :
+    /// elle se dérive à chaque instant plutôt que de se figer dans un curseur.
+    private var focusDistance: Double {
+        if case .hyperfocal = spec.focus {
+            return Optics.hyperfocal(
+                focal: focal, aperture: workingAperture,
+                circleOfConfusion: carnet.settings.circleOfConfusion)
+        }
+        return distance
+    }
+
     private var result: Assistant.Result {
         Assistant.advise(
             Assistant.Input(
@@ -75,7 +89,7 @@ struct AssistantScreen: View {
                 iso: iso,
                 aperture: workingAperture,
                 focal: focal,
-                distance: distance,
+                distance: focusDistance,
                 circleOfConfusion: carnet.settings.circleOfConfusion,
                 handheld: spec.handheld,
                 availableShutters: availableShutters,
@@ -99,7 +113,7 @@ struct AssistantScreen: View {
                     meterButton
                     lightPicker
                     aperturePicker
-                    if spec.handheld { distanceSlider }
+                    if case .metres = spec.focus { distanceSlider }
                     focalSlider
                     depthOfField
                     adviceList
@@ -241,7 +255,9 @@ struct AssistantScreen: View {
                     label: { "f/\(trimmed($0))" },
                     selection: Binding<Double?>(
                         get: { workingAperture },
-                        set: { aperture = $0 }))
+                        // Retaper la valeur choisie la désélectionnerait ; une
+                        // bague d'ouverture n'a pas de position « aucune ».
+                        set: { if let value = $0 { aperture = value } }))
                 if apertureRange.isAssumed {
                     Text("Aucun objectif déclaré : le conseil suppose un objectif courant. Ajoutez le vôtre dans Matériel pour qu’il soit juste.")
                         .font(Typo.caption)
@@ -281,7 +297,7 @@ struct AssistantScreen: View {
         if let dof = result.depthOfField {
             FieldRow(label: "Zone de netteté") {
                 VStack(alignment: .leading, spacing: 8) {
-                    DepthOfFieldBar(depthOfField: dof, distance: distance)
+                    DepthOfFieldBar(depthOfField: dof, distance: focusDistance)
                     HStack {
                         ValueText(text: formatDistance(dof.near), size: 13, colour: palette.textDim)
                         Spacer()
@@ -289,7 +305,16 @@ struct AssistantScreen: View {
                             text: dof.far.isFinite ? formatDistance(dof.far) : "∞",
                             size: 13, colour: palette.textDim)
                     }
-                    Text("Hyperfocale à \(formatDistance(dof.hyperfocal)) : au-delà, tout est net jusqu’à l’infini.")
+                    if case .hyperfocal = spec.focus {
+                        Text("Faites le point à \(formatDistance(dof.hyperfocal)), l’hyperfocale : tout est net de \(formatDistance(dof.near)) à l’infini.")
+                            .font(Typo.caption)
+                            .foregroundStyle(palette.textFaint)
+                            .fixedSize(horizontal: false, vertical: true)
+                    } else {
+                        Text("Hyperfocale à \(formatDistance(dof.hyperfocal)) : au-delà, tout est net jusqu’à l’infini.")
+                            .font(Typo.caption)
+                            .foregroundStyle(palette.textFaint)
+                    }
                         .font(Typo.caption)
                         .foregroundStyle(palette.textFaint)
                 }
