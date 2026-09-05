@@ -1,7 +1,7 @@
 {
   "format": "pellicule-backup",
   "version": 1,
-  "exportedAt": "2026-09-05T10:46:15.986Z",
+  "exportedAt": "2026-09-05T10:49:12.862Z",
   "includesPhotos": false,
   "data": {
     "cameras": [
@@ -12,9 +12,9 @@
         "shutterSlowest": "1s",
         "notes": "Priorité ouverture et manuel. Vendu X-370 aux États-Unis.",
         "archived": false,
-        "updatedAt": "2026-09-05T10:46:13.007Z",
-        "id": "61acc95e-e3ca-4cad-9463-ff043adf1236",
-        "createdAt": "2026-09-05T10:46:13.007Z"
+        "updatedAt": "2026-09-05T10:49:09.735Z",
+        "id": "eef8e030-2261-47c8-bc11-521eb2fd6af0",
+        "createdAt": "2026-09-05T10:49:09.735Z"
       }
     ],
     "lenses": [
@@ -28,9 +28,9 @@
         "mount": "Minolta SR",
         "notes": "L’objectif livré avec la plupart des X-300 et X-700.",
         "archived": false,
-        "updatedAt": "2026-09-05T10:46:14.124Z",
-        "id": "c93817be-a580-44ff-ade6-0ba13dfcc925",
-        "createdAt": "2026-09-05T10:46:14.124Z"
+        "updatedAt": "2026-09-05T10:49:10.867Z",
+        "id": "76f7f982-42a9-4c61-8b54-468dd4cda78c",
+        "createdAt": "2026-09-05T10:49:10.867Z"
       }
     ],
     "filmStocks": [
@@ -48,8 +48,8 @@
         },
         "notes": "Double émulsion argentique, rendu très doux dans les hautes lumières.",
         "isCustom": false,
-        "createdAt": "2026-09-05T10:46:11.341Z",
-        "updatedAt": "2026-09-05T10:46:11.341Z"
+        "createdAt": "2026-09-05T10:49:08.070Z",
+        "updatedAt": "2026-09-05T10:49:08.070Z"
       },
       {
         "id": "cinestill-400d",
@@ -64,8 +64,8 @@
           "thresholdSec": 1
         },
         "isCustom": false,
-        "createdAt": "2026-09-05T10:46:11.341Z",
-        "updatedAt": "2026-09-05T10:46:11.341Z"
+        "createdAt": "2026-09-05T10:49:08.070Z",
+        "updatedAt": "2026-09-05T10:49:08.070Z"
       },
       {
         "id": "cinestill-50d",
@@ -80,8 +80,8 @@
           "thresholdSec": 1
         },
         "isCustom": false,
-        "createdAt": "2026-09-05T10:46:11.341Z",
-        "updatedAt": "2026-09-05T10:46:11.341Z"
+        "createdAt": "2026-09-05T10:49:08.070Z",
+        "updatedAt": "2026-09-05T10:49:08.070Z"
       },
       {
         "id": "cinestill-800t",
@@ -98,8 +98,8 @@
         },
         "notes": "Film cinéma sans couche anti-halo : halos rouges typiques autour des sources lumineuses. Filtre 85B recommandé en plein jour.",
         "isCustom": false,
-        "createdAt": "2026-09-05T10:46:11.341Z",
-        "updatedAt": "2026-09-05T10:46:11.341Z"
+        "createdAt": "2026-09-05T10:49:08.070Z",
+        "updatedAt": "2026-09-05T10:49:08.070Z"
       },
       {
         "id": "cinestill-bwxx",
@@ -115,8 +115,8 @@
         },
         "notes": "Reconditionnement de la Kodak Double-X.",
         "isCustom": false,
-        "createdAt": "2026-09-05T10:46:11.341Z",
-        "updatedAt": "2026-09-05T10:46:11.341Z"
+        "createdAt": "2026-09-05T10:49:08.070Z",
+        "updatedAt": "2026-09-05T10:49:08.070Z"
       },
       {
         "id": "foma-fomapan-100",
@@ -132,8 +132,8 @@
         },
         "notes": "Bon marché, mais défaut de réciprocité important dès la demi-seconde.",
         "isCustom": false,
-        "createdAt": "2026-09-05T10:46:11.341Z",
-        "updatedAt": "2026-09-05T10:46:11.341Z"
+        "createdAt": "2026-09-05T10:49:08.070Z",
+        "updatedAt": "2026-09-05T10:49:08.070Z"
       },
       {
         "id": "foma-fomapan-200",
@@ -148,8 +148,8 @@
           "thresholdSec": 0.5
         },
         "isCustom": false,
-        "createdAt": "2026-09-05T10:46:11.341Z",
-        "updatedAt": "2026-09-05T10:46:11.341Z"
+        "createdAt": "2026-09-05T10:49:08.070Z",
+        "updatedAt": "2026-09-05T10:49:08.070Z"
       },
       {
         "id": "foma-fomapan-400",
@@ -164,8 +164,8 @@
           "thresholdSec": 0.5
         },
         "isCustom": false,
-        "createdAt": "2026-09-05T10:46:11.341Z",
-        "updatedAt": "2026-09-05T10:46:11.341Z"
+        "createdAt": "2026-09-05T10:49:08.070Z",
+        "updatedAt": "2026-09-05T10:49:08.070Z"
       },
       {
         "id": "fujifilm-acros-100-ii",
@@ -181,8 +181,8 @@
         },
         "notes": "Réciprocité exceptionnelle : aucune correction avant deux minutes de pose.",
         "isCustom": false,
-        "createdAt": "2026-09-05T10:46:11.341Z",
-        "updatedAt": "2026-09-05T10:46:11.341Z"
+        "createdAt": "2026-09-05T10:49:08.070Z",
+        "updatedAt": "2026-09-05T10:49:08.070Z"
       },
       {
         "id": "fujifilm-c200",
@@ -198,8 +198,8 @@
         },
         "notes": "Verts et cyans caractéristiques de Fuji, pour trois fois rien.",
         "isCustom": false,
-        "createdAt": "2026-09-05T10:46:11.341Z",
-        "updatedAt": "2026-09-05T10:46:11.341Z"
+        "createdAt": "2026-09-05T10:49:08.070Z",
+        "updatedAt": "2026-09-05T10:49:08.070Z"
       },
       {
         "id": "fujifilm-pro-400h",
@@ -216,8 +216,8 @@
         "discontinued": true,
         "notes": "Production arrêtée en 2021. Tons pastel et verts très reconnaissables.",
         "isCustom": false,
-        "createdAt": "2026-09-05T10:46:11.341Z",
-        "updatedAt": "2026-09-05T10:46:11.341Z"
+        "createdAt": "2026-09-05T10:49:08.070Z",
+        "updatedAt": "2026-09-05T10:49:08.070Z"
       },
       {
         "id": "fujifilm-provia-100f",
@@ -233,8 +233,8 @@
         },
         "notes": "La diapo la plus fiable en pose longue : rien à corriger avant deux minutes.",
         "isCustom": false,
-        "createdAt": "2026-09-05T10:46:11.341Z",
-        "updatedAt": "2026-09-05T10:46:11.341Z"
+        "createdAt": "2026-09-05T10:49:08.070Z",
+        "updatedAt": "2026-09-05T10:49:08.070Z"
       },
       {
         "id": "fujifilm-superia-xtra-400",
@@ -249,8 +249,8 @@
           "thresholdSec": 1
         },
         "isCustom": false,
-        "createdAt": "2026-09-05T10:46:11.341Z",
-        "updatedAt": "2026-09-05T10:46:11.341Z"
+        "createdAt": "2026-09-05T10:49:08.070Z",
+        "updatedAt": "2026-09-05T10:49:08.070Z"
       },
       {
         "id": "fujifilm-velvia-100",
@@ -265,8 +265,8 @@
           "thresholdSec": 1
         },
         "isCustom": false,
-        "createdAt": "2026-09-05T10:46:11.341Z",
-        "updatedAt": "2026-09-05T10:46:11.341Z"
+        "createdAt": "2026-09-05T10:49:08.070Z",
+        "updatedAt": "2026-09-05T10:49:08.070Z"
       },
       {
         "id": "fujifilm-velvia-50",
@@ -283,8 +283,8 @@
         },
         "notes": "Saturation extrême, latitude très étroite. Fuji déconseille de dépasser une minute de pose.",
         "isCustom": false,
-        "createdAt": "2026-09-05T10:46:11.341Z",
-        "updatedAt": "2026-09-05T10:46:11.341Z"
+        "createdAt": "2026-09-05T10:49:08.070Z",
+        "updatedAt": "2026-09-05T10:49:08.070Z"
       },
       {
         "id": "harman-phoenix-200",
@@ -300,8 +300,8 @@
         },
         "notes": "Premier négatif couleur fabriqué par Harman. Contraste élevé, latitude étroite : exposer au plus juste, voire légèrement surexposer.",
         "isCustom": false,
-        "createdAt": "2026-09-05T10:46:11.341Z",
-        "updatedAt": "2026-09-05T10:46:11.341Z"
+        "createdAt": "2026-09-05T10:49:08.070Z",
+        "updatedAt": "2026-09-05T10:49:08.070Z"
       },
       {
         "id": "ilford-delta-100",
@@ -325,8 +325,8 @@
           }
         ],
         "isCustom": false,
-        "createdAt": "2026-09-05T10:46:11.341Z",
-        "updatedAt": "2026-09-05T10:46:11.341Z"
+        "createdAt": "2026-09-05T10:49:08.070Z",
+        "updatedAt": "2026-09-05T10:49:08.070Z"
       },
       {
         "id": "ilford-delta-3200",
@@ -342,8 +342,8 @@
         },
         "notes": "Sensibilité réelle autour de 1000 ISO, prévue pour être exposée à 3200.",
         "isCustom": false,
-        "createdAt": "2026-09-05T10:46:11.341Z",
-        "updatedAt": "2026-09-05T10:46:11.341Z"
+        "createdAt": "2026-09-05T10:49:08.070Z",
+        "updatedAt": "2026-09-05T10:49:08.070Z"
       },
       {
         "id": "ilford-delta-400",
@@ -367,8 +367,8 @@
           }
         ],
         "isCustom": false,
-        "createdAt": "2026-09-05T10:46:11.341Z",
-        "updatedAt": "2026-09-05T10:46:11.341Z"
+        "createdAt": "2026-09-05T10:49:08.070Z",
+        "updatedAt": "2026-09-05T10:49:08.070Z"
       },
       {
         "id": "ilford-fp4-plus-125",
@@ -400,8 +400,8 @@
         ],
         "notes": "Le compromis finesse/souplesse d’Ilford, idéal en lumière du jour.",
         "isCustom": false,
-        "createdAt": "2026-09-05T10:46:11.341Z",
-        "updatedAt": "2026-09-05T10:46:11.341Z"
+        "createdAt": "2026-09-05T10:49:08.070Z",
+        "updatedAt": "2026-09-05T10:49:08.070Z"
       },
       {
         "id": "ilford-hp5-plus-400",
@@ -440,8 +440,8 @@
         ],
         "notes": "Immense latitude de pose, pardonne beaucoup. Superbe poussée à 1600.",
         "isCustom": false,
-        "createdAt": "2026-09-05T10:46:11.341Z",
-        "updatedAt": "2026-09-05T10:46:11.341Z"
+        "createdAt": "2026-09-05T10:49:08.070Z",
+        "updatedAt": "2026-09-05T10:49:08.070Z"
       },
       {
         "id": "ilford-ortho-plus-80",
@@ -457,8 +457,8 @@
         },
         "notes": "Insensible au rouge : les ciels et les carnations sortent très contrastés.",
         "isCustom": false,
-        "createdAt": "2026-09-05T10:46:11.341Z",
-        "updatedAt": "2026-09-05T10:46:11.341Z"
+        "createdAt": "2026-09-05T10:49:08.070Z",
+        "updatedAt": "2026-09-05T10:49:08.070Z"
       },
       {
         "id": "ilford-pan-f-plus-50",
@@ -474,8 +474,8 @@
         },
         "notes": "Grain quasi invisible. À développer sans trop attendre après la prise de vue.",
         "isCustom": false,
-        "createdAt": "2026-09-05T10:46:11.341Z",
-        "updatedAt": "2026-09-05T10:46:11.341Z"
+        "createdAt": "2026-09-05T10:49:08.070Z",
+        "updatedAt": "2026-09-05T10:49:08.070Z"
       },
       {
         "id": "ilford-sfx-200",
@@ -491,8 +491,8 @@
         },
         "notes": "Sensibilité étendue au proche infrarouge. Spectaculaire avec un filtre rouge foncé.",
         "isCustom": false,
-        "createdAt": "2026-09-05T10:46:11.341Z",
-        "updatedAt": "2026-09-05T10:46:11.341Z"
+        "createdAt": "2026-09-05T10:49:08.070Z",
+        "updatedAt": "2026-09-05T10:49:08.070Z"
       },
       {
         "id": "ilford-xp2-super-400",
@@ -508,8 +508,8 @@
         },
         "notes": "Noir et blanc développé en C-41 : n’importe quel labo photo peut le traiter.",
         "isCustom": false,
-        "createdAt": "2026-09-05T10:46:11.341Z",
-        "updatedAt": "2026-09-05T10:46:11.341Z"
+        "createdAt": "2026-09-05T10:49:08.070Z",
+        "updatedAt": "2026-09-05T10:49:08.070Z"
       },
       {
         "id": "jch-streetpan-400",
@@ -525,8 +525,8 @@
         },
         "notes": "Ancienne émulsion de surveillance Agfa, très contrastée.",
         "isCustom": false,
-        "createdAt": "2026-09-05T10:46:11.341Z",
-        "updatedAt": "2026-09-05T10:46:11.341Z"
+        "createdAt": "2026-09-05T10:49:08.070Z",
+        "updatedAt": "2026-09-05T10:49:08.070Z"
       },
       {
         "id": "kentmere-pan-100",
@@ -542,8 +542,8 @@
         },
         "notes": "L’entrée de gamme d’Ilford, très bon rapport qualité/prix pour s’entraîner.",
         "isCustom": false,
-        "createdAt": "2026-09-05T10:46:11.341Z",
-        "updatedAt": "2026-09-05T10:46:11.341Z"
+        "createdAt": "2026-09-05T10:49:08.070Z",
+        "updatedAt": "2026-09-05T10:49:08.070Z"
       },
       {
         "id": "kentmere-pan-400",
@@ -558,8 +558,8 @@
           "thresholdSec": 1
         },
         "isCustom": false,
-        "createdAt": "2026-09-05T10:46:11.341Z",
-        "updatedAt": "2026-09-05T10:46:11.341Z"
+        "createdAt": "2026-09-05T10:49:08.070Z",
+        "updatedAt": "2026-09-05T10:49:08.070Z"
       },
       {
         "id": "kodak-colorplus-200",
@@ -575,8 +575,8 @@
         },
         "notes": "L’économique de Kodak, rendu vintage assumé.",
         "isCustom": false,
-        "createdAt": "2026-09-05T10:46:11.341Z",
-        "updatedAt": "2026-09-05T10:46:11.341Z"
+        "createdAt": "2026-09-05T10:49:08.070Z",
+        "updatedAt": "2026-09-05T10:49:08.070Z"
       },
       {
         "id": "kodak-double-x-5222",
@@ -592,8 +592,8 @@
         },
         "notes": "Film cinéma noir et blanc, rendu contrasté très années 50.",
         "isCustom": false,
-        "createdAt": "2026-09-05T10:46:11.341Z",
-        "updatedAt": "2026-09-05T10:46:11.341Z"
+        "createdAt": "2026-09-05T10:49:08.070Z",
+        "updatedAt": "2026-09-05T10:49:08.070Z"
       },
       {
         "id": "kodak-ektachrome-e100",
@@ -609,8 +609,8 @@
         },
         "notes": "Rendu neutre et grain très fin, plus sobre que la Velvia.",
         "isCustom": false,
-        "createdAt": "2026-09-05T10:46:11.341Z",
-        "updatedAt": "2026-09-05T10:46:11.341Z"
+        "createdAt": "2026-09-05T10:49:08.070Z",
+        "updatedAt": "2026-09-05T10:49:08.070Z"
       },
       {
         "id": "kodak-ektar-100",
@@ -626,8 +626,8 @@
         },
         "notes": "Le négatif couleur le plus saturé et le plus fin. Peu tolérant sur les carnations.",
         "isCustom": false,
-        "createdAt": "2026-09-05T10:46:11.341Z",
-        "updatedAt": "2026-09-05T10:46:11.341Z"
+        "createdAt": "2026-09-05T10:49:08.070Z",
+        "updatedAt": "2026-09-05T10:49:08.070Z"
       },
       {
         "id": "kodak-gold-200",
@@ -643,8 +643,8 @@
         },
         "notes": "Dominante chaude et dorée, parfaite en lumière rasante de fin de journée.",
         "isCustom": false,
-        "createdAt": "2026-09-05T10:46:11.341Z",
-        "updatedAt": "2026-09-05T10:46:11.341Z"
+        "createdAt": "2026-09-05T10:49:08.070Z",
+        "updatedAt": "2026-09-05T10:49:08.070Z"
       },
       {
         "id": "kodak-portra-160",
@@ -660,8 +660,8 @@
         },
         "notes": "Carnations très justes, grain minimal. La référence du portrait en lumière douce.",
         "isCustom": false,
-        "createdAt": "2026-09-05T10:46:11.341Z",
-        "updatedAt": "2026-09-05T10:46:11.341Z"
+        "createdAt": "2026-09-05T10:49:08.070Z",
+        "updatedAt": "2026-09-05T10:49:08.070Z"
       },
       {
         "id": "kodak-portra-400",
@@ -677,8 +677,8 @@
         },
         "notes": "Le couteau suisse de la couleur : énorme latitude, supporte la surexposition.",
         "isCustom": false,
-        "createdAt": "2026-09-05T10:46:11.341Z",
-        "updatedAt": "2026-09-05T10:46:11.341Z"
+        "createdAt": "2026-09-05T10:49:08.070Z",
+        "updatedAt": "2026-09-05T10:49:08.070Z"
       },
       {
         "id": "kodak-portra-800",
@@ -693,8 +693,8 @@
           "thresholdSec": 1
         },
         "isCustom": false,
-        "createdAt": "2026-09-05T10:46:11.341Z",
-        "updatedAt": "2026-09-05T10:46:11.341Z"
+        "createdAt": "2026-09-05T10:49:08.070Z",
+        "updatedAt": "2026-09-05T10:49:08.070Z"
       },
       {
         "id": "kodak-pro-image-100",
@@ -709,8 +709,8 @@
           "thresholdSec": 1
         },
         "isCustom": false,
-        "createdAt": "2026-09-05T10:46:11.341Z",
-        "updatedAt": "2026-09-05T10:46:11.341Z"
+        "createdAt": "2026-09-05T10:49:08.070Z",
+        "updatedAt": "2026-09-05T10:49:08.070Z"
       },
       {
         "id": "kodak-tmax-100",
@@ -735,8 +735,8 @@
         ],
         "notes": "Grain très fin, excellente tenue en pose longue grâce aux cristaux tabulaires.",
         "isCustom": false,
-        "createdAt": "2026-09-05T10:46:11.341Z",
-        "updatedAt": "2026-09-05T10:46:11.341Z"
+        "createdAt": "2026-09-05T10:49:08.070Z",
+        "updatedAt": "2026-09-05T10:49:08.070Z"
       },
       {
         "id": "kodak-tmax-400",
@@ -761,8 +761,8 @@
         ],
         "notes": "Le 400 ISO le plus fin de Kodak. Moins « caractériel » que la Tri-X.",
         "isCustom": false,
-        "createdAt": "2026-09-05T10:46:11.341Z",
-        "updatedAt": "2026-09-05T10:46:11.341Z"
+        "createdAt": "2026-09-05T10:49:08.070Z",
+        "updatedAt": "2026-09-05T10:49:08.070Z"
       },
       {
         "id": "kodak-tmax-p3200",
@@ -778,8 +778,8 @@
         },
         "notes": "Sensibilité réelle proche de 800 ISO, conçue pour être poussée à 3200.",
         "isCustom": false,
-        "createdAt": "2026-09-05T10:46:11.341Z",
-        "updatedAt": "2026-09-05T10:46:11.341Z"
+        "createdAt": "2026-09-05T10:49:08.070Z",
+        "updatedAt": "2026-09-05T10:49:08.070Z"
       },
       {
         "id": "kodak-tri-x-400",
@@ -818,8 +818,8 @@
         ],
         "notes": "Le classique du reportage. Grain marqué et très tolérant au push jusqu'à 1600.",
         "isCustom": false,
-        "createdAt": "2026-09-05T10:46:11.341Z",
-        "updatedAt": "2026-09-05T10:46:11.341Z"
+        "createdAt": "2026-09-05T10:49:08.070Z",
+        "updatedAt": "2026-09-05T10:49:08.070Z"
       },
       {
         "id": "kodak-ultramax-400",
@@ -834,8 +834,8 @@
           "thresholdSec": 1
         },
         "isCustom": false,
-        "createdAt": "2026-09-05T10:46:11.341Z",
-        "updatedAt": "2026-09-05T10:46:11.341Z"
+        "createdAt": "2026-09-05T10:49:08.070Z",
+        "updatedAt": "2026-09-05T10:49:08.070Z"
       },
       {
         "id": "lomography-berlin-400",
@@ -850,8 +850,8 @@
           "thresholdSec": 1
         },
         "isCustom": false,
-        "createdAt": "2026-09-05T10:46:11.341Z",
-        "updatedAt": "2026-09-05T10:46:11.341Z"
+        "createdAt": "2026-09-05T10:49:08.070Z",
+        "updatedAt": "2026-09-05T10:49:08.070Z"
       },
       {
         "id": "lomography-color-negative-400",
@@ -866,8 +866,8 @@
           "thresholdSec": 1
         },
         "isCustom": false,
-        "createdAt": "2026-09-05T10:46:11.341Z",
-        "updatedAt": "2026-09-05T10:46:11.341Z"
+        "createdAt": "2026-09-05T10:49:08.070Z",
+        "updatedAt": "2026-09-05T10:49:08.070Z"
       },
       {
         "id": "lomography-lomochrome-purple",
@@ -884,8 +884,8 @@
         },
         "notes": "Sensibilité utilisable de 100 à 400 ISO selon l’intensité de l’effet recherché.",
         "isCustom": false,
-        "createdAt": "2026-09-05T10:46:11.341Z",
-        "updatedAt": "2026-09-05T10:46:11.341Z"
+        "createdAt": "2026-09-05T10:49:08.070Z",
+        "updatedAt": "2026-09-05T10:49:08.070Z"
       },
       {
         "id": "rollei-retro-80s",
@@ -901,8 +901,8 @@
         },
         "notes": "Support transparent et sensibilité étendue au proche infrarouge.",
         "isCustom": false,
-        "createdAt": "2026-09-05T10:46:11.341Z",
-        "updatedAt": "2026-09-05T10:46:11.341Z"
+        "createdAt": "2026-09-05T10:49:08.070Z",
+        "updatedAt": "2026-09-05T10:49:08.070Z"
       },
       {
         "id": "rollei-rpx-400",
@@ -917,31 +917,32 @@
           "thresholdSec": 1
         },
         "isCustom": false,
-        "createdAt": "2026-09-05T10:46:11.341Z",
-        "updatedAt": "2026-09-05T10:46:11.341Z"
+        "createdAt": "2026-09-05T10:49:08.070Z",
+        "updatedAt": "2026-09-05T10:49:08.070Z"
       }
     ],
     "rolls": [
       {
-        "id": "894c610a-ff68-4a58-a90c-405af2eaf07a",
+        "id": "9ac719a5-d312-4d25-9704-635928179208",
         "label": "Pointe du Raz",
         "filmStockId": "kodak-tri-x-400",
-        "cameraId": "61acc95e-e3ca-4cad-9463-ff043adf1236",
+        "cameraId": "eef8e030-2261-47c8-bc11-521eb2fd6af0",
         "shotIso": 1600,
         "exposures": 36,
-        "loadedAt": "2026-09-05T10:46:00.000Z",
+        "loadedAt": "2026-09-05T10:49:00.000Z",
         "status": "shooting",
-        "createdAt": "2026-09-05T10:46:14.541Z",
-        "updatedAt": "2026-09-05T10:46:14.839Z"
+        "createdAt": "2026-09-05T10:49:11.300Z",
+        "updatedAt": "2026-09-05T10:49:11.567Z"
       }
     ],
     "frames": [
       {
-        "rollId": "894c610a-ff68-4a58-a90c-405af2eaf07a",
+        "rollId": "9ac719a5-d312-4d25-9704-635928179208",
         "number": 1,
-        "shotAt": "2026-09-05T10:46:00.000Z",
+        "shotAt": "2026-09-05T10:49:00.000Z",
         "shutter": "1/250",
         "aperture": 8,
+        "lensId": "76f7f982-42a9-4c61-8b54-468dd4cda78c",
         "subject": "Le phare dans la brume",
         "tags": [],
         "location": {
@@ -950,16 +951,17 @@
           "accuracy": 0
         },
         "status": "shot",
-        "updatedAt": "2026-09-05T10:46:14.839Z",
-        "id": "26b79469-e677-4a89-9517-b74761ca3d10",
-        "createdAt": "2026-09-05T10:46:14.839Z"
+        "updatedAt": "2026-09-05T10:49:11.567Z",
+        "id": "951194ce-8357-4243-bc4f-c2239ffdd137",
+        "createdAt": "2026-09-05T10:49:11.567Z"
       },
       {
-        "rollId": "894c610a-ff68-4a58-a90c-405af2eaf07a",
+        "rollId": "9ac719a5-d312-4d25-9704-635928179208",
         "number": 2,
-        "shotAt": "2026-09-05T10:46:00.000Z",
+        "shotAt": "2026-09-05T10:49:00.000Z",
         "shutter": "8s",
         "aperture": 8,
+        "lensId": "76f7f982-42a9-4c61-8b54-468dd4cda78c",
         "tags": [],
         "location": {
           "lat": 47.7986,
@@ -967,9 +969,9 @@
           "accuracy": 0
         },
         "status": "shot",
-        "updatedAt": "2026-09-05T10:46:15.423Z",
-        "id": "60461289-bec3-4981-b7b5-5c7a2be62371",
-        "createdAt": "2026-09-05T10:46:15.423Z"
+        "updatedAt": "2026-09-05T10:49:12.151Z",
+        "id": "ea62e357-4ec6-4383-a2d2-86b7567497fb",
+        "createdAt": "2026-09-05T10:49:12.151Z"
       }
     ],
     "settings": [
@@ -981,8 +983,8 @@
         "autoGeolocate": true,
         "defaultExposures": 36,
         "circleOfConfusion": 0.03,
-        "updatedAt": "2026-09-05T10:46:14.554Z",
-        "defaultCameraId": "61acc95e-e3ca-4cad-9463-ff043adf1236",
+        "updatedAt": "2026-09-05T10:49:11.312Z",
+        "defaultCameraId": "eef8e030-2261-47c8-bc11-521eb2fd6af0",
         "defaultFilmStockId": "kodak-tri-x-400"
       }
     ],

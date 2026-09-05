@@ -140,7 +140,10 @@ public enum Model {
         public var updatedAt: String
 
         public struct Development: Codable, Sendable, Hashable {
-            public var `self`: Bool
+            /// Développé par le photographe plutôt qu'au laboratoire.
+            /// Le champ s'appelle « self » dans le JSON web ; en Swift ce mot
+            /// est réservé, d'où le renommage et la clé de décodage explicite.
+            public var developedByOwner: Bool
             public var developer: String?
             public var dilution: String?
             public var timeSec: Double?
@@ -148,6 +151,11 @@ public enum Model {
             public var agitation: String?
             public var developedAt: String?
             public var notes: String?
+
+            private enum CodingKeys: String, CodingKey {
+                case developedByOwner = "self"
+                case developer, dilution, timeSec, tempC, agitation, developedAt, notes
+            }
         }
 
         public struct Costs: Codable, Sendable, Hashable {

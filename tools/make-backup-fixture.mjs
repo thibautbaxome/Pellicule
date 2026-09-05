@@ -67,6 +67,14 @@ await page.getByRole('group', { name: "Vitesse d’obturation" })
 await page.getByRole('button', { name: 'Enregistrer', exact: true }).click();
 await page.waitForURL(/#\/rolls\/[^/]+$/);
 
+// Le CSV exiftool du même rouleau : il sert de référence au portage Swift,
+// qui doit produire exactement les mêmes métadonnées.
+await page.goto(`${BASE}#/export`);
+await page.waitForSelector('.result');
+const csv = page.waitForEvent('download');
+await page.getByRole('button', { name: 'CSV pour exiftool' }).click();
+await (await csv).saveAs(`${OUT}/export-web.csv`);
+
 // La sauvegarde elle-même, par le bouton que l'utilisateur emploie.
 await page.goto(`${BASE}#/settings`);
 await page.waitForTimeout(500);
@@ -77,3 +85,4 @@ await file.saveAs(`${OUT}/backup-web.json`);
 
 await browser.close();
 console.log(`✓ ${OUT}/backup-web.json`);
+console.log(`✓ ${OUT}/export-web.csv`);
