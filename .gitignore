@@ -28,3 +28,6 @@ captures
 
 # Cache local de Wrangler
 .wrangler
+
+# Artefacts de build Swift
+native/**/.build

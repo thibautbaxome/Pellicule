@@ -323,7 +323,12 @@ export function advise(input: AssistantInput): AssistantResult {
   }
 
   // --- L'intention vise une vitesse que la lumière ne permet pas ---
-  if (desiredShutterSeconds != null && shutterSeconds != null) {
+  // Seulement quand la pose tient dans la plage du boîtier : hors plage,
+  // l'écart ne vient pas de la lumière mais des limites de l'obturateur, et
+  // l'avertissement précédent le dit déjà — plus justement. Sans ce garde-fou,
+  // un boîtier qui plafonne à la seconde affichait « pas assez de lumière » et
+  // « trop de lumière pour poser aussi longtemps » côte à côte.
+  if (!tooBright && !tooDark && desiredShutterSeconds != null && shutterSeconds != null) {
     const gap = Math.log2(shutterSeconds / desiredShutterSeconds);
     if (gap < -1) {
       advice.push({

@@ -1,0 +1,41 @@
+name: Noyau natif
+
+on:
+  push:
+    branches: ['**']
+    paths: ['native/**', '.github/workflows/native.yml']
+  pull_request:
+    paths: ['native/**', '.github/workflows/native.yml']
+
+jobs:
+  # Le noyau métier ne dépend d'aucun SDK Apple : il se compile et se teste sur
+  # Linux, ce qui donne une boucle de quelques secondes plutôt que de quelques
+  # minutes. C'est là que vivent tous les calculs argentiques.
+  core-linux:
+    name: Tests du noyau (Linux)
+    runs-on: ubuntu-latest
+    container: swift:6.3
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tests
+        working-directory: native/PelliculeCore
+        run: swift test
+
+  # Le même noyau sur macOS, compilé pour iOS : c'est ce qui prouve que le code
+  # tourne réellement sur la plateforme cible, et pas seulement sur Linux.
+  # Les runners macOS sont gratuits sur les dépôts publics.
+  core-ios:
+    name: Compilation pour iOS
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compiler pour le simulateur iOS
+        working-directory: native/PelliculeCore
+        run: |
+          xcodebuild build \
+            -scheme PelliculeCore \
+            -destination 'generic/platform=iOS Simulator' \
+            -skipPackagePluginValidation \
+            | xcbeautify || xcodebuild build \
+              -scheme PelliculeCore \
+              -destination 'generic/platform=iOS Simulator'
