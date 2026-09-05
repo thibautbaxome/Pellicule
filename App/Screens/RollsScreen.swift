@@ -11,13 +11,17 @@ struct RollsScreen: View {
         NavigationStack {
             Group {
                 if carnet.rolls.isEmpty {
-                    EmptyState(
-                        title: "Aucun rouleau",
-                        message: carnet.cameras.isEmpty
-                            ? "Déclarez d’abord un boîtier dans l’onglet Matériel, puis chargez votre première pellicule."
-                            : "Chargez une pellicule pour commencer à consigner vos vues.",
-                        actionTitle: carnet.cameras.isEmpty ? nil : "Charger une pellicule",
-                        action: carnet.cameras.isEmpty ? nil : { isLoadingRoll = true })
+                    if carnet.cameras.isEmpty {
+                        EmptyState(
+                            title: "Aucun rouleau",
+                            message: "Déclarez d’abord un boîtier dans l’onglet Matériel, puis chargez votre première pellicule.")
+                    } else {
+                        EmptyState(
+                            title: "Aucun rouleau",
+                            message: "Chargez une pellicule pour commencer à consigner vos vues.",
+                            actionTitle: "Charger une pellicule",
+                            action: { isLoadingRoll = true })
+                    }
                 } else {
                     rollList
                 }

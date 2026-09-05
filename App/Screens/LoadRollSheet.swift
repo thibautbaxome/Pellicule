@@ -138,7 +138,7 @@ struct LoadRollSheet: View {
                 ScaleDial(
                     values: choices,
                     label: { "\(Int($0))" },
-                    selection: Binding(
+                    selection: Binding<Double?>(
                         get: { shotIso ?? film.iso },
                         set: { shotIso = $0 ?? film.iso }))
                 if let shotIso, abs(shotIso - film.iso) > 0.01 {
@@ -169,9 +169,9 @@ struct LoadRollSheet: View {
     private func exposuresField(film: Catalog.Film) -> some View {
         FieldRow(label: "Nombre de poses") {
             ScaleDial(
-                values: [12, 24, 36],
+                values: [12, 24, 36] as [Int],
                 label: { "\($0)" },
-                selection: Binding(
+                selection: Binding<Int?>(
                     get: { exposures ?? film.defaultExposures },
                     set: { exposures = $0 ?? film.defaultExposures }))
         }

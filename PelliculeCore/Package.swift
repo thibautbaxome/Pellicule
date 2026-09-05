@@ -6,6 +6,10 @@ import PackageDescription
 // tous les calculs argentiques hors de tout simulateur.
 let package = Package(
     name: "PelliculeCore",
+    // Sans cette déclaration, Xcode compile le paquet pour iOS 12 quelle que
+    // soit la cible de l'application, et `@Observable` — qui date d'iOS 17 —
+    // n'existe pas. Aucun effet sur Linux, où ces versions ne veulent rien dire.
+    platforms: [.iOS(.v17), .macOS(.v14)],
     products: [
         .library(name: "PelliculeCore", targets: ["PelliculeCore"])
     ],

@@ -36,8 +36,16 @@ struct SettingsScreen: View {
             ) { result in
                 importOutcome = restore(from: result)
             }
-            .alert(item: $importOutcome) { outcome in
-                Alert(title: Text(outcome.title), message: Text(outcome.message))
+            .alert(
+                importOutcome?.title ?? "",
+                isPresented: Binding(
+                    get: { importOutcome != nil },
+                    set: { if !$0 { importOutcome = nil } }),
+                presenting: importOutcome
+            ) { _ in
+                Button("Entendu", role: .cancel) {}
+            } message: { outcome in
+                Text(outcome.message)
             }
         }
     }

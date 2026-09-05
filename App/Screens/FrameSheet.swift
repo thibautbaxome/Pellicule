@@ -26,7 +26,8 @@ struct FrameSheet: View {
     /// la meilleure façon de noter un réglage qui n'a jamais existé.
     private var shutters: [String] {
         let available = camera?.availableShutters ?? []
-        return available.isEmpty ? Exposure.fullShutters.reversed() : available.reversed()
+        // De la plus rapide à la plus lente : c'est l'ordre de la molette.
+        return Array((available.isEmpty ? Exposure.fullShutters : available).reversed())
     }
 
     /// De même pour les ouvertures, bornées par l'objectif employé.
