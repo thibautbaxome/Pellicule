@@ -188,7 +188,9 @@ public enum Catalog {
         }
 
         return pool.filter { lens in
-            let haystack = normalise("\(lens.brand) \(lens.name) \(lens.mount)")
+            // « zoom » doit trouver un 35-70 même quand son nom ne le dit pas.
+            let kind = lens.isPrime ? "" : " zoom"
+            let haystack = normalise("\(lens.brand) \(lens.name) \(lens.mount)\(kind)")
             return terms.allSatisfy { haystack.contains($0) }
         }
         .prefix(limit)

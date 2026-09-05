@@ -314,9 +314,8 @@ struct AssistantScreen: View {
                         Text("Hyperfocale à \(formatDistance(dof.hyperfocal)) : au-delà, tout est net jusqu’à l’infini.")
                             .font(Typo.caption)
                             .foregroundStyle(palette.textFaint)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
-                        .font(Typo.caption)
-                        .foregroundStyle(palette.textFaint)
                 }
             }
         }
