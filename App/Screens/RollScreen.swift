@@ -13,6 +13,7 @@ struct RollScreen: View {
     @Environment(\.dismiss) private var dismiss
     @State private var editedFrame: Model.Frame?
     @State private var isEditingRoll = false
+    @State private var isExporting = false
     @State private var isConfirmingDeletion = false
 
     private var roll: Model.Roll? { carnet.roll(id: rollId) }
@@ -36,10 +37,15 @@ struct RollScreen: View {
         .toolbar {
             if roll != nil {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        isEditingRoll = true
+                    Menu {
+                        Button("Le rouleau", systemImage: "info.circle") {
+                            isEditingRoll = true
+                        }
+                        Button("Vers les scans", systemImage: "square.and.arrow.up") {
+                            isExporting = true
+                        }
                     } label: {
-                        Label("Le rouleau", systemImage: "info.circle")
+                        Label("Actions", systemImage: "ellipsis.circle")
                     }
                 }
             }
@@ -51,6 +57,9 @@ struct RollScreen: View {
             if let roll {
                 RollEditSheet(carnet: carnet, roll: roll)
             }
+        }
+        .sheet(isPresented: $isExporting) {
+            ExportSheet(carnet: carnet, rollId: rollId)
         }
     }
 

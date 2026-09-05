@@ -203,3 +203,94 @@ public enum ExifExport {
         return joined.isEmpty ? "rouleau" : String(joined.prefix(40))
     }
 }
+
+// MARK: - Rapprochement des scans
+
+/// Associer des fichiers de scan aux vues d'un rouleau.
+///
+/// C'est le problème que personne ne voit venir. Le laboratoire numérote ses
+/// fichiers dans son ordre à lui, en partant de la première image exploitable :
+/// les deux ou trois vues gâchées à l'amorce n'existent pas pour lui, alors
+/// qu'elles occupent bien les numéros 1 à 3 du carnet. Les deux numérotations
+/// sont donc décalées d'un nombre que la machine ne peut pas deviner.
+///
+/// Aucune heuristique ne réglera cela — l'horodatage d'un scan est celui de la
+/// numérisation, pas de la prise de vue. La seule réponse honnête est de
+/// laisser le photographe régler le décalage et de lui montrer aussitôt à quoi
+/// il aboutit, vue par vue.
+public extension ExifExport {
+
+    struct Pairing: Sendable, Equatable, Identifiable {
+        public let fileName: String
+        public let frame: Model.Frame?
+
+        public var id: String { fileName }
+        /// Un scan qu'aucune vue ne réclame : décalage trop grand, ou vue
+        /// jamais notée.
+        public var isOrphan: Bool { frame == nil }
+    }
+
+    /// Rapproche des fichiers, dans l'ordre où le laboratoire les a nommés, des
+    /// vues du rouleau, décalées d'autant de rangs qu'on le demande.
+    ///
+    /// Un décalage de 2 signifie que le premier fichier du laboratoire
+    /// correspond à la troisième vue du carnet.
+    static func pair(
+        files: [String],
+        with frames: [Model.Frame],
+        offset: Int
+    ) -> [Pairing] {
+        let ordered = frames.sorted { $0.number < $1.number }
+        return files.enumerated().map { index, name in
+            let position = index + offset
+            let frame = ordered.indices.contains(position) ? ordered[position] : nil
+            return Pairing(fileName: name, frame: frame)
+        }
+    }
+
+    /// Décalages qu'il vaut la peine de proposer, et le nombre de vues que
+    /// chacun laisse sans scan. Aucun n'est « le bon » : c'est le photographe
+    /// qui reconnaît ses images.
+    static func plausibleOffsets(fileCount: Int, frameCount: Int) -> [Int] {
+        guard fileCount > 0, frameCount > 0 else { return [0] }
+        // Au-delà de cinq vues perdues à l'amorce, ce n'est plus une amorce.
+        let maximum = max(0, min(5, frameCount - 1))
+        return Array(0...maximum)
+    }
+
+    /// Script pour `exiftool`, à lancer dans le dossier des scans.
+    ///
+    /// Il existe pour les fichiers que l'application ne sait pas modifier
+    /// elle-même — les TIFF, les DNG de scanner — et pour qui préfère voir ce
+    /// qui sera écrit avant que ça le soit.
+    static func script(rows: [[String: String]]) -> String {
+        var lines = [
+            "#!/bin/sh",
+            "# Métadonnées engendrées par Pellicule.",
+            "#",
+            "# À lancer dans le dossier contenant les scans. exiftool conserve",
+            "# l'original sous le suffixe _original ; supprimez-le une fois le",
+            "# résultat vérifié.",
+            "set -e",
+            "",
+        ]
+
+        for row in rows {
+            guard let file = row["SourceFile"], !file.isEmpty else { continue }
+            var arguments: [String] = []
+            for column in columns where column != "SourceFile" {
+                guard let value = row[column], !value.isEmpty else { continue }
+                arguments.append("-\(column)=\(shellQuoted(value))")
+            }
+            guard !arguments.isEmpty else { continue }
+            lines.append("exiftool \(arguments.joined(separator: " ")) \(shellQuoted(file))")
+        }
+        return lines.joined(separator: "\n") + "\n"
+    }
+
+    /// Guillemets simples pour le shell : tout y est littéral, sauf le
+    /// guillemet lui-même, qu'il faut sortir de la chaîne.
+    private static func shellQuoted(_ value: String) -> String {
+        "'" + value.replacingOccurrences(of: "'", with: "'\\''") + "'"
+    }
+}
