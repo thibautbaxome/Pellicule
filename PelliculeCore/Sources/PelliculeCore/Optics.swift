@@ -43,6 +43,32 @@ public enum Optics {
         ((focal * focal) / (aperture * circleOfConfusion) + focal) / 1000
     }
 
+    /// Filtre gris neutre capable de retirer un nombre donné de diaphragmes,
+    /// dans la désignation qu'on lit sur la bague.
+    ///
+    /// « Il faut un filtre gris neutre » ne sert à rien à qui n'en a jamais
+    /// acheté : ce qu'il faut savoir, c'est lequel. La force se compte en
+    /// diaphragmes et se vend sous un facteur — six diaphragmes, c'est un ND64.
+    /// On arrondit vers le haut : un filtre trop fort se rattrape en ouvrant,
+    /// un filtre trop faible ne se rattrape pas.
+    public struct NeutralDensity: Sendable, Equatable {
+        public let stops: Int
+        /// Désignation commerciale, quand elle existe.
+        public let name: String?
+        /// Faux au-delà de ce qu'un filtre du commerce retire : il faut alors
+        /// renoncer, pas empiler des verres jusqu'à l'absurde.
+        public var isAvailable: Bool { name != nil }
+    }
+
+    public static func neutralDensity(removingStops stops: Double) -> NeutralDensity? {
+        let needed = Int(stops.rounded(.up))
+        guard needed >= 1 else { return nil }
+        // Au-delà de dix diaphragmes, on quitte ce qui se trouve en boutique.
+        guard needed <= 10 else { return NeutralDensity(stops: needed, name: nil) }
+        // Le ND1000 est vendu pour dix diaphragmes bien qu'il en retire 1024.
+        return NeutralDensity(stops: needed, name: needed == 10 ? "ND1000" : "ND\(1 << needed)")
+    }
+
     public static func depthOfField(
         focal: Double,
         aperture: Double,

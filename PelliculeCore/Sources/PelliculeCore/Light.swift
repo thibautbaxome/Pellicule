@@ -63,13 +63,22 @@ public enum Light {
             shadows: "Grande fenêtre en plein jour, pièce baignée de lumière.",
             ev100: 9),
         Condition(
-            id: "indoors", label: "Intérieur éclairé", aperture: nil,
-            shadows: "Pièce sous éclairage domestique, le soir.",
+            id: "indoors", label: "Intérieur bien éclairé", aperture: nil,
+            shadows: "Pièce vivement éclairée le soir, plusieurs sources allumées.",
             ev100: 7),
+        // Deux diaphragmes séparent une pièce vivement éclairée d'une pièce
+        // ordinaire, et les tables publiées distinguent les deux. Ne garder
+        // que la première sous un libellé décrivant la seconde faisait
+        // sous-exposer de deux diaphragmes — ce qui, sur un négatif, ne se
+        // rattrape pas au tirage.
+        Condition(
+            id: "indoors-dim", label: "Intérieur ordinaire", aperture: nil,
+            shadows: "Une lampe ou deux, le soir. Il faut un film rapide, un appui, ou les deux.",
+            ev100: 5),
         Condition(
             id: "street-night", label: "Rue de nuit", aperture: nil,
-            shadows: "Éclairage public, vitrines, façades éclairées.",
-            ev100: 5),
+            shadows: "Éclairage public ordinaire. Une vitrine ou une façade éclairée vaut un diaphragme de plus.",
+            ev100: 4),
     ]
 
     public static func condition(id: String) -> Condition? {

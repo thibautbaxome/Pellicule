@@ -50,10 +50,14 @@ struct AssistantScreen: View {
 
     private var availableApertures: [Double] { apertureRange.values }
 
+    /// L'ouverture de départ tient compte des vitesses du boîtier : demander
+    /// « le plus de flou possible » n'a de sens que dans les limites de ce que
+    /// l'obturateur sait accompagner.
     private var workingAperture: Double {
         aperture ?? Assistant.startingAperture(
             for: spec, available: availableApertures,
-            ev100: condition.ev100, iso: iso)
+            ev100: condition.ev100, iso: iso,
+            availableShutters: availableShutters)
     }
 
     private var result: Assistant.Result {

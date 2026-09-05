@@ -179,8 +179,15 @@ public enum Assistant {
                     "À \(formatAperture(input.aperture)), il faudrait poser plus court que le "
                         + "\(Exposure.shutter(fromSeconds: fastest ?? 0)) du boîtier. "
                         + "Fermez à \(formatAperture($0))."
-                } ?? "Même au plus fermé, la scène est trop lumineuse pour cet obturateur. "
-                    + "Il faut un filtre gris neutre, ou un film moins sensible."))
+                } ?? {
+                    let excess = fastest.map { log2($0 / ideal) } ?? 0
+                    // Ici l'ouverture est déjà au bout : le remède le plus
+                    // simple n'est pas d'attendre le soir, c'est de charger un
+                    // film moins sensible la prochaine fois.
+                    return "Même au plus fermé, la scène est trop lumineuse pour cet obturateur. "
+                        + remedy(forExcessStops: excess)
+                        + " Un film moins sensible aurait évité cela."
+                }()))
         }
         if tooDark {
             advice.append(.init(
@@ -200,12 +207,14 @@ public enum Assistant {
            let desired = input.desiredShutterSeconds, let actual = shutterSeconds {
             let gap = log2(actual / desired)
             if gap < -1 {
+                // Dire « il faut un filtre » ne sert à rien à qui n'en a jamais
+                // acheté : ce qu'il faut savoir, c'est lequel.
                 advice.append(.init(
                     level: .warning,
                     title: "Trop de lumière pour poser aussi longtemps",
                     detail: "Cette intention vise \(Exposure.shutter(fromSeconds: desired)) ; la "
-                        + "scène impose \(Exposure.shutter(fromSeconds: actual)). Il faut un "
-                        + "filtre gris neutre, ou attendre que la lumière baisse."))
+                        + "scène impose \(Exposure.shutter(fromSeconds: actual)). "
+                        + remedy(forExcessStops: -gap)))
             } else if gap > 1 {
                 advice.append(.init(
                     level: .warning,
@@ -261,6 +270,20 @@ public enum Assistant {
                     + "\(formatMetres(dof.near)). Vous pouvez déclencher sans refaire le point."))
         }
 
+        // Un écran muet laisse le débutant se demander si l'application a
+        // compris sa question. Quand rien ne s'oppose au réglage, on le dit.
+        if !advice.contains(where: { $0.level == .warning || $0.level == .danger }),
+           let shutter, shutterSeconds != nil {
+            advice.insert(.init(
+                level: .good,
+                title: "Ce réglage tient",
+                detail: "\(shutter) à \(formatAperture(input.aperture)) : le boîtier sait le "
+                    + "faire, et rien dans la scène ne s'y oppose."
+                    + (dof.map { " Net de \(formatMetres($0.near)) à "
+                        + ($0.isFarInfinite ? "l’infini." : "\(formatMetres($0.far)).") } ?? "")),
+                at: 0)
+        }
+
         return Result(
             idealSeconds: ideal,
             shutter: shutter,
@@ -281,20 +304,64 @@ public enum Assistant {
         for spec: IntentSpec,
         available: [Double],
         ev100: Double,
-        iso: Double
+        iso: Double,
+        availableShutters: [String] = Exposure.fullShutters
     ) -> Double {
         guard !available.isEmpty else { return 8 }
 
+        let wished: Double
         switch spec.target {
         case .widestAperture:
-            return available.min()!
+            wished = available.min()!
         case .aperture(let value):
-            return nearest(in: available, to: value)
+            wished = nearest(in: available, to: value)
         case .shutterSeconds(let seconds):
             let wanted = Exposure.aperture(ev100: ev100, iso: iso, seconds: seconds)
-            let clamped = min(max(wanted, available.min()!), available.max()!)
-            return nearest(in: available, to: clamped)
+            wished = min(max(wanted, available.min()!), available.max()!)
         }
+        return workable(
+            wished, available: available, ev100: ev100, iso: iso,
+            availableShutters: availableShutters)
+    }
+
+    /// Ramène une ouverture souhaitée à la plus proche que l'obturateur sache
+    /// accompagner.
+    ///
+    /// Sans cela, un portrait par temps couvert ouvrait à pleine ouverture et
+    /// l'écran s'ouvrait sur une erreur rouge : c'est la première chose qu'un
+    /// débutant voyait de l'assistant, sur le cas le plus banal qui soit.
+    /// Demander « le plus de flou possible », c'est demander le plus de flou
+    /// *réalisable* — l'ouverture au-delà de laquelle le boîtier ne suit plus
+    /// n'est pas un choix, c'est une impasse.
+    static func workable(
+        _ wished: Double,
+        available: [Double],
+        ev100: Double,
+        iso: Double,
+        availableShutters: [String]
+    ) -> Double {
+        let seconds = availableShutters.compactMap { Exposure.seconds(from: $0) }
+        guard let fastest = seconds.min(), let slowest = seconds.max() else { return wished }
+
+        // Un tiers de diaphragme de tolérance, comme partout ailleurs : il ne
+        // se voit pas sur un négatif et évite de fermer pour rien.
+        let thirdStop = pow(2.0, 1.0 / 6.0)
+        let widestUsable = pow(2, (Exposure.ev(ev100: ev100, iso: iso) + log2(fastest)) / 2)
+            / thirdStop
+        let narrowestUsable = pow(2, (Exposure.ev(ev100: ev100, iso: iso) + log2(slowest)) / 2)
+            * thirdStop
+
+        // Le résultat doit toujours être un cran de la bague : une valeur
+        // calculée comme f/11,45 ne se règle sur aucun objectif.
+        if wished < widestUsable {
+            // Trop de lumière pour ouvrir autant : fermer juste ce qu'il faut.
+            return available.first { $0 >= widestUsable } ?? available.max()!
+        }
+        if wished > narrowestUsable {
+            // Pas assez de lumière : ouvrir juste ce qu'il faut.
+            return available.reversed().first { $0 <= narrowestUsable } ?? available.min()!
+        }
+        return nearest(in: available, to: wished)
     }
 
     /// Valeur de la graduation la plus proche d'une valeur théorique.
@@ -317,6 +384,25 @@ public enum Assistant {
             if let slowestSeconds, seconds > slowestSeconds + 1e-9 { return false }
             return true
         }
+    }
+
+    /// Ce qu'il reste à faire quand la scène est trop lumineuse.
+    ///
+    /// « Il faut un filtre gris neutre » ne sert à rien à qui n'en a jamais
+    /// acheté : ce qu'il faut savoir, c'est lequel — et, au-delà de ce que le
+    /// commerce propose, qu'il faut renoncer plutôt qu'empiler des verres.
+    private static func remedy(forExcessStops stops: Double) -> String {
+        guard let filter = Optics.neutralDensity(removingStops: stops) else {
+            return "Attendez que la lumière baisse."
+        }
+        let missing = "Il manque \(filter.stops) diaphragme\(filter.stops > 1 ? "s" : "")"
+        guard let name = filter.name else {
+            return "\(missing), soit plus qu'aucun filtre du commerce ne retire. "
+                + "À cette lumière, cette intention est hors de portée : "
+                + "revenez à l'aube ou au crépuscule."
+        }
+        return "\(missing) : un filtre gris neutre \(name) les retire. "
+            + "Sinon, attendez que la lumière baisse."
     }
 
     private static func formatAperture(_ value: Double) -> String {
