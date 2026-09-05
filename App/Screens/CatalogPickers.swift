@@ -176,3 +176,74 @@ struct LensPickerSheet: View {
         value == value.rounded() ? String(Int(value)) : String(value)
     }
 }
+
+/// Choix d'un filtre.
+///
+/// Le facteur est ce qui compte : il dit combien de diaphragmes le filtre
+/// coûte, donc de combien il faut rallonger la pose. L'effet est rappelé parce
+/// qu'un débutant ne sait pas ce qu'un jaune n°8 fait à un ciel.
+struct FilterPickerSheet: View {
+    let onPick: (Filters.Preset?) -> Void
+
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.palette) private var palette
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section {
+                    Button {
+                        onPick(nil)
+                        dismiss()
+                    } label: {
+                        Text("Aucun filtre")
+                            .font(Typo.body)
+                            .foregroundStyle(palette.text)
+                    }
+                    .listRowBackground(palette.surface)
+                }
+
+                ForEach(Filters.Category.allCases, id: \.self) { category in
+                    Section {
+                        ForEach(Filters.presets(in: category)) { preset in
+                            Button {
+                                onPick(preset)
+                                dismiss()
+                            } label: {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    HStack {
+                                        Text(preset.name)
+                                            .font(Typo.body)
+                                            .foregroundStyle(palette.text)
+                                        Spacer()
+                                        ValueText(
+                                            text: preset.stops < 0.05
+                                                ? "gratuit"
+                                                : "+\(String(format: "%.1f", preset.stops)) IL",
+                                            size: 13, colour: palette.accent)
+                                    }
+                                    Text(preset.effect)
+                                        .font(Typo.caption)
+                                        .foregroundStyle(palette.textDim)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                }
+                            }
+                            .listRowBackground(palette.surface)
+                        }
+                    } header: {
+                        MicroLabel(category.label)
+                    }
+                }
+            }
+            .listStyle(.plain)
+            .carnetBackground(palette)
+            .navigationTitle("Filtre")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Annuler") { dismiss() }
+                }
+            }
+        }
+    }
+}

@@ -15,6 +15,7 @@ struct FrameSheet: View {
 
     @State private var showsDetails = false
     @State private var locator = Locator()
+    @State private var isPickingFilter = false
     @State private var isPickingLens = false
     @State private var isConfirmingDeletion = false
 
@@ -75,8 +76,11 @@ struct FrameSheet: View {
                     DisclosureGroup(isExpanded: $showsDetails) {
                         VStack(alignment: .leading, spacing: 18) {
                             focalField
-                            locationField
                             compensationField
+                            filterField
+                            flashAndDistance
+                            locationField
+                            meteringField
                             FieldRow(label: "Notes") {
                                 TextField("Mesure, lumière, intention…", text: notesBinding, axis: .vertical)
                                     .lineLimit(2...5)
@@ -130,6 +134,13 @@ struct FrameSheet: View {
             }
             .onChange(of: locator.location) { _, relevé in
                 if let relevé, frame.location == nil { frame.location = relevé }
+            }
+            .sheet(isPresented: $isPickingFilter) {
+                FilterPickerSheet { preset in
+                    frame.filter = preset.map {
+                        Model.Frame.Filter(name: $0.name, factorStops: $0.stops)
+                    }
+                }
             }
             .sheet(isPresented: $isPickingLens) {
                 LensPickerSheet(mount: camera?.mount) { entry in
@@ -284,6 +295,102 @@ struct FrameSheet: View {
         case .idle, .located:
             Button("Relever la position") { locator.request() }
                 .buttonStyle(SecondaryButtonStyle(palette: palette))
+        }
+    }
+
+    /// Un filtre coûte de la lumière : le noter, c'est pouvoir expliquer plus
+    /// tard pourquoi une vue est plus sombre que sa voisine.
+    private var filterField: some View {
+        FieldRow(label: "Filtre") {
+            Button {
+                isPickingFilter = true
+            } label: {
+                HStack {
+                    if let filter = frame.filter {
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text(filter.name)
+                                .font(Typo.body)
+                                .foregroundStyle(palette.text)
+                            Text(filterCost(filter))
+                                .font(Typo.caption)
+                                .foregroundStyle(palette.accent)
+                        }
+                    } else {
+                        Text("Aucun")
+                            .font(Typo.body)
+                            .foregroundStyle(palette.textDim)
+                    }
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .foregroundStyle(palette.textFaint)
+                }
+                .padding(12)
+                .frame(maxWidth: .infinity)
+                .background(palette.sunken)
+                .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 5, style: .continuous)
+                        .strokeBorder(palette.line, lineWidth: 1))
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    private func filterCost(_ filter: Model.Frame.Filter) -> String {
+        guard filter.factorStops >= 0.05 else { return "Sans coût en lumière" }
+        let stops = String(format: "%.1f", filter.factorStops)
+        return "Coûte \(stops) diaphragme\(filter.factorStops >= 2 ? "s" : "")"
+    }
+
+    private var flashAndDistance: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            Toggle(isOn: Binding(
+                get: { frame.flash ?? false },
+                set: { frame.flash = $0 ? true : nil })
+            ) {
+                Text("Flash employé")
+                    .font(Typo.body)
+                    .foregroundStyle(palette.text)
+            }
+            .tint(palette.accent)
+
+            FieldRow(label: "Distance de mise au point") {
+                ScaleDial(
+                    values: [0.5, 0.7, 1, 1.5, 2, 3, 5, 10, 20] as [Double],
+                    label: { $0 < 1 ? "\(Int($0 * 100)) cm" : "\(trimmed($0)) m" },
+                    selection: $frame.focusDistance)
+            }
+        }
+    }
+
+    /// Comment la mesure a été faite. C'est ce qui permet, en relisant un
+    /// rouleau raté, de comprendre d'où venait l'erreur — et de savoir à quoi
+    /// se fier la fois suivante.
+    private var meteringField: some View {
+        FieldRow(label: "Mesure") {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(
+                        ["Posemètre du boîtier", "Cellule à main", "Application", "À l’œil"],
+                        id: \.self
+                    ) { method in
+                        let selected = frame.meteringNote == method
+                        Button {
+                            frame.meteringNote = selected ? nil : method
+                        } label: {
+                            Text(method)
+                                .font(Typo.caption)
+                                .foregroundStyle(selected ? palette.accentInk : palette.textDim)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 9)
+                                .background(selected ? palette.accent : palette.sunken)
+                                .clipShape(Capsule())
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(.vertical, 2)
+            }
         }
     }
 

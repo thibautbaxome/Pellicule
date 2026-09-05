@@ -15,6 +15,8 @@ struct GearScreen: View {
     @State private var isPickingLens = false
     @State private var manualName = ""
     @State private var isNamingCamera = false
+    @State private var editedCamera: Model.Camera?
+    @State private var editedLens: Model.Lens?
 
     var body: some View {
         NavigationStack {
@@ -53,6 +55,12 @@ struct GearScreen: View {
                     carnet.save(carnet.makeLens(from: entry))
                 }
             }
+            .sheet(item: $editedCamera) { camera in
+                CameraEditSheet(carnet: carnet, camera: camera)
+            }
+            .sheet(item: $editedLens) { lens in
+                LensEditSheet(carnet: carnet, lens: lens)
+            }
             .alert("Nouveau boîtier", isPresented: $isNamingCamera) {
                 TextField("Nom du boîtier", text: $manualName)
                 Button("Ajouter") {
@@ -74,17 +82,19 @@ struct GearScreen: View {
                 if !carnet.cameras.isEmpty {
                     MicroLabel("Boîtiers").padding(.top, 6)
                     ForEach(carnet.cameras) { camera in
-                        CameraCard(camera: camera, isUsed: carnet.isUsed(cameraId: camera.id)) {
-                            carnet.delete(cameraId: camera.id)
+                        Button { editedCamera = camera } label: {
+                            CameraCard(camera: camera)
                         }
+                        .buttonStyle(.plain)
                     }
                 }
                 if !carnet.lenses.isEmpty {
                     MicroLabel("Objectifs").padding(.top, 14)
                     ForEach(carnet.lenses) { lens in
-                        LensCard(lens: lens, isUsed: carnet.isUsed(lensId: lens.id)) {
-                            carnet.delete(lensId: lens.id)
+                        Button { editedLens = lens } label: {
+                            LensCard(lens: lens)
                         }
+                        .buttonStyle(.plain)
                     }
                 }
             }
@@ -95,17 +105,21 @@ struct GearScreen: View {
 
 private struct CameraCard: View {
     let camera: Model.Camera
-    let isUsed: Bool
-    let onDelete: () -> Void
 
     @Environment(\.palette) private var palette
 
     var body: some View {
         Card {
             VStack(alignment: .leading, spacing: 8) {
-                Text(camera.name)
-                    .font(Typo.heading)
-                    .foregroundStyle(palette.text)
+                HStack {
+                    Text(camera.name)
+                        .font(Typo.heading)
+                        .foregroundStyle(palette.text)
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 12))
+                        .foregroundStyle(palette.textFaint)
+                }
 
                 HStack(spacing: 10) {
                     if let mount = camera.mount {
@@ -127,17 +141,11 @@ private struct CameraCard: View {
                 } else {
                     // Sans plage déclarée, l'assistant ne peut pas dire qu'un
                     // réglage sort des capacités du boîtier. Autant le dire.
-                    Text("Plage de vitesses inconnue : les réglages proposés ne seront pas bornés.")
+                    Text("Plage de vitesses inconnue : les réglages proposés ne seront pas bornés. Touchez pour la compléter.")
                         .font(Typo.caption)
-                        .foregroundStyle(palette.textFaint)
+                        .foregroundStyle(palette.accent)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
-            }
-        }
-        .contextMenu {
-            if isUsed {
-                Text("Employé par un rouleau")
-            } else {
-                Button("Supprimer", role: .destructive, action: onDelete)
             }
         }
     }
@@ -149,17 +157,21 @@ private struct CameraCard: View {
 
 private struct LensCard: View {
     let lens: Model.Lens
-    let isUsed: Bool
-    let onDelete: () -> Void
 
     @Environment(\.palette) private var palette
 
     var body: some View {
         Card {
             VStack(alignment: .leading, spacing: 6) {
-                Text(lens.name)
-                    .font(Typo.body)
-                    .foregroundStyle(palette.text)
+                HStack {
+                    Text(lens.name)
+                        .font(Typo.body)
+                        .foregroundStyle(palette.text)
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 12))
+                        .foregroundStyle(palette.textFaint)
+                }
                 HStack(spacing: 10) {
                     ValueText(
                         text: lens.isPrime
@@ -177,12 +189,6 @@ private struct LensCard: View {
                         MicroLabel("⌀ \(Int(thread))")
                     }
                 }
-            }
-        }
-        .contextMenu {
-            Button("Supprimer", role: .destructive, action: onDelete)
-            if isUsed {
-                Text("Des vues y font référence : elles seront conservées.")
             }
         }
     }
