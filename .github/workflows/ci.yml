@@ -199,16 +199,23 @@ jobs:
           if not manifest.exists():
               print("aucun manifeste : le parcours n'a produit aucune capture")
               raise SystemExit(0)
+          # Xcode joint aussi une vidéo de la session, la hiérarchie des vues et
+          # une description par échec — utiles dans Xcode, pas ici : la vidéo
+          # pèse dix mégaoctets et les descriptions portent des guillemets dans
+          # leur nom de fichier, ce que l'archivage refuse. Seules les captures
+          # nommées par le parcours sont retenues, et elles commencent par leur
+          # rang.
           for entry in json.loads(manifest.read_text()):
               for item in entry.get("attachments", []):
                   exported = item.get("exportedFileName")
-                  name = item.get("suggestedHumanReadableName") or exported
-                  if not exported:
+                  name = item.get("suggestedHumanReadableName") or exported or ""
+                  stem = pathlib.Path(name).stem
+                  if not exported or not stem[:1].isdigit():
                       continue
                   origin = source / exported
                   if origin.exists():
-                      shutil.copy(origin, target / f"{pathlib.Path(name).stem}.png")
-                      print("capture", name)
+                      shutil.copy(origin, target / f"{stem}.png")
+                      print("capture", stem)
           EOF
           ls -la captures
 

@@ -50,6 +50,9 @@ struct MicroLabel: View {
             .font(.system(size: 10.5, weight: .semibold))
             .tracking(1.4)
             .foregroundStyle(colour ?? palette.textFaint)
+            // Les capitales sont un parti pris typographique, pas le texte :
+            // une synthèse vocale qui lit « EXPOSÉE À » l'épelle ou la crie.
+            .accessibilityLabel(text)
     }
 }
 

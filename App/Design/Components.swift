@@ -140,6 +140,7 @@ struct EmptyState: View {
 
     var body: some View {
         VStack(spacing: 14) {
+            Spacer(minLength: 0)
             SprocketRule(holes: 8)
                 .frame(width: 100)
             Text(title)
@@ -155,9 +156,10 @@ struct EmptyState: View {
                     .buttonStyle(PrimaryButtonStyle(palette: palette))
                     .padding(.top, 4)
             }
+            Spacer(minLength: 0)
         }
         .padding(28)
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 
@@ -179,10 +181,20 @@ struct FieldRow<Content: View>: View {
 
 extension View {
     /// Fond de l'application, appliqué à un écran entier.
+    ///
+    /// L'expansion forcée n'est pas décorative : sans elle, la teinte ne peint
+    /// que derrière le contenu, et le reste de l'écran garde le fond du
+    /// système. Sur le thème sombre cela passait presque inaperçu ; en papier
+    /// crème, une bande claire au milieu d'un écran blanc ne passe pas.
     func carnetBackground(_ palette: Palette) -> some View {
         self
-            .background(palette.bg.ignoresSafeArea())
             .scrollContentBackground(.hidden)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(palette.bg.ignoresSafeArea())
+            .toolbarBackground(palette.surface, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
+            .toolbarBackground(palette.surface, for: .tabBar)
+            .toolbarBackground(.visible, for: .tabBar)
     }
 
     /// Habillage d'un champ de texte pour le sortir du style système.
