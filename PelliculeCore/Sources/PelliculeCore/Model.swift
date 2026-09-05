@@ -432,13 +432,20 @@ public enum Model {
         public var defaultExposures: Int
         public var defaultLab: String?
         public var circleOfConfusion: Double
+        /// Correction, en diaphragmes, appliquée aux mesures de la caméra.
+        ///
+        /// Les capteurs ne s'accordent pas tous, et l'écart d'un téléphone
+        /// donné avec une cellule à main est constant : on le règle une fois.
+        /// Facultatif dans le format, pour qu'une sauvegarde antérieure se
+        /// relise sans erreur.
+        public var meterCalibrationStops: Double?
         public var updatedAt: String
 
         public init(
             id: String, theme: String, currency: String, stopIncrement: String,
             autoGeolocate: Bool, defaultCameraId: String?, defaultLensId: String?,
             defaultFilmStockId: String?, defaultExposures: Int, defaultLab: String?,
-            circleOfConfusion: Double, updatedAt: String
+            circleOfConfusion: Double, meterCalibrationStops: Double?, updatedAt: String
         ) {
             self.id = id
             self.theme = theme
@@ -451,6 +458,7 @@ public enum Model {
             self.defaultExposures = defaultExposures
             self.defaultLab = defaultLab
             self.circleOfConfusion = circleOfConfusion
+            self.meterCalibrationStops = meterCalibrationStops
             self.updatedAt = updatedAt
         }
 
@@ -461,7 +469,7 @@ public enum Model {
                 id: "settings", theme: "dark", currency: "EUR", stopIncrement: "third",
                 autoGeolocate: true, defaultCameraId: nil, defaultLensId: nil,
                 defaultFilmStockId: nil, defaultExposures: 36, defaultLab: nil,
-                circleOfConfusion: 0.03, updatedAt: now)
+                circleOfConfusion: 0.03, meterCalibrationStops: nil, updatedAt: now)
         }
     }
 }

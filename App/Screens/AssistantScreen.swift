@@ -18,6 +18,10 @@ struct AssistantScreen: View {
     @State private var aperture: Double?
     @State private var distance: Double = 3
     @State private var focal: Double = 50
+    /// Lumière relevée à la caméra. Prime sur l'estimation à l'œil tant qu'on
+    /// n'a pas repris la main en choisissant une condition.
+    @State private var measuredEV: Double?
+    @State private var isMetering = false
 
     /// Le rouleau en cours donne la sensibilité et le film ; à défaut, on
     /// raisonne sur du 400 ISO, l'émulsion la plus courante.
@@ -29,6 +33,10 @@ struct AssistantScreen: View {
     private var condition: Light.Condition {
         Light.condition(id: conditionId) ?? Light.conditions[1]
     }
+
+    /// L'indice employé pour tout le reste de l'écran : la mesure quand il y
+    /// en a une, l'estimation sinon.
+    private var ev100: Double { measuredEV ?? condition.ev100 }
 
     private var spec: Assistant.IntentSpec { Assistant.spec(for: intent) }
 
@@ -56,14 +64,14 @@ struct AssistantScreen: View {
     private var workingAperture: Double {
         aperture ?? Assistant.startingAperture(
             for: spec, available: availableApertures,
-            ev100: condition.ev100, iso: iso,
+            ev100: ev100, iso: iso,
             availableShutters: availableShutters)
     }
 
     private var result: Assistant.Result {
         Assistant.advise(
             Assistant.Input(
-                ev100: condition.ev100,
+                ev100: ev100,
                 iso: iso,
                 aperture: workingAperture,
                 focal: focal,
@@ -88,6 +96,7 @@ struct AssistantScreen: View {
                     verdict
                     contextLine
                     intentPicker
+                    meterButton
                     lightPicker
                     aperturePicker
                     if spec.handheld { distanceSlider }
@@ -99,6 +108,26 @@ struct AssistantScreen: View {
             }
             .carnetBackground(palette)
             .navigationTitle("Assistant")
+            .sheet(isPresented: $isMetering) {
+                MeterSheet(
+                    iso: iso,
+                    aperture: workingAperture,
+                    availableShutters: availableShutters,
+                    estimated: condition,
+                    calibrationStops: carnet.settings.meterCalibrationStops ?? 0
+                ) { measured in
+                    measuredEV = measured
+                    // La condition nommée la plus proche sert d'étiquette, mais
+                    // c'est la mesure elle-même qui gouverne les calculs.
+                    if let named = Meter.nearestCondition(toEV100: measured) {
+                        conditionId = named.id
+                    }
+                } onCalibrate: { stops in
+                    var updated = carnet.settings
+                    updated.meterCalibrationStops = stops == 0 ? nil : stops
+                    carnet.save(updated)
+                }
+            }
             .onChange(of: intent) { _, _ in
                 // Changer d'intention change l'ouverture de départ : garder
                 // l'ancienne donnerait un conseil qui ne sert plus l'intention.
@@ -157,6 +186,9 @@ struct AssistantScreen: View {
                 MicroLabel(camera.name)
             }
             Spacer()
+            if measuredEV != nil {
+                MicroLabel("Mesuré", colour: palette.ok)
+            }
         }
     }
 
@@ -170,11 +202,27 @@ struct AssistantScreen: View {
         }
     }
 
+    /// La mesure à la caméra, offerte juste avant le choix à l'œil : c'est
+    /// l'ordre dans lequel on hésite.
+    private var meterButton: some View {
+        Button {
+            isMetering = true
+        } label: {
+            Label(
+                measuredEV == nil ? "Mesurer avec la caméra" : "Mesurer à nouveau",
+                systemImage: "sun.max")
+        }
+        .buttonStyle(SecondaryButtonStyle(palette: palette))
+    }
+
     private var lightPicker: some View {
         FieldRow(label: "La lumière que j’ai") {
             VStack(alignment: .leading, spacing: 8) {
                 chipRow(Light.conditions, label: \.label) { $0.id == conditionId } action: {
                     conditionId = $0.id
+                    // Choisir à la main, c'est reprendre la main : la mesure
+                    // précédente ne décrit plus ce qu'on regarde.
+                    measuredEV = nil
                 }
                 // On reconnaît une lumière à ses ombres, pas à un chiffre.
                 Text(condition.shadows)

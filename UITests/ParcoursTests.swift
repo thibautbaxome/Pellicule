@@ -145,6 +145,15 @@ final class ParcoursTests: XCTestCase {
             app.staticTexts["Kodak Tri-X 400"].exists,
             "l’assistant doit raisonner sur le rouleau en cours")
 
+        // Le posemètre. Un simulateur n'a pas de caméra : l'application doit
+        // le dire franchement plutôt que d'afficher un chiffre sans fondement.
+        tap(button: "Mesurer avec la caméra")
+        XCTAssertTrue(
+            app.staticTexts["Pas de caméra"].waitForExistence(timeout: 15),
+            "sans caméra, le posemètre doit le dire au lieu d’inventer une mesure")
+        capture("13b-posemetre-sans-camera")
+        tap(button: "Fermer")
+
         // Changer d’intention doit changer le conseil, pas seulement l’étiquette.
         tap(button: "Paysage")
         capture("14-assistant-paysage")

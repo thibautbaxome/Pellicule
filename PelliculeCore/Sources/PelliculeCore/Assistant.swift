@@ -75,6 +75,12 @@ public enum Assistant {
         public let level: AdviceLevel
         public let title: String
         public let detail: String
+
+        public init(level: AdviceLevel, title: String, detail: String) {
+            self.level = level
+            self.title = title
+            self.detail = detail
+        }
     }
 
     public struct Input: Sendable {
