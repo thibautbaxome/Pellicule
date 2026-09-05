@@ -255,7 +255,7 @@ struct AssistantScreen: View {
     /// lumière : deux choix de même nature méritent la même forme.
     private func chipRow<T>(
         _ values: [T],
-        label: (T) -> String,
+        label: @escaping (T) -> String,
         isSelected: @escaping (T) -> Bool,
         action: @escaping (T) -> Void
     ) -> some View {
