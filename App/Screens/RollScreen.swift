@@ -12,6 +12,7 @@ struct RollScreen: View {
     @Environment(\.palette) private var palette
     @Environment(\.dismiss) private var dismiss
     @State private var editedFrame: Model.Frame?
+    @State private var isEditingRoll = false
     @State private var isConfirmingDeletion = false
 
     private var roll: Model.Roll? { carnet.roll(id: rollId) }
@@ -32,8 +33,24 @@ struct RollScreen: View {
         .carnetBackground(palette)
         .navigationTitle(roll?.label ?? film?.displayName ?? "Rouleau")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            if roll != nil {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        isEditingRoll = true
+                    } label: {
+                        Label("Le rouleau", systemImage: "info.circle")
+                    }
+                }
+            }
+        }
         .sheet(item: $editedFrame) { frame in
             FrameSheet(carnet: carnet, frame: frame)
+        }
+        .sheet(isPresented: $isEditingRoll) {
+            if let roll {
+                RollEditSheet(carnet: carnet, roll: roll)
+            }
         }
     }
 
