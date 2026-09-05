@@ -7,18 +7,21 @@ Format pris en charge : **135 (24×36)**.
 
 ## État du projet
 
-**En construction.** Le noyau métier est terminé et testé ; l'interface n'existe
-pas encore.
+**Première version installable.** De quoi tenir un rouleau de bout en bout —
+déclarer un boîtier, charger une pellicule, noter ses vues, suivre le rouleau
+jusqu'à l'archive, exporter le carnet.
 
 | | |
 |---|---|
-| Calculs argentiques, banques de matériel, assistant | **fait**, 59 tests |
-| Import d'un carnet existant, export des métadonnées | **fait** |
-| Stockage et écrans iOS | en cours |
+| Calculs argentiques, banques de matériel, assistant | **fait**, 79 tests |
+| Stockage du carnet, import et export | **fait** |
+| Écrans : rouleaux, vues, matériel, réglages | **fait** |
+| Écran d'assistance à la prise de vue | à venir |
 | Posemètre par la caméra | à venir |
 | Rapprochement des scans du laboratoire | à venir |
 
-Rien n'est installable pour l'instant. Ce dépôt n'est pas encore un produit.
+L'installation passe par SideStore, et non par l'App Store : voir
+[INSTALLATION.md](INSTALLATION.md), qui dit aussi ce que ça coûte.
 
 ## Ce que l'application fait
 
@@ -35,14 +38,17 @@ labo, développé, scanné, archivé — référence d'archive, laboratoire, co�
 push/pull se déduit de l'écart entre la sensibilité employée et l'ISO de la
 boîte.
 
-**Vues.** Vitesse, ouverture, objectif, focale, correction, filtre, distance,
-flash, mesure, mots-clés, position, notes. Une pose longue affiche
-immédiatement la correction de réciprocité du film chargé.
+**Vues.** Vitesse, ouverture, objectif, focale, correction d'exposition, sujet,
+notes. Les graduations sont bornées par le matériel : les vitesses sont celles
+du boîtier, les ouvertures celles de l'objectif monté — proposer un 1/4000 sur
+un boîtier qui plafonne à 1/1000, c'est offrir de consigner un réglage qui n'a
+jamais existé. D'une vue à l'autre les réglages sont repris, le sujet non.
 
-**Assistant de prise de vue.** Le cœur de l'aide à la décision. On déclare une
-intention — portrait, paysage, rue, mouvement, filé, basse lumière, pose longue
-— et une condition de lumière ; l'application en déduit le couple
-vitesse/ouverture, la zone de netteté et l'hyperfocale.
+**Assistant de prise de vue** *(le moteur est écrit et testé, l'écran reste à
+faire)*. Le cœur de l'aide à la décision. On déclare une intention — portrait,
+paysage, rue, mouvement, filé, basse lumière, pose longue — et une condition de
+lumière ; l'application en déduit le couple vitesse/ouverture, la zone de
+netteté et l'hyperfocale.
 
 Tout est borné par le matériel réellement déclaré. Quand la scène sort de ces
 limites, l'application ne se contente pas de le signaler : elle propose la
@@ -50,22 +56,27 @@ correction applicable et explique ce qui coince — un film trop rapide pour la
 lumière, un besoin de filtre gris neutre, un risque de flou de bougé au regard
 de la règle du 1/focale.
 
-**Développement.** Révélateur, dilution, temps, température, agitation. Le temps
-est suggéré à partir des données du film, de la température du bain et du
-push/pull du rouleau.
+**Développement** *(à venir dans l'application)*. Révélateur, dilution, temps,
+température, agitation. Le temps se déduit des données du film, de la
+température du bain et du push/pull du rouleau.
 
-**Métadonnées des scans.** Un scan de laboratoire arrive nu : ni date de prise
-de vue, ni boîtier, ni réglages. L'application reconstitue tout cela depuis le
-carnet et l'écrit dans les fichiers, qui se comportent dès lors comme des photos
-numériques dans n'importe quelle photothèque.
+**Métadonnées des scans** *(à venir dans l'application)*. Un scan de laboratoire
+arrive nu : ni date de prise de vue, ni boîtier, ni réglages. Le carnet sait
+reconstituer tout cela et l'écrire dans les fichiers, qui se comportent dès lors
+comme des photos numériques dans n'importe quelle photothèque.
 
-**Sauvegarde.** Fichier JSON complet, lisible, qui appartient au photographe.
+**Sauvegarde.** Le carnet *est* un fichier JSON lisible, et il appartient au
+photographe. Il n'y a pas de base de données à côté : exporter revient à en
+copier une, importer à la relire. Le fichier apparaît dans l'application
+Fichiers, sous « Sur mon iPhone » — récupérable même si l'application refuse de
+s'ouvrir.
 
 ## Le noyau
 
-`PelliculeCore/` contient tout ce qui calcule : échelles d'exposition,
-réciprocité, profondeur de champ, temps de développement, moteur de
-l'assistant, banques de matériel, sauvegarde, métadonnées.
+`PelliculeCore/` contient tout ce qui calcule et tout ce qui se range : échelles
+d'exposition, réciprocité, profondeur de champ, temps de développement, moteur
+de l'assistant, banques de matériel, carnet, persistance, métadonnées.
+`App/` ne contient que des écrans.
 
 Il ne dépend d'**aucun SDK Apple**, ce qui a une conséquence pratique
 importante : il se compile et se teste sur Linux comme sur macOS, en une

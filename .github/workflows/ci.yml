@@ -28,6 +28,10 @@ jobs:
   app:
     name: Application iOS
     runs-on: macos-15
+    # Nécessaire pour publier la version : le jeton est en lecture seule par
+    # défaut sur un dépôt public.
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
