@@ -98,7 +98,7 @@ struct StatsScreen: View {
                         }
                         Spacer()
                         ValueText(text: "\(usage.frames)", size: 15, colour: palette.accent)
-                        MicroLabel("vues")
+                        MicroLabel(usage.frames > 1 ? "vues" : "vue")
                     }
                     .padding(.vertical, 8)
                     .padding(.horizontal, 12)

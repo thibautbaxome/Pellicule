@@ -18,6 +18,17 @@ final class ParcoursTests: XCTestCase {
         continueAfterFailure = false
         app = XCUIApplication()
         app.launchArguments = ["-carnet-neuf"]
+
+        // La première vue déclenche la demande de position. Sans ce moniteur,
+        // la boîte de dialogue du système reste devant l'écran au moment de la
+        // capture — le parcours passe, mais on ne voit rien.
+        addUIInterruptionMonitor(withDescription: "Autorisation système") { alert in
+            for label in ["Allow While Using App", "Allow Once", "Autoriser lorsque l’app est active", "Autoriser une fois", "OK"] {
+                let button = alert.buttons[label]
+                if button.exists { button.tap(); return true }
+            }
+            return false
+        }
         app.launch()
     }
 
@@ -123,6 +134,9 @@ final class ParcoursTests: XCTestCase {
         XCTAssertTrue(
             app.staticTexts["Vitesse"].waitForExistence(timeout: 10),
             "la saisie doit commencer par la vitesse")
+        // Provoque le passage du moniteur d'interruption si la demande de
+        // position est affichée, pour capturer l'écran et non la boîte.
+        app.swipeUp(); app.swipeDown()
         capture("10-vue-vierge")
 
         // Les graduations sont bornées par le matériel : le X-300 plafonne à
