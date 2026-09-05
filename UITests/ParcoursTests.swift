@@ -126,15 +126,33 @@ final class ParcoursTests: XCTestCase {
             "la vue enregistrée doit s’afficher avec son couple")
         capture("12-rouleau-une-vue")
 
+        // MARK: L'assistant
+        tapTab("Assistant")
+        XCTAssertTrue(
+            app.staticTexts["Ce que je veux faire"].waitForExistence(timeout: 10),
+            "l’assistant doit partir de l’intention")
+        capture("13-assistant")
+
+        // Le rouleau chargé doit alimenter l’assistant sans qu’on le ressaisisse.
+        XCTAssertTrue(
+            app.staticTexts["Kodak Tri-X 400"].exists,
+            "l’assistant doit raisonner sur le rouleau en cours")
+
+        // Changer d’intention doit changer le conseil, pas seulement l’étiquette.
+        tap(button: "Paysage")
+        capture("14-assistant-paysage")
+        tap(button: "Pose longue")
+        capture("15-assistant-pose-longue")
+
         // MARK: Les thèmes
         tapTab("Réglages")
-        capture("13-reglages")
+        capture("16-reglages")
 
         tap(button: "Papier")
-        capture("14-theme-papier")
+        capture("17-theme-papier")
 
         tap(button: "Chambre noire")
-        capture("15-theme-chambre-noire")
+        capture("18-theme-chambre-noire")
 
         tap(button: "Sombre")
     }

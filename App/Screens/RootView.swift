@@ -19,6 +19,9 @@ struct RootView: View {
             RollsScreen(carnet: carnet)
                 .tabItem { Label("Rouleaux", systemImage: "film") }
 
+            AssistantScreen(carnet: carnet)
+                .tabItem { Label("Assistant", systemImage: "sun.max") }
+
             GearScreen(carnet: carnet)
                 .tabItem { Label("Matériel", systemImage: "camera") }
 
