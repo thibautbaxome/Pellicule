@@ -77,14 +77,17 @@ final class ExifExportTests: XCTestCase {
 
     /// Les accents et les espaces d'un libellé doivent donner un nom de
     /// fichier utilisable partout.
-    func testFilenameSlugIsSafe() {
-        let roll = Model.Roll(
-            id: "x", label: "Été à l’Île d’Yeu", filmStockId: "f", cameraId: "c",
-            shotIso: 400, exposures: 36, loadedAt: "", status: .shooting,
-            createdAt: "", updatedAt: "")
-        let frame = Model.Frame(
-            id: "y", rollId: "x", number: 7, shotAt: "", tags: [], status: .shot,
-            createdAt: "", updatedAt: "")
+    func testFilenameSlugIsSafe() throws {
+        let carnet = Carnet(fileURL: nil)
+        let camera = carnet.makeCamera(named: "Un boîtier")
+        carnet.save(camera)
+
+        let film = try XCTUnwrap(Catalog.films.first { $0.id == "kodak-tri-x-400" })
+        let roll = carnet.loadRoll(film: film, camera: camera, label: "Été à l’Île d’Yeu")
+        carnet.save(roll)
+
+        var frame = carnet.makeFrame(inRoll: roll.id)
+        frame.number = 7
 
         XCTAssertEqual(
             ExifExport.filename(pattern: "{roll}-{nn}.jpg", roll: roll, frame: frame),

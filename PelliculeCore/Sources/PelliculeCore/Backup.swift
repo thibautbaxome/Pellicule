@@ -20,6 +20,17 @@ public struct Backup: Codable, Sendable {
     public let includesPhotos: Bool
     public let data: Payload
 
+    public init(
+        format: String, version: Int, exportedAt: String,
+        includesPhotos: Bool, data: Payload
+    ) {
+        self.format = format
+        self.version = version
+        self.exportedAt = exportedAt
+        self.includesPhotos = includesPhotos
+        self.data = data
+    }
+
     public struct Payload: Codable, Sendable {
         public var cameras: [Model.Camera]
         public var lenses: [Model.Lens]
@@ -28,6 +39,20 @@ public struct Backup: Codable, Sendable {
         public var frames: [Model.Frame]
         public var settings: [Model.Settings]
         public var attachments: [Attachment]
+
+        public init(
+            cameras: [Model.Camera], lenses: [Model.Lens], filmStocks: [Model.FilmStock],
+            rolls: [Model.Roll], frames: [Model.Frame], settings: [Model.Settings],
+            attachments: [Attachment]
+        ) {
+            self.cameras = cameras
+            self.lenses = lenses
+            self.filmStocks = filmStocks
+            self.rolls = rolls
+            self.frames = frames
+            self.settings = settings
+            self.attachments = attachments
+        }
     }
 
     public struct Attachment: Codable, Sendable, Identifiable {
@@ -38,6 +63,18 @@ public struct Backup: Codable, Sendable {
         public var createdAt: String
         /// Contenu de l'image, encodé en base64 sans préfixe de type.
         public var base64: String
+
+        public init(
+            id: String, mime: String, width: Double?, height: Double?,
+            createdAt: String, base64: String
+        ) {
+            self.id = id
+            self.mime = mime
+            self.width = width
+            self.height = height
+            self.createdAt = createdAt
+            self.base64 = base64
+        }
 
         public var imageData: Data? { Data(base64Encoded: base64) }
     }
