@@ -5,6 +5,15 @@ on:
     branches: ['**']
     tags: ['v*']
   pull_request:
+  # Publication d'une version à la demande. L'étiquette est posée par le
+  # runner : c'est ce qui permet de publier depuis un environnement dont
+  # l'accès Git sortant ne laisse pas passer les étiquettes.
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version à publier, par exemple v0.1.0"
+        required: true
+        type: string
 
 jobs:
   # Le noyau métier ne dépend d'aucun SDK Apple : il se compile et se teste sur
@@ -85,10 +94,22 @@ jobs:
       # Une version publiée donne une adresse directe, que SideStore sait
       # ouvrir depuis l'iPhone sans passer par un ordinateur.
       - name: Publier la version
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/v')
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ inputs.version || github.ref_name }}
         run: |
-          gh release create "${GITHUB_REF_NAME}" Pellicule.ipa \
-            --title "Pellicule ${GITHUB_REF_NAME}" \
-            --notes "Application non signée, à installer avec SideStore. Voir INSTALLATION.md."
+          gh release create "$VERSION" Pellicule.ipa \
+            --target "${GITHUB_SHA}" \
+            --title "Pellicule $VERSION" \
+            --notes "$(cat <<'NOTES'
+          Application **non signée**, à installer avec SideStore — elle sera
+          signée sur votre iPhone par votre propre compte Apple.
+
+          Le parcours complet, et ce qu'il coûte, sont décrits dans
+          [INSTALLATION.md](https://github.com/thibautbaxome/Pellicule/blob/main/INSTALLATION.md).
+
+          Une mise à jour conserve le carnet : il vit dans les documents de
+          l'application, pas dans le code.
+          NOTES
+          )"
