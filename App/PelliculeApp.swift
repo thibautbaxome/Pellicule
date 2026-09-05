@@ -76,5 +76,8 @@ private struct UnreadableCarnetView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(palette.bg.ignoresSafeArea())
         .environment(\.palette, palette)
+        // Sinon, sur un téléphone en mode clair, l'heure et la batterie sont
+        // dessinées en noir sur ce fond noir.
+        .preferredColorScheme(.dark)
     }
 }

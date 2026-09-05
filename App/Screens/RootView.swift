@@ -31,8 +31,10 @@ struct RootView: View {
         .tint(palette.accent)
         .environment(\.palette, palette)
         // Le thème pilote aussi l'apparence des éléments système — barre
-        // d'onglets, clavier, indicateurs de défilement.
-        .preferredColorScheme(palette.scheme)
+        // d'onglets, clavier, indicateurs de défilement. Sauf « Système » :
+        // forcer l'apparence réécrirait la valeur qu'on lit justement pour la
+        // suivre, et le thème resterait figé sur son premier état.
+        .preferredColorScheme(theme == .system ? nil : palette.scheme)
         .overlay(alignment: .top) {
             if let error = carnet.lastWriteError {
                 WriteErrorBanner(message: error, palette: palette)

@@ -227,7 +227,7 @@ struct FrameRow: View {
 
             // La vignette de repérage, quand il y en a une : c'est elle qui fait
             // reconnaître une vue d'un coup d'œil dans la liste.
-            if let id = frame.refPhotoId, let thumbnail = PhotoStore.load(id) {
+            if let id = frame.refPhotoId, let thumbnail = PhotoStore.thumbnail(id, side: 40) {
                 Image(uiImage: thumbnail)
                     .resizable()
                     .scaledToFill()

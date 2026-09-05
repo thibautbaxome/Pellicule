@@ -80,9 +80,13 @@ final class LightMeter {
         }
         // Un relevé toutes les deux dixièmes : assez pour suivre la main qui
         // balaie la scène, assez peu pour que le chiffre reste lisible.
-        poll = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { [weak self] _ in
+        let timer = Timer(timeInterval: 0.2, repeats: true) { [weak self] _ in
             Task { @MainActor in self?.sample() }
         }
+        // En mode .common : le mode par défaut du run loop se tait pendant
+        // qu'on fait défiler, et la mesure se figerait sous le doigt.
+        RunLoop.main.add(timer, forMode: .common)
+        poll = timer
     }
 
     @MainActor

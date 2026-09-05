@@ -20,7 +20,9 @@ struct MeterSheet: View {
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.palette) private var palette
-    @State private var meter = LightMeter()
+    // Sans valeur par défaut : elle serait construite — session de capture
+    // comprise — puis aussitôt jetée par l'init, à chaque réévaluation.
+    @State private var meter: LightMeter
 
     init(
         iso: Double,

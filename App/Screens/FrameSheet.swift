@@ -24,6 +24,14 @@ struct FrameSheet: View {
     @State private var isPickingLens = false
     @State private var isConfirmingDeletion = false
 
+    /// La vue est un brouillon jusqu'à « Enregistrer », et ses photos doivent
+    /// l'être aussi : celles prises pendant la saisie n'existent que si elle
+    /// aboutit, celles qu'on remplace ne disparaissent que si elle aboutit.
+    /// Sans quoi « Annuler » laisserait la vue enregistrée pointer vers un
+    /// fichier effacé.
+    @State private var draftPhotoIds: [String] = []
+    @State private var photosToDeleteOnSave: [String] = []
+
     private var roll: Model.Roll? { carnet.roll(id: frame.rollId) }
     private var camera: Model.Camera? { roll.flatMap { carnet.camera(id: $0.cameraId) } }
     private var isExisting: Bool { carnet.frames.contains { $0.id == frame.id } }
@@ -131,6 +139,7 @@ struct FrameSheet: View {
                 Button("Enregistrer") {
                     frame.updatedAt = Carnet.timestamp(Date())
                     carnet.save(frame)
+                    photosToDeleteOnSave.forEach(PhotoStore.delete)
                     didSave = true
                     dismiss()
                 }
@@ -160,6 +169,13 @@ struct FrameSheet: View {
             }
             .onAppear {
                 if let id = frame.refPhotoId { referencePhoto = PhotoStore.load(id) }
+            }
+            // Fermée sans enregistrer — « Annuler », ou un glissement vers le
+            // bas — la feuille ne laisse pas derrière elle les photos du
+            // brouillon. Les feuilles présentées par-dessus ne la font pas
+            // disparaître : ceci ne joue qu'à la vraie fermeture.
+            .onDisappear {
+                if !didSave { draftPhotoIds.forEach(PhotoStore.delete) }
             }
             .onChange(of: pickedPhoto) { _, item in
                 guard let item else { return }
@@ -194,6 +210,12 @@ struct FrameSheet: View {
                 isPresented: $isConfirmingDeletion, titleVisibility: .visible
             ) {
                 Button("Supprimer", role: .destructive) {
+                    // La photo de la vue telle qu'elle est enregistrée — pas
+                    // celle du brouillon, qui part avec lui à la fermeture.
+                    if let saved = carnet.frames.first(where: { $0.id == frame.id }),
+                       let photo = saved.refPhotoId {
+                        PhotoStore.delete(photo)
+                    }
                     carnet.delete(frameId: frame.id)
                     dismiss()
                 }
@@ -319,19 +341,24 @@ struct FrameSheet: View {
                     .foregroundStyle(palette.textDim)
             }
         case .permissionDenied:
-            Text("Accès refusé. Autorisez la position dans Réglages → Pellicule pour l’inscrire dans les métadonnées du scan.")
+            // Le même état couvre le refus pour l'application et le service
+            // coupé pour tout le téléphone : le chemin indiqué mène aux deux.
+            Text("Accès refusé. Autorisez la position pour Pellicule dans Réglages → Confidentialité et sécurité → Service de localisation.")
                 .font(Typo.caption)
                 .foregroundStyle(palette.textFaint)
                 .fixedSize(horizontal: false, vertical: true)
-        case .servicesOff:
-            Text("La localisation est désactivée sur cet appareil.")
+        case .restricted:
+            Text("La localisation est restreinte sur cet appareil — Temps d’écran ou gestion de l’appareil l’interdit.")
                 .font(Typo.caption)
                 .foregroundStyle(palette.textFaint)
+                .fixedSize(horizontal: false, vertical: true)
         case .failed(let reason):
             Text("Position introuvable : \(reason)")
                 .font(Typo.caption)
                 .foregroundStyle(palette.textFaint)
                 .fixedSize(horizontal: false, vertical: true)
+            Button("Réessayer") { locator.request() }
+                .buttonStyle(SecondaryButtonStyle(palette: palette))
         case .idle, .located:
             Button("Relever la position") { locator.request() }
                 .buttonStyle(SecondaryButtonStyle(palette: palette))
@@ -385,16 +412,38 @@ struct FrameSheet: View {
     }
 
     private func attach(_ image: UIImage) {
-        if let previous = frame.refPhotoId { PhotoStore.delete(previous) }
-        guard let id = PhotoStore.save(image) else { return }
-        frame.refPhotoId = id
-        referencePhoto = PhotoStore.load(id)
+        // Réduire et encoder une photo de douze mégapixels prend un moment
+        // perceptible : pas sur le fil de l'interface, au moment précis où
+        // l'on veut passer à la vue suivante.
+        Task.detached(priority: .userInitiated) {
+            guard let id = PhotoStore.save(image) else { return }
+            let loaded = PhotoStore.load(id)
+            await MainActor.run {
+                releasePhoto(frame.refPhotoId)
+                frame.refPhotoId = id
+                draftPhotoIds.append(id)
+                referencePhoto = loaded
+            }
+        }
     }
 
     private func detachPhoto() {
-        if let id = frame.refPhotoId { PhotoStore.delete(id) }
+        releasePhoto(frame.refPhotoId)
         frame.refPhotoId = nil
         referencePhoto = nil
+    }
+
+    /// Une photo que le brouillon lâche : si elle est née dans ce brouillon,
+    /// personne d'autre ne la connaît et elle part tout de suite ; si elle est
+    /// celle de la vue enregistrée, elle ne part qu'avec l'enregistrement.
+    private func releasePhoto(_ id: String?) {
+        guard let id else { return }
+        if draftPhotoIds.contains(id) {
+            PhotoStore.delete(id)
+            draftPhotoIds.removeAll { $0 == id }
+        } else {
+            photosToDeleteOnSave.append(id)
+        }
     }
 
     /// Un filtre coûte de la lumière : le noter, c'est pouvoir expliquer plus

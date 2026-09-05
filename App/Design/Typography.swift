@@ -1,4 +1,5 @@
 import CoreText
+import os
 import SwiftUI
 
 /// Deux règles typographiques tiennent tout le système.
@@ -22,10 +23,20 @@ enum Typo {
 
     /// À appeler une fois, au démarrage, avant la première vue.
     static func registerFonts() {
-        guard let urls = Bundle.main.urls(forResourcesWithExtension: "ttf", subdirectory: nil)
-        else { return }
+        let log = Logger(subsystem: "app.pellicule.carnet", category: "typographie")
+        guard let urls = Bundle.main.urls(forResourcesWithExtension: "ttf", subdirectory: nil),
+              !urls.isEmpty
+        else {
+            log.error("Aucune police embarquée : l’interface retombe sur la police système.")
+            return
+        }
         for url in urls {
-            CTFontManagerRegisterFontsForURL(url as CFURL, .process, nil)
+            var error: Unmanaged<CFError>?
+            if !CTFontManagerRegisterFontsForURL(url as CFURL, .process, &error) {
+                let reason = error.map { CFErrorCopyDescription($0.takeRetainedValue()) as String }
+                    ?? "raison inconnue"
+                log.error("Police non enregistrée : \(url.lastPathComponent, privacy: .public) — \(reason, privacy: .public)")
+            }
         }
     }
 

@@ -1,4 +1,5 @@
 import Foundation
+import ImageIO
 import PelliculeCore
 import UIKit
 
@@ -50,6 +51,31 @@ enum PhotoStore {
 
     static func data(_ id: String) -> Data? {
         try? Data(contentsOf: url(for: id))
+    }
+
+    private static let thumbnails = NSCache<NSString, UIImage>()
+
+    /// Une vignette pour les listes. Décoder la photo entière pour l'afficher
+    /// en quarante points coûterait huit mégaoctets par ligne et ferait
+    /// bégayer le défilement ; ImageIO sait produire directement une image
+    /// réduite, et on la garde en cache tant que la mémoire le permet.
+    static func thumbnail(_ id: String, side: CGFloat) -> UIImage? {
+        let key = "\(id)@\(Int(side))" as NSString
+        if let cached = thumbnails.object(forKey: key) { return cached }
+
+        // Trois pixels par point : net sur tous les écrans, sans interroger
+        // l'écran depuis un endroit qui n'a pas à le connaître.
+        let options: [CFString: Any] = [
+            kCGImageSourceCreateThumbnailFromImageAlways: true,
+            kCGImageSourceCreateThumbnailWithTransform: true,
+            kCGImageSourceThumbnailMaxPixelSize: Int(side * 3),
+        ]
+        guard let source = CGImageSourceCreateWithURL(url(for: id) as CFURL, nil),
+              let reduced = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary)
+        else { return nil }
+        let image = UIImage(cgImage: reduced)
+        thumbnails.setObject(image, forKey: key)
+        return image
     }
 
     static func delete(_ id: String) {

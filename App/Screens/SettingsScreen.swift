@@ -7,6 +7,9 @@ struct SettingsScreen: View {
 
     @Environment(\.palette) private var palette
     @State private var isExporting = false
+    /// Construit au moment d'exporter, jamais dans `body` : encoder le carnet
+    /// — et ses photos — à chaque frappe dans un champ serait absurde.
+    @State private var exportDocument: CarnetDocument?
     @State private var isImporting = false
     @State private var importOutcome: ImportOutcome?
     @State private var includePhotos = false
@@ -30,15 +33,17 @@ struct SettingsScreen: View {
             .navigationTitle("Réglages")
             .fileExporter(
                 isPresented: $isExporting,
-                document: CarnetDocument(carnet: carnet, includePhotos: includePhotos),
+                document: exportDocument,
                 contentType: .json,
                 defaultFilename: "pellicule-\(dateStamp()).json"
-            ) { _ in }
+            ) { _ in
+                exportDocument = nil
+            }
             .fileImporter(
                 isPresented: $isImporting,
                 allowedContentTypes: [.json]
             ) { result in
-                importOutcome = restore(from: result)
+                Task { importOutcome = await restore(from: result) }
             }
             .alert(
                 importOutcome?.title ?? "",
@@ -168,8 +173,11 @@ struct SettingsScreen: View {
                 }
                 .tint(palette.accent)
 
-                Button("Exporter le carnet") { isExporting = true }
-                    .buttonStyle(SecondaryButtonStyle(palette: palette))
+                Button("Exporter le carnet") {
+                    exportDocument = CarnetDocument(carnet: carnet, includePhotos: includePhotos)
+                    isExporting = true
+                }
+                .buttonStyle(SecondaryButtonStyle(palette: palette))
 
                 Button("Importer un carnet") { isImporting = true }
                     .buttonStyle(SecondaryButtonStyle(palette: palette))
@@ -213,17 +221,26 @@ struct SettingsScreen: View {
 
     // MARK: - Import
 
-    private func restore(from result: Result<URL, Error>) -> ImportOutcome {
+    /// La lecture et le décodage se font hors du fil de l'interface : une
+    /// sauvegarde avec photos pèse des dizaines de mégaoctets, et l'écran ne
+    /// doit pas se figer le temps de la relire. Seule la fusion dans le carnet
+    /// revient sur le fil principal.
+    @MainActor
+    private func restore(from result: Result<URL, Error>) async -> ImportOutcome {
         do {
             let url = try result.get()
-            // Un fichier choisi hors du bac à sable de l'application n'est
-            // lisible qu'après cette demande explicite.
-            let accessed = url.startAccessingSecurityScopedResource()
-            defer { if accessed { url.stopAccessingSecurityScopedResource() } }
-
-            let backup = try Backup.decode(from: Data(contentsOf: url))
+            let backup = try await Task.detached(priority: .userInitiated) {
+                // Un fichier choisi hors du bac à sable de l'application n'est
+                // lisible qu'après cette demande explicite.
+                let accessed = url.startAccessingSecurityScopedResource()
+                defer { if accessed { url.stopAccessingSecurityScopedResource() } }
+                return try Backup.decode(from: Data(contentsOf: url))
+            }.value
             carnet.restore(backup, mode: .merge)
-            let photos = PhotoStore.restore(backup.data.attachments)
+            let attachments = backup.data.attachments
+            let photos = await Task.detached(priority: .userInitiated) {
+                PhotoStore.restore(attachments)
+            }.value
             let summary = backup.summary
             return ImportOutcome(
                 title: "Carnet importé",

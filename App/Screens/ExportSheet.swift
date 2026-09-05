@@ -84,9 +84,14 @@ struct ExportSheet: View {
                 allowsMultipleSelection: true
             ) { result in
                 // L'ordre du laboratoire est celui des noms de fichiers : c'est
-                // la seule chose sur laquelle on puisse s'appuyer.
+                // la seule chose sur laquelle on puisse s'appuyer. Tri
+                // numérique, comme le Finder : « IMG_2 » avant « IMG_10 »,
+                // même quand le laboratoire n'a pas complété par des zéros.
                 files = ((try? result.get()) ?? [])
-                    .sorted { $0.lastPathComponent < $1.lastPathComponent }
+                    .sorted {
+                        $0.lastPathComponent.localizedStandardCompare($1.lastPathComponent)
+                            == .orderedAscending
+                    }
                 tagged = []
                 problems = []
             }
@@ -269,20 +274,30 @@ struct ExportSheet: View {
         isWorking = true
         problems = []
 
-        let directory = FileManager.default.temporaryDirectory
-            .appendingPathComponent("scans-\(UUID().uuidString)")
-        try? FileManager.default.createDirectory(
-            at: directory, withIntermediateDirectories: true)
-
+        let pairings = pairings
+        let pattern = pattern
+        // Deux fichiers du même nom, venus de deux dossiers : le premier
+        // l'emporte. Une clé en double planterait l'application.
         let sources = Dictionary(
-            uniqueKeysWithValues: files.map { ($0.lastPathComponent, $0) })
-        let outcome = ScanTagger.tag(
-            pairings: pairings, sources: sources, context: context,
-            pattern: pattern, into: directory)
+            files.map { ($0.lastPathComponent, $0) },
+            uniquingKeysWith: { first, _ in first })
 
-        tagged = outcome.written
-        problems = outcome.failures
-        isWorking = false
+        // Ré-encoder trente scans n'a rien à faire sur le fil de l'interface :
+        // le bouton dit « Écriture… », il faut qu'on ait le temps de le lire.
+        Task.detached(priority: .userInitiated) {
+            let directory = FileManager.default.temporaryDirectory
+                .appendingPathComponent("scans-\(UUID().uuidString)")
+            try? FileManager.default.createDirectory(
+                at: directory, withIntermediateDirectories: true)
+            let outcome = ScanTagger.tag(
+                pairings: pairings, sources: sources, context: context,
+                pattern: pattern, into: directory)
+            await MainActor.run {
+                tagged = outcome.written
+                problems = outcome.failures
+                isWorking = false
+            }
+        }
     }
 }
 

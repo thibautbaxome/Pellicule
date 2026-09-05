@@ -19,9 +19,13 @@ final class Locator: NSObject, CLLocationManagerDelegate {
         case idle
         case locating
         case located
+        /// Refusée pour l'application, ou service de localisation coupé pour
+        /// tout le téléphone : CoreLocation ne distingue pas les deux.
         case permissionDenied
-        /// La localisation est coupée à l'échelle de l'appareil.
-        case servicesOff
+        /// Interdite par une restriction — Temps d'écran, gestion de
+        /// l'appareil — sur laquelle l'utilisateur n'a pas la main.
+        case restricted
+        /// Le relevé a échoué ; la raison est déjà rédigée pour l'écran.
         case failed(String)
     }
 
@@ -51,7 +55,7 @@ final class Locator: NSObject, CLLocationManagerDelegate {
         case .denied:
             status = .permissionDenied
         case .restricted:
-            status = .servicesOff
+            status = .restricted
         @unknown default:
             status = .permissionDenied
         }
@@ -71,7 +75,7 @@ final class Locator: NSObject, CLLocationManagerDelegate {
         case .denied:
             status = .permissionDenied
         case .restricted:
-            status = .servicesOff
+            status = .restricted
         case .notDetermined:
             break
         @unknown default:
@@ -92,12 +96,20 @@ final class Locator: NSObject, CLLocationManagerDelegate {
     }
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        // Un refus arrive aussi par ici sur certaines versions.
-        if let clError = error as? CLError, clError.code == .denied {
+        // La description système est en anglais et parle en codes d'erreur ;
+        // le photographe a besoin de savoir quoi faire, pas de quel domaine
+        // vient l'échec.
+        switch (error as? CLError)?.code {
+        case .denied:
+            // Un refus arrive aussi par ici sur certaines versions.
             status = .permissionDenied
-            return
+        case .locationUnknown:
+            status = .failed("le téléphone n’a pas réussi à se situer. Réessayez à découvert.")
+        case .network:
+            status = .failed("aucun réseau pour établir la position.")
+        default:
+            status = .failed("le téléphone n’a pas pu se situer.")
         }
-        status = .failed(error.localizedDescription)
     }
 }
 
