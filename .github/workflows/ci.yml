@@ -15,6 +15,13 @@ on:
         required: true
         type: string
 
+# Deux poussées rapprochées produisaient deux exécutions qui se disputaient la
+# branche des captures, et celle qu'on finissait par lire n'était pas celle du
+# dernier commit. La plus ancienne est désormais abandonnée.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   # Le noyau métier ne dépend d'aucun SDK Apple : il se compile et se teste sur
   # Linux, ce qui donne une boucle de quelques secondes plutôt que de quelques
@@ -235,10 +242,13 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           cd captures
-          cat > LISEZMOI.md <<'EOF'
+          cat > LISEZMOI.md <<EOF
           # Captures du parcours automatisé
 
-          Engendrées à chaque poussée sur `main` par le parcours dans le
+          Commit : ${GITHUB_SHA}
+          Exécution : ${GITHUB_RUN_ID}
+
+          Engendrées à chaque poussée sur \`main\` par le parcours dans le
           simulateur. Elles sont écrasées à chaque exécution : cette branche
           n'a pas d'historique utile, elle sert à regarder l'interface.
           EOF

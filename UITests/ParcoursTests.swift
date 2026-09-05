@@ -21,6 +21,13 @@ final class ParcoursTests: XCTestCase {
         app.launch()
     }
 
+    /// Quel que soit le sort du parcours, l'écran tel qu'il était à la fin.
+    /// Sur échec, c'est la capture la plus utile : elle montre où ça a bloqué,
+    /// là où le message d'erreur ne dit que ce qui manquait.
+    override func tearDownWithError() throws {
+        capture("99-etat-final")
+    }
+
     /// Le parcours complet, en une seule fonction : chaque étape dépend de la
     /// précédente, et les découper obligerait à rejouer les mêmes gestes.
     func testParcoursComplet() throws {
