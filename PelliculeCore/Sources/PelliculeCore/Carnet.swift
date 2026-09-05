@@ -40,6 +40,15 @@ public final class Carnet {
     private let now: () -> Date
     private let makeID: () -> String
 
+    /// Vrai quand la relecture du fichier a échoué.
+    ///
+    /// Le carnet refuse alors toute écriture. C'est la précaution la plus
+    /// importante du fichier : un carnet qu'on n'a pas su lire contient
+    /// peut-être des années de prises de vue, et l'écraser par un carnet vide
+    /// à la première saisie les effacerait définitivement. Mieux vaut une
+    /// application inutilisable qu'une application destructrice.
+    public private(set) var isSealed = false
+
     /// Dernière erreur d'écriture, s'il y en a eu une.
     ///
     /// Une écriture qui échoue ne doit pas faire perdre la saisie en cours : la
@@ -64,8 +73,13 @@ public final class Carnet {
     /// pas une erreur.
     public func load() throws {
         guard let fileURL, FileManager.default.fileExists(atPath: fileURL.path) else { return }
-        let backup = try Backup.decode(from: Data(contentsOf: fileURL))
-        adopt(backup)
+        do {
+            adopt(try Backup.decode(from: Data(contentsOf: fileURL)))
+            isSealed = false
+        } catch {
+            isSealed = true
+            throw error
+        }
     }
 
     private func adopt(_ backup: Backup) {
@@ -83,6 +97,7 @@ public final class Carnet {
     /// intact plutôt qu'un fichier tronqué. Perdre la dernière vue saisie est
     /// désagréable ; perdre le carnet entier ne doit pas pouvoir arriver.
     public func persist() {
+        guard !isSealed else { return }
         guard let fileURL else { return }
         do {
             try backup(includingPhotos: false).encoded().write(to: fileURL, options: .atomic)

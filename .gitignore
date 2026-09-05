@@ -6,3 +6,6 @@ DerivedData
 
 # macOS
 .DS_Store
+
+# Engendré par XcodeGen depuis project.yml
+Pellicule.xcodeproj

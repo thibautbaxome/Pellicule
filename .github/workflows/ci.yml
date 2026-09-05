@@ -3,13 +3,15 @@ name: CI
 on:
   push:
     branches: ['**']
+    tags: ['v*']
   pull_request:
 
 jobs:
   # Le noyau métier ne dépend d'aucun SDK Apple : il se compile et se teste sur
   # Linux, ce qui donne une boucle de quelques secondes plutôt que de quelques
-  # minutes. C'est là que vivent tous les calculs argentiques, et c'est aussi ce
-  # qui valide les banques de matériel — elles sont écrites à la main.
+  # minutes. C'est là que vivent tous les calculs argentiques, le carnet et sa
+  # persistance, et c'est aussi ce qui valide les banques de matériel — elles
+  # sont écrites à la main.
   core-linux:
     name: Tests du noyau (Linux)
     runs-on: ubuntu-latest
@@ -20,21 +22,69 @@ jobs:
         working-directory: PelliculeCore
         run: swift test
 
-  # Le même noyau sur macOS, compilé pour iOS : c'est ce qui prouve que le code
-  # tourne réellement sur la plateforme cible, et pas seulement sur Linux.
-  # Les runners macOS sont gratuits sur les dépôts publics.
-  core-ios:
-    name: Compilation pour iOS
+  # L'application elle-même, compilée pour l'appareil. Les runners macOS sont
+  # gratuits sur les dépôts publics : c'est ce qui rend l'ensemble possible sans
+  # posséder de Mac.
+  app:
+    name: Application iOS
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
-      - name: Compiler pour le simulateur iOS
-        working-directory: PelliculeCore
+
+      # Le .xcodeproj n'est pas versionné — format binaire de fait, illisible en
+      # revue et champion des conflits. XcodeGen le reconstitue depuis
+      # project.yml.
+      - name: Installer XcodeGen
+        run: brew install xcodegen
+
+      - name: Engendrer le projet
+        run: xcodegen generate
+
+      # Sans signature : l'application est signée sur l'appareil, au moment de
+      # l'installation, par le compte Apple de son utilisateur.
+      - name: Compiler
         run: |
+          set -o pipefail
           xcodebuild build \
-            -scheme PelliculeCore \
-            -destination 'generic/platform=iOS Simulator' \
-            -skipPackagePluginValidation \
+            -project Pellicule.xcodeproj \
+            -scheme Pellicule \
+            -configuration Release \
+            -sdk iphoneos \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
             | xcbeautify || xcodebuild build \
-              -scheme PelliculeCore \
-              -destination 'generic/platform=iOS Simulator'
+              -project Pellicule.xcodeproj \
+              -scheme Pellicule \
+              -configuration Release \
+              -sdk iphoneos \
+              -derivedDataPath build \
+              CODE_SIGNING_ALLOWED=NO \
+              CODE_SIGNING_REQUIRED=NO \
+              CODE_SIGN_IDENTITY=""
+
+      # Un IPA n'est qu'une archive zip contenant un dossier Payload.
+      - name: Empaqueter l'IPA
+        run: |
+          mkdir -p Payload
+          cp -R build/Build/Products/Release-iphoneos/Pellicule.app Payload/
+          zip -qry Pellicule.ipa Payload
+          ls -lh Pellicule.ipa
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Pellicule-ipa
+          path: Pellicule.ipa
+          if-no-files-found: error
+
+      # Une version publiée donne une adresse directe, que SideStore sait
+      # ouvrir depuis l'iPhone sans passer par un ordinateur.
+      - name: Publier la version
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" Pellicule.ipa \
+            --title "Pellicule ${GITHUB_REF_NAME}" \
+            --notes "Application non signée, à installer avec SideStore. Voir INSTALLATION.md."

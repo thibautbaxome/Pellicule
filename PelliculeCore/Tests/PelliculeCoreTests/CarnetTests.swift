@@ -356,3 +356,37 @@ final class CarnetTests: XCTestCase {
         XCTAssertTrue(early.hasSuffix("Z"), "l'horodatage doit être en temps universel")
     }
 }
+
+// MARK: - Protection du fichier
+
+extension CarnetTests {
+
+    /// La précaution la plus importante du carnet : un fichier illisible peut
+    /// contenir des années de prises de vue. L'application doit refuser
+    /// d'écrire par-dessus, quitte à être inutilisable.
+    func testAnUnreadableCarnetIsNeverOverwritten() throws {
+        let corrupt = Data(#"{"format":"pellicule-backup","version":99,"exportedAt":"","includesPhotos":false,"data":{"cameras":[],"lenses":[],"filmStocks":[],"rolls":[],"frames":[],"settings":[],"attachments":[]}}"#.utf8)
+        try corrupt.write(to: fileURL)
+
+        let carnet = makeCarnet()
+        XCTAssertThrowsError(try carnet.load())
+        XCTAssertTrue(carnet.isSealed)
+
+        carnet.save(carnet.makeCamera(named: "Une saisie qui ne doit rien écraser"))
+
+        XCTAssertEqual(
+            try Data(contentsOf: fileURL), corrupt,
+            "le fichier d'origine doit être intact")
+    }
+
+    /// Un fichier qui n'est même pas du JSON est refusé de la même façon.
+    func testGarbageFileSealsTheCarnet() throws {
+        try Data("ceci n'est pas un carnet".utf8).write(to: fileURL)
+
+        let carnet = makeCarnet()
+        XCTAssertThrowsError(try carnet.load())
+        XCTAssertTrue(carnet.isSealed)
+        carnet.save(carnet.makeCamera(named: "Rien ne doit sortir"))
+        XCTAssertEqual(try String(contentsOf: fileURL, encoding: .utf8), "ceci n'est pas un carnet")
+    }
+}
