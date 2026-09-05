@@ -27,6 +27,20 @@ export interface Camera {
   mount?: string;
   /** Décalage systématique du posemètre du boîtier, en IL. */
   meterBiasStops?: number;
+
+  /**
+   * Vitesses extrêmes du boîtier, en libellés canoniques. L'assistant s'en
+   * sert pour signaler qu'un réglage sort de ce que l'appareil sait faire.
+   */
+  shutterFastest?: string;
+  shutterSlowest?: string;
+
+  /**
+   * Objectif solidaire du boîtier, pour un compact. Sa présence dispense de
+   * déclarer un objectif séparé.
+   */
+  fixedLens?: { focal: number; maxAperture: number; minAperture?: number };
+
   notes?: string;
   archived: boolean;
   createdAt: ISODate;

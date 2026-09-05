@@ -46,8 +46,29 @@ immédiatement la correction de réciprocité du film chargé.
 température, agitation. Le temps est suggéré à partir des données du film, de
 la température du bain et du push/pull du rouleau.
 
-**Outils.** Règle du f/16, correction de réciprocité, profondeur de champ et
-hyperfocale, facteurs de filtre cumulés, correction du temps de développement.
+**Assistant de prise de vue.** L'écran central de l'aide à la décision. On y
+déclare une intention — portrait, paysage, rue, mouvement, filé, basse lumière,
+pose longue — et une condition de lumière ; l'application en déduit le couple
+vitesse/ouverture et l'affiche en gros, épinglé en haut de l'écran. Les
+curseurs d'ouverture, de distance et de focale le recalculent en direct, avec
+la zone de netteté représentée sur une échelle logarithmique.
+
+Tout est borné par le matériel réellement déclaré : les vitesses proposées sont
+celles du boîtier, les ouvertures celles de l'objectif. Quand la scène sort de
+ces limites, l'application ne se contente pas de le signaler — elle propose la
+correction, applicable d'un geste, et explique ce qui coince : un film trop
+rapide pour la lumière, un besoin de filtre gris neutre, un risque de flou de
+bougé au regard de la règle du 1/focale.
+
+**Calculateurs.** Derrière l'assistant, le détail : règle du f/16, correction de
+réciprocité, profondeur de champ et hyperfocale, facteurs de filtre cumulés,
+correction du temps de développement.
+
+**Banques de matériel.** Plus de 150 boîtiers 135 référencés — reflex,
+télémétriques, compacts — avec monture, plage de vitesses et objectif solidaire,
+plus un catalogue d'objectifs filtré par monture. On cherche son appareil, on le
+sélectionne, les caractéristiques se remplissent. Rien n'est imposé : un modèle
+absent se déclare à la main comme avant.
 
 **Export vers les scans.** Un CSV pour `exiftool`, un script shell prêt à
 lancer, ou un CSV lisible dans un tableur. Les scans du laboratoire récupèrent
@@ -154,6 +175,20 @@ Aucun état global : les écrans lisent la base par `useLiveQuery`, et toute
 écriture rafraîchit l'affichage. Le routage se fait par fragment d'URL
 (`HashRouter`), ce qui permet d'héberger l'application n'importe où sans
 réécriture côté serveur et de recharger une page profonde hors ligne.
+
+## Ce que l'application ne peut pas faire
+
+**Mesurer la lumière avec la caméra de l'iPhone.** Un navigateur n'a pas accès
+à la luminance absolue d'une scène : la caméra corrige son exposition en
+continu, si bien que la clarté moyenne d'une image reste constante quelle que
+soit la lumière réelle. La seule méthode exacte consiste à lire les réglages
+que la caméra a elle-même retenus — temps de pose et sensibilité. Chrome les
+publie sur Android, WebKit non : sur iPhone, la mesure est donc impossible, et
+l'application le dit au lieu d'afficher un chiffre inventé.
+
+L'estimation par la scène reste fiable — c'est ainsi qu'on a exposé pendant un
+siècle — et une cellule à main ou le posemètre du boîtier prennent le relais
+quand la précision compte.
 
 ## Réserves sur les calculs
 

@@ -10,6 +10,7 @@ import GearScreen from './screens/GearScreen';
 import CameraEditScreen from './screens/CameraEditScreen';
 import LensEditScreen from './screens/LensEditScreen';
 import FilmEditScreen from './screens/FilmEditScreen';
+import AssistantScreen from './screens/AssistantScreen';
 import ToolsScreen from './screens/ToolsScreen';
 import SettingsScreen from './screens/SettingsScreen';
 import StatsScreen from './screens/StatsScreen';
@@ -19,7 +20,7 @@ import ExportScreen from './screens/ExportScreen';
 const TABS = [
   { to: '/', Icon: IconFilm, label: 'Rouleaux' },
   { to: '/gear', Icon: IconCamera, label: 'Matériel' },
-  { to: '/tools', Icon: IconAperture, label: 'Outils' },
+  { to: '/tools', Icon: IconAperture, label: 'Assistant' },
   { to: '/settings', Icon: IconSliders, label: 'Réglages' },
 ];
 
@@ -54,7 +55,8 @@ export default function App() {
         <Route path="/gear/cameras/:cameraId" element={<CameraEditScreen />} />
         <Route path="/gear/lenses/:lensId" element={<LensEditScreen />} />
         <Route path="/gear/films/:filmId" element={<FilmEditScreen />} />
-        <Route path="/tools" element={<ToolsScreen />} />
+        <Route path="/tools" element={<AssistantScreen />} />
+        <Route path="/tools/calc" element={<ToolsScreen />} />
         <Route path="/stats" element={<StatsScreen />} />
         <Route path="/export" element={<ExportScreen />} />
         <Route path="/settings" element={<SettingsScreen />} />

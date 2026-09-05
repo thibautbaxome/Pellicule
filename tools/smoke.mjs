@@ -55,25 +55,30 @@ await step('Accueil vide', async () => {
   await shot('01-accueil-vide');
 });
 
-await step('Créer un boîtier', async () => {
+await step('Créer un boîtier depuis la banque', async () => {
   await page.goto(`${BASE}#/gear/cameras/new`);
   await page.waitForTimeout(400);
-  await page.fill('input[type="text"]', 'Nikon FM2');
-  await page.locator('input[placeholder="Nikon F"]').first().fill('Nikon F');
-  await shot('02-nouveau-boitier');
+  await page.getByRole('button', { name: /banque de boîtiers/i }).click();
+  await page.locator('input[type="search"]').fill('nikon fm2');
+  await page.waitForTimeout(350);
+  await shot('02-banque-boitiers');
+  await page.locator('.picker-item').first().click();
+  await page.waitForTimeout(300);
+  await shot('02b-boitier-prerempli');
   await page.getByRole('button', { name: 'Enregistrer' }).click();
-  await page.waitForURL(/#\/gear/);
+  await page.waitForURL(/#\/gear$/);
 });
 
-await step('Créer un objectif', async () => {
+await step('Créer un objectif depuis la banque', async () => {
   await page.goto(`${BASE}#/gear/lenses/new`);
   await page.waitForTimeout(400);
-  await page.locator('input[placeholder="Nikkor 50 mm f/1.4 AI-S"]').fill('Nikkor 50 mm f/1.4');
-  await page.locator('input[placeholder="50"]').fill('50');
-  await page.locator('input[placeholder="1.4"]').fill('1.4');
-  await page.locator('input[placeholder="16"]').fill('16');
+  await page.getByRole('button', { name: /banque d’objectifs/i }).click();
+  await page.locator('input[type="search"]').fill('nikkor 50mm f/1.4');
+  await page.waitForTimeout(350);
+  await page.locator('.picker-item').first().click();
+  await page.waitForTimeout(300);
   await page.getByRole('button', { name: 'Enregistrer' }).click();
-  await page.waitForURL(/#\/gear/);
+  await page.waitForURL(/#\/gear$/);
   await shot('03-materiel');
 });
 
@@ -119,8 +124,20 @@ await step('Accueil peuplé', async () => {
   await shot('11-accueil');
 });
 
-await step('Outils', async () => {
+await step('Assistant', async () => {
   await page.goto(`${BASE}#/tools`);
+  await page.waitForSelector('.verdict');
+  await shot('12a-assistant-portrait');
+  await page.getByRole('button', { name: 'Paysage' }).click();
+  await page.waitForTimeout(350);
+  await shot('12b-assistant-paysage');
+  await page.getByRole('button', { name: 'Pose longue' }).click();
+  await page.waitForTimeout(350);
+  await shot('12c-assistant-pose-longue');
+});
+
+await step('Calculateurs', async () => {
+  await page.goto(`${BASE}#/tools/calc`);
   await page.waitForSelector('.segmented');
   await shot('12-outils-sunny16');
   await page.getByRole('button', { name: 'Netteté' }).click();

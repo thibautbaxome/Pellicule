@@ -41,7 +41,7 @@ console.log('▸ Saisie d’un boîtier');
 await page.goto(`${BASE}#/gear/cameras/new`);
 await page.fill('input[type="text"]', 'Olympus OM-1');
 await page.getByRole('button', { name: 'Enregistrer' }).click();
-await page.waitForURL(/#\/gear/);
+await page.waitForURL(/#\/gear$/);
 
 // Laisser au service worker le temps de finir sa mise en cache.
 await page.waitForTimeout(1500);
@@ -66,10 +66,10 @@ console.log('  données retrouvées');
 
 console.log('▸ Écriture hors ligne');
 await page.goto(`${BASE}#/gear/lenses/new`);
-await page.locator('input[placeholder="Nikkor 50 mm f/1.4 AI-S"]').fill('Zuiko 50 mm f/1.8');
+await page.locator('input[placeholder="MD 50mm f/1.7"]').fill('Zuiko 50 mm f/1.8');
 await page.locator('input[placeholder="50"]').fill('50');
 await page.getByRole('button', { name: 'Enregistrer' }).click();
-await page.waitForURL(/#\/gear/);
+await page.waitForURL(/#\/gear$/);
 await page.waitForTimeout(400);
 const lensCount = await page.locator('.segmented button', { hasText: 'Objectifs' }).textContent();
 if (!lensCount?.includes('(1)')) await fail(`Objectif non enregistré hors ligne : ${lensCount}`);

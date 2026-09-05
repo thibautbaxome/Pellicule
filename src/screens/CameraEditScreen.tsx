@@ -3,24 +3,18 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, newId, now } from '../db/db';
 import { Field, Note, ScreenHeader } from '../components/ui';
+import { CatalogPicker } from '../components/CatalogPicker';
+import {
+  CAMERA_TYPE_LABELS,
+  FIXED_MOUNT,
+  searchCameras,
+  type CatalogCamera,
+} from '../db/cameraCatalog';
+import { BULB, shutterScale } from '../lib/exposure';
 import type { Camera } from '../db/types';
 
-/** Boîtiers courants proposés en suggestion à la saisie du nom. */
-const SUGGESTIONS = [
-  'Canon AE-1',
-  'Canon A-1',
-  'Minolta X-700',
-  'Nikon F3',
-  'Nikon FM2',
-  'Nikon FE',
-  'Olympus OM-1',
-  'Olympus Trip 35',
-  'Pentax K1000',
-  'Pentax MX',
-  'Leica M6',
-  'Contax T2',
-  'Yashica Electro 35',
-];
+/** Graduation complète, proposée pour délimiter la plage du boîtier. */
+const ALL_SHUTTERS = shutterScale('full');
 
 export default function CameraEditScreen() {
   const { cameraId } = useParams();
@@ -37,6 +31,10 @@ export default function CameraEditScreen() {
   const [serial, setSerial] = useState('');
   const [meterBias, setMeterBias] = useState('');
   const [notes, setNotes] = useState('');
+  const [fastest, setFastest] = useState('');
+  const [slowest, setSlowest] = useState('');
+  const [fixedFocal, setFixedFocal] = useState('');
+  const [fixedAperture, setFixedAperture] = useState('');
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -46,6 +44,10 @@ export default function CameraEditScreen() {
     setSerial(existing.serial ?? '');
     setMeterBias(existing.meterBiasStops != null ? String(existing.meterBiasStops) : '');
     setNotes(existing.notes ?? '');
+    setFastest(existing.shutterFastest ?? '');
+    setSlowest(existing.shutterSlowest ?? '');
+    setFixedFocal(existing.fixedLens ? String(existing.fixedLens.focal) : '');
+    setFixedAperture(existing.fixedLens ? String(existing.fixedLens.maxAperture) : '');
     setLoaded(true);
   }, [existing, isNew, loaded]);
 
@@ -59,6 +61,15 @@ export default function CameraEditScreen() {
       mount: mount.trim() || undefined,
       serial: serial.trim() || undefined,
       meterBiasStops: meterBias ? Number(meterBias.replace(',', '.')) : undefined,
+      shutterFastest: fastest || undefined,
+      shutterSlowest: slowest || undefined,
+      fixedLens:
+        fixedFocal && fixedAperture
+          ? {
+              focal: Number(fixedFocal),
+              maxAperture: Number(fixedAperture.replace(',', '.')),
+            }
+          : undefined,
       notes: notes.trim() || undefined,
       archived: existing?.archived ?? false,
       updatedAt: timestamp,
@@ -101,22 +112,44 @@ export default function CameraEditScreen() {
       />
 
       <form onSubmit={save}>
+        <CatalogPicker
+          label="Chercher dans la banque de boîtiers"
+          placeholder="minolta x-300, canon ae-1, trip 35…"
+          search={searchCameras}
+          emptyHint="Plus de 150 boîtiers référencés : marque, modèle ou monture."
+          renderItem={(camera: CatalogCamera) => ({
+            title: `${camera.brand} ${camera.model}`,
+            meta: [
+              CAMERA_TYPE_LABELS[camera.type],
+              camera.mount,
+              camera.years,
+              camera.fixedLens ? `${camera.fixedLens.focal} mm f/${camera.fixedLens.maxAperture}` : null,
+            ]
+              .filter(Boolean)
+              .join(' · '),
+            badge: camera.shutterFastest,
+          })}
+          onPick={(camera: CatalogCamera) => {
+            setName(`${camera.brand} ${camera.model}`);
+            setMount(camera.mount === FIXED_MOUNT ? '' : camera.mount);
+            setFastest(camera.shutterFastest ?? '');
+            setSlowest(camera.shutterSlowest ?? '');
+            setFixedFocal(camera.fixedLens ? String(camera.fixedLens.focal) : '');
+            setFixedAperture(camera.fixedLens ? String(camera.fixedLens.maxAperture) : '');
+            if (camera.notes && !notes.trim()) setNotes(camera.notes);
+          }}
+        />
+
         <Field label="Nom" hint="Tel que vous l’appelez au quotidien.">
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            list="camera-suggestions"
-            placeholder="Nikon FM2"
+            placeholder="Minolta X-300"
             required
             maxLength={60}
             autoFocus={isNew}
           />
-          <datalist id="camera-suggestions">
-            {SUGGESTIONS.map((suggestion) => (
-              <option key={suggestion} value={suggestion} />
-            ))}
-          </datalist>
         </Field>
 
         <div className="field-inline">
@@ -135,6 +168,53 @@ export default function CameraEditScreen() {
               value={serial}
               onChange={(e) => setSerial(e.target.value)}
               maxLength={40}
+            />
+          </Field>
+        </div>
+
+        <p className="eyebrow">Obturateur</p>
+        <div className="field-inline">
+          <Field label="Vitesse la plus rapide">
+            <select value={fastest} onChange={(e) => setFastest(e.target.value)}>
+              <option value="">Inconnue</option>
+              {ALL_SHUTTERS.map((value) => (
+                <option key={value} value={value}>
+                  {value}
+                </option>
+              ))}
+            </select>
+          </Field>
+          <Field label="La plus lente">
+            <select value={slowest} onChange={(e) => setSlowest(e.target.value)}>
+              <option value="">Inconnue</option>
+              {[...ALL_SHUTTERS, BULB].map((value) => (
+                <option key={value} value={value}>
+                  {value}
+                </option>
+              ))}
+            </select>
+          </Field>
+        </div>
+
+        <p className="eyebrow">Objectif solidaire</p>
+        <div className="field-inline">
+          <Field label="Focale (mm)" hint="À remplir seulement pour un compact.">
+            <input
+              type="number"
+              inputMode="numeric"
+              value={fixedFocal}
+              onChange={(e) => setFixedFocal(e.target.value)}
+              placeholder="—"
+            />
+          </Field>
+          <Field label="Ouverture maxi">
+            <input
+              type="number"
+              inputMode="decimal"
+              step="0.1"
+              value={fixedAperture}
+              onChange={(e) => setFixedAperture(e.target.value)}
+              placeholder="—"
             />
           </Field>
         </div>

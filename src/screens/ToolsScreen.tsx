@@ -39,7 +39,12 @@ export default function ToolsScreen() {
 
   return (
     <main className="screen">
-      <ScreenHeader eyebrow="Calculs" title="Outils" subtitle="Ce qu’on ne fait pas de tête" />
+      <ScreenHeader
+        eyebrow="Calculs"
+        title="Calculateurs"
+        subtitle="Le détail, quand l’assistant ne suffit pas"
+        back={{ to: '/tools', label: 'Assistant' }}
+      />
 
       <div style={{ marginBottom: 20 }}>
         <Segmented label="Calculateur" value={tool} onChange={setTool} options={TOOLS} />

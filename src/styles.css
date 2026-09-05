@@ -1213,3 +1213,254 @@ code {
     animation: none !important;
   }
 }
+
+/* --------------------------------------------------------------------------
+   Sélecteur de banque de matériel
+   -------------------------------------------------------------------------- */
+
+.picker {
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 11px;
+  margin-bottom: 20px;
+}
+
+.picker-head {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.picker-head input {
+  flex: 1;
+}
+
+/* La liste défile plutôt que de repousser le formulaire hors de l'écran. */
+.picker-results {
+  max-height: 46vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-top: 10px;
+}
+
+.picker-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: var(--tap);
+  padding: 10px 11px;
+  border: none;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.picker-item:last-child {
+  border-bottom: none;
+}
+
+.picker-item:active {
+  background: var(--raised);
+}
+
+.picker-title {
+  display: block;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.picker-meta {
+  display: block;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--text-faint);
+  margin-top: 3px;
+}
+
+/* --------------------------------------------------------------------------
+   Assistant de prise de vue
+   -------------------------------------------------------------------------- */
+
+/* Puces de choix : plus compactes que le segmenté, elles passent à la ligne
+   plutôt que de défiler, pour que toutes les intentions restent visibles. */
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.chip {
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 19px;
+  background: transparent;
+  color: var(--text-dim);
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+}
+
+.chip[aria-pressed='true'] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+/* Le verdict : l'écran existe pour ces deux nombres, ils occupent la place. */
+.verdict {
+  background: var(--sunken);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  padding: 16px 18px 14px;
+  margin-bottom: 30px;
+}
+
+/* Le verdict reste sous les yeux pendant qu'on manipule les réglages plus bas :
+   voir la vitesse changer en tirant sur un curseur, c'est tout l'intérêt. */
+.verdict--sticky {
+  position: sticky;
+  top: 6px;
+  z-index: 20;
+  box-shadow: 0 6px 20px rgb(0 0 0 / 35%);
+}
+
+.verdict-values {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 22px;
+  font-family: var(--mono);
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.verdict-shutter {
+  font-size: 2.4rem;
+  line-height: 1;
+}
+
+.verdict-aperture {
+  font-size: 1.9rem;
+  line-height: 1;
+}
+
+.verdict-meta {
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--text-faint);
+  margin: 12px 0 0;
+}
+
+/* Zone de netteté, échelle logarithmique. */
+.dofbar {
+  margin-top: 18px;
+}
+
+.dofbar-track {
+  position: relative;
+  height: 8px;
+  background: var(--line);
+  border-radius: 2px;
+}
+
+.dofbar-zone {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+/* Repère du sujet : le trait blanc d'une échelle de mise au point. */
+.dofbar-subject {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 2px;
+  background: var(--text);
+  transform: translateX(-1px);
+}
+
+.dofbar-legend {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-top: 7px;
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+.dofbar-legend .faint {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.6rem;
+}
+
+/* Bornes d'un curseur, en langage clair plutôt qu'en chiffres. */
+.range-ends {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 5px;
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.11em;
+  color: var(--text-faint);
+}
+
+/* Conseils, colorés par gravité. */
+.advice {
+  border-left: 2px solid var(--line-strong);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  background: var(--surface);
+  padding: 12px 14px;
+}
+
+.advice--good {
+  border-left-color: var(--ok);
+  background: var(--ok-soft);
+}
+
+.advice--warning {
+  border-left-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.advice--danger {
+  border-left-color: var(--danger);
+  background: var(--danger-soft);
+}
+
+.advice-title {
+  margin: 0;
+  font-weight: 700;
+  font-size: 0.92rem;
+  letter-spacing: -0.01em;
+}
+
+.advice-detail {
+  margin: 5px 0 0;
+  font-size: 0.84rem;
+  line-height: 1.5;
+  color: var(--text-dim);
+}

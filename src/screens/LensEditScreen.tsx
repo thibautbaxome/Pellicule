@@ -3,6 +3,9 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, newId, now } from '../db/db';
 import { Field, Note, ScreenHeader } from '../components/ui';
+import { CatalogPicker } from '../components/CatalogPicker';
+import { searchLenses, type CatalogLens } from '../db/lensCatalog';
+import { useCameras } from '../hooks/useData';
 import type { Lens } from '../db/types';
 
 export default function LensEditScreen() {
@@ -14,6 +17,11 @@ export default function LensEditScreen() {
     () => (lensId && !isNew ? db.lenses.get(lensId) : undefined),
     [lensId, isNew],
   );
+
+  // La monture du matériel déjà déclaré oriente la recherche : sans rien
+  // taper, on se voit proposer ce qui se monte réellement sur son boîtier.
+  const cameras = useCameras();
+  const ownedMounts = [...new Set(cameras.map((camera) => camera.mount).filter(Boolean))] as string[];
 
   const [name, setName] = useState('');
   const [focalMin, setFocalMin] = useState('');
@@ -100,12 +108,45 @@ export default function LensEditScreen() {
       />
 
       <form onSubmit={save}>
+        <CatalogPicker
+          label="Chercher dans la banque d’objectifs"
+          placeholder="50mm, takumar, zuiko…"
+          search={(query) =>
+            ownedMounts.length === 1
+              ? searchLenses(query, ownedMounts[0])
+              : searchLenses(query)
+          }
+          emptyHint={
+            ownedMounts.length > 0
+              ? `Objectifs en monture ${ownedMounts.join(', ')} et au-delà.`
+              : 'Tapez une marque, une focale ou une monture.'
+          }
+          renderItem={(lens: CatalogLens) => ({
+            title: lens.name,
+            meta: `${lens.brand} · ${lens.mount}`,
+            badge:
+              lens.focalMin === lens.focalMax
+                ? `${lens.focalMin} mm`
+                : `${lens.focalMin}–${lens.focalMax}`,
+          })}
+          onPick={(lens: CatalogLens) => {
+            setName(lens.name);
+            setFocalMin(String(lens.focalMin));
+            setFocalMax(lens.focalMax !== lens.focalMin ? String(lens.focalMax) : '');
+            setMaxAperture(String(lens.maxAperture));
+            setMinAperture(String(lens.minAperture));
+            setFilterThread(lens.filterThread ? String(lens.filterThread) : '');
+            setMount(lens.mount);
+            if (lens.notes && !notes.trim()) setNotes(lens.notes);
+          }}
+        />
+
         <Field label="Nom">
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Nikkor 50 mm f/1.4 AI-S"
+            placeholder="MD 50mm f/1.7"
             required
             maxLength={70}
             autoFocus={isNew}
