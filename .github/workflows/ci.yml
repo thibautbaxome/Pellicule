@@ -6,45 +6,35 @@ on:
   pull_request:
 
 jobs:
-  build:
+  # Le noyau métier ne dépend d'aucun SDK Apple : il se compile et se teste sur
+  # Linux, ce qui donne une boucle de quelques secondes plutôt que de quelques
+  # minutes. C'est là que vivent tous les calculs argentiques, et c'est aussi ce
+  # qui valide les banques de matériel — elles sont écrites à la main.
+  core-linux:
+    name: Tests du noyau (Linux)
     runs-on: ubuntu-latest
+    container: swift:6.3
     steps:
       - uses: actions/checkout@v4
+      - name: Tests
+        working-directory: PelliculeCore
+        run: swift test
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-
-      - run: npm ci
-
-      - name: Lint
-        run: npm run lint
-
-      - name: Build
-        run: npm run build
-
-      # Le parcours de bout en bout tourne sur le build réel, servi comme en
-      # production : c'est le seul moyen de vérifier le service worker.
-      - name: Installer Chromium
-        run: npx playwright install --with-deps chromium
-
-      - name: Démarrer le serveur
-        run: npm run preview -- --port 4173 --host 127.0.0.1 &
-
-      - name: Attendre le serveur
-        run: npx wait-on http://127.0.0.1:4173 --timeout 30000
-
-      - name: Parcours de bout en bout
-        run: npm run smoke
-
-      - name: Vérification hors ligne
-        run: node tools/offline-check.mjs
-
-      - name: Conserver les captures
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: captures
-          path: captures/
-          if-no-files-found: ignore
+  # Le même noyau sur macOS, compilé pour iOS : c'est ce qui prouve que le code
+  # tourne réellement sur la plateforme cible, et pas seulement sur Linux.
+  # Les runners macOS sont gratuits sur les dépôts publics.
+  core-ios:
+    name: Compilation pour iOS
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compiler pour le simulateur iOS
+        working-directory: PelliculeCore
+        run: |
+          xcodebuild build \
+            -scheme PelliculeCore \
+            -destination 'generic/platform=iOS Simulator' \
+            -skipPackagePluginValidation \
+            | xcbeautify || xcodebuild build \
+              -scheme PelliculeCore \
+              -destination 'generic/platform=iOS Simulator'

@@ -5,98 +5,96 @@ de vue argentique qui fonctionne hors ligne, sans compte et sans serveur.
 
 ## La contribution la plus utile : enrichir les banques
 
-Deux catalogues font tourner l'application, et ce sont de simples fichiers de
-données. **Aucune connaissance de React n'est nécessaire pour les enrichir** —
-si vous possédez un boîtier absent de la liste, vous êtes la bonne personne
-pour l'ajouter.
+Trois catalogues font tourner l'application, et ce sont de simples fichiers
+JSON. **Aucune connaissance de Swift n'est nécessaire pour les enrichir** — si
+vous possédez un boîtier absent de la liste, vous êtes la bonne personne pour
+l'ajouter.
+
+Ils vivent dans `PelliculeCore/Sources/PelliculeCore/Resources/`.
 
 ### Ajouter un boîtier
 
-`src/db/cameraCatalog.ts` :
+`cameras.json` :
 
-```ts
+```json
 {
-  brand: 'Minolta',
-  model: 'X-300',
-  mount: 'Minolta SR',
-  type: 'slr',
-  years: '1984–1990',
-  shutterFastest: '1/1000',
-  shutterSlowest: '1s',
-  notes: 'Priorité ouverture et manuel.',
-},
+  "id": "minolta-x-300",
+  "brand": "Minolta",
+  "model": "X-300",
+  "mount": "Minolta SR",
+  "type": "slr",
+  "years": "1984–1990",
+  "shutterFastest": "1/1000",
+  "shutterSlowest": "1s",
+  "notes": "Priorité ouverture et manuel."
+}
 ```
+
+`type` vaut `slr`, `rangefinder`, `compact` ou `viewfinder`.
 
 La plage de vitesses est le champ qui compte le plus : c'est elle qui permet à
 l'assistant de dire « ce réglage sort de ce que ton boîtier sait faire ».
-**Dans le doute, laissez le champ vide plutôt que de deviner** — une valeur
-fausse est pire qu'une valeur absente, elle donne un conseil faux avec
-assurance.
+**Dans le doute, omettez le champ plutôt que de deviner** — une valeur fausse
+est pire qu'une valeur absente, elle donne un conseil faux avec assurance.
 
-Pour un compact à objectif solidaire, `mount: FIXED_MOUNT` et
-`fixedLens: { focal: 35, maxAperture: 2.8 }`.
+Pour un compact à objectif solidaire, la monture vaut `"Fixe"` et le boîtier
+porte `"fixedLens": { "focal": 35, "maxAperture": 2.8 }`. Les deux vont
+ensemble : l'un sans l'autre fait échouer les tests.
 
 ### Ajouter un objectif
 
-`src/db/lensCatalog.ts` : marque, nom, monture, focales, ouvertures extrêmes,
-diamètre de filtre. Une focale fixe a `focalMin === focalMax`.
+`lenses.json` : marque, nom, monture, focales, ouvertures extrêmes, diamètre de
+filtre. Une focale fixe a `focalMin` égal à `focalMax`. Attention au sens des
+ouvertures : `maxAperture` est la **plus grande** ouverture, donc le plus petit
+nombre — f/1.7 pour un 50 mm standard.
+
+La monture doit exister sur un boîtier de `cameras.json`, sans quoi l'objectif
+serait introuvable : le sélecteur filtre par monture.
 
 ### Ajouter une pellicule
 
-`src/db/filmCatalog.ts`. L'identifiant est un slug **stable** : il ne doit
-jamais changer, sous peine de dupliquer l'entrée chez les utilisateurs à la
-mise à jour.
+`films.json`. L'identifiant est un slug **stable** : il ne doit jamais changer,
+sous peine de dupliquer l'entrée chez les utilisateurs à la mise à jour.
 
 L'exposant de réciprocité vient de la notice du fabricant quand elle le
 publie — Ilford donne directement `t_c = t^p` — ou de l'interpolation de ses
 tables de correction. Citez votre source dans la pull request.
 
+Les temps de développement ne concernent que le noir et blanc.
+
 ### Après avoir modifié une banque
 
-Les trois catalogues sont aussi lus par la version native, qui les décode
-depuis une projection JSON. Régénérez-la et versionnez-la avec votre
-modification :
-
 ```sh
-npm run catalogs
+cd PelliculeCore && swift test
 ```
 
-Les fichiers TypeScript restent la source de vérité — ils portent les
-commentaires et les regroupements que JSON ne sait pas contenir. La commande
-échoue si deux entrées partagent un identifiant, ce qui en ferait disparaître
-une silencieusement.
+JSON n'a ni commentaire, ni type, ni contrainte : c'est
+`CatalogValidationTests` qui tient lieu de garde-fou. Il refuse un identifiant
+en double, des vitesses inversées, une ouverture maximale plus petite que la
+minimale, un objectif dont la monture n'existe nulle part, un exposant de
+réciprocité aberrant, un temps de développement invraisemblable.
+
+Il vérifie la **cohérence**, jamais l'exactitude historique : il ne saura pas
+vous dire qu'un Nikon FM2 monte à 1/4000 et non à 1/2000. Cette partie-là repose
+sur vous, et c'est pourquoi un champ vide reste préférable à un champ deviné.
 
 ## Le code
 
 ```sh
-npm install
-npm run dev      # serveur de développement
-npm run build    # build de production
-npm run lint
-npm run smoke    # parcours de bout en bout, serveur de prévisualisation requis
+cd PelliculeCore
+swift test          # tous les calculs, en une dizaine de secondes
+swift build
 ```
 
-Le parcours `tools/smoke.mjs` traverse l'application dans un iPhone simulé et
-**échoue à la moindre erreur de console**. Il produit une capture par étape,
-utile pour vérifier une modification visuelle. `tools/offline-check.mjs`
-vérifie que l'application reste utilisable réseau coupé — c'est une promesse du
-projet, pas un bonus.
+Le noyau ne dépend d'aucun SDK Apple : il se compile et se teste sur Linux comme
+sur macOS, sans Xcode ni simulateur. C'est délibéré — toute la partie du projet
+où une erreur coûte un rouleau de pellicule est vérifiable partout, et
+rapidement.
 
-Faites tourner les deux avant d'ouvrir une pull request.
-
-### Le noyau natif
-
-`native/PelliculeCore/` contient les calculs argentiques portés en Swift, pour
-l'application iOS en préparation. Aucune dépendance aux SDK Apple : ils se
-compilent et se testent sur Linux comme sur macOS.
-
-```sh
-cd native/PelliculeCore && swift test
-```
-
-Toute modification d'un calcul doit l'être des deux côtés, avec le même test de
-part et d'autre. C'est cette redondance qui a permis de repérer un conseil
-contradictoire que la version web donnait depuis des semaines.
+Un calcul modifié se modifie avec son test. Les valeurs attendues des tests ne
+sont pas des captures de la sortie courante : elles viennent des tables des
+fabricants et de l'arithmétique de l'exposition. Un test qu'on ajuste jusqu'à ce
+qu'il passe ne vérifie plus rien.
 
 ## Conventions
 
@@ -104,10 +102,8 @@ contradictoire que la version web donnait depuis des semaines.
 - Les commentaires expliquent *pourquoi*, pas *quoi*. Un commentaire qui
   paraphrase la ligne suivante est du bruit ; un commentaire qui dit pourquoi
   la tolérance vaut un tiers de diaphragme vaut de l'or.
-- Aucune dépendance sans raison sérieuse. L'application doit rester légère et
-  précachée en entier par le service worker.
-- Aucune requête sortante. La politique de sécurité du site l'interdit, et
-  c'est volontaire : les données ne quittent pas l'appareil.
+- Aucune dépendance sans raison sérieuse.
+- Aucune requête sortante. Les données ne quittent pas l'appareil.
 
 ## Ce qui ne sera pas accepté
 
