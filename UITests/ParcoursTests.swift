@@ -69,7 +69,7 @@ final class ParcoursTests: XCTestCase {
 
         // Le boîtier s'ouvre et se corrige : sans cela une entrée fausse le
         // resterait pour toujours.
-        app.staticTexts["Minolta X-300"].firstMatch.tap()
+        tap(button: "Minolta X-300")
         XCTAssertTrue(
             app.staticTexts["Plage de vitesses"].waitForExistence(timeout: 10),
             "la fiche du boîtier doit exposer sa plage de vitesses")

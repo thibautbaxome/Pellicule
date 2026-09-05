@@ -76,6 +76,10 @@ struct SettingsScreen: View {
             }
         }
         .buttonStyle(PressableCardStyle())
+        // Une carte à deux lignes s'annonce sinon en récitant les deux : le nom
+        // du choix se perd dans le résumé.
+        .accessibilityLabel("Statistiques")
+        .accessibilityHint("\(carnet.rolls.count) rouleau\(carnet.rolls.count > 1 ? "x" : ""), \(carnet.frames.count) vue\(carnet.frames.count > 1 ? "s" : "")")
     }
 
     private var themeField: some View {

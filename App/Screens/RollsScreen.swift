@@ -71,6 +71,8 @@ struct RollsScreen: View {
                     RollCard(carnet: carnet, roll: roll)
                 }
                 .buttonStyle(PressableCardStyle())
+                .accessibilityLabel(roll.label ?? carnet.film(id: roll.filmStockId)?.displayName ?? "Rouleau")
+                .accessibilityHint("\(carnet.frames(ofRoll: roll.id).count) vues sur \(roll.exposures), \(roll.status.label)")
                 .transition(.opacity.combined(with: .move(edge: .top)))
             }
         }

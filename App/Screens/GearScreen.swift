@@ -86,6 +86,8 @@ struct GearScreen: View {
                             CameraCard(camera: camera)
                         }
                         .buttonStyle(PressableCardStyle())
+                        .accessibilityLabel(camera.name)
+                        .accessibilityHint("Modifier ce boîtier")
                     }
                 }
                 if !carnet.lenses.isEmpty {
@@ -95,6 +97,8 @@ struct GearScreen: View {
                             LensCard(lens: lens)
                         }
                         .buttonStyle(PressableCardStyle())
+                        .accessibilityLabel(lens.name)
+                        .accessibilityHint("Modifier cet objectif")
                     }
                 }
             }
