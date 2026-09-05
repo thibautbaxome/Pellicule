@@ -132,6 +132,14 @@ struct RollCard: View {
         }
     }
 
+    private func shortType(_ type: Catalog.FilmType) -> String {
+        switch type {
+        case .blackAndWhite: "N & B"
+        case .colourNegative: "Couleur"
+        case .slide: "Diapo"
+        }
+    }
+
     var body: some View {
         HStack(spacing: 0) {
             Rectangle()
@@ -155,7 +163,9 @@ struct RollCard: View {
 
                 HStack(spacing: 10) {
                     if let film {
-                        MicroLabel(film.type.label)
+                        // Court, comme sur la boîte : « Noir et blanc » en
+                        // capitales interlettrées se coupait sur deux lignes.
+                        MicroLabel(shortType(film.type))
                     }
                     ValueText(
                         text: "\(Int(roll.shotIso)) ISO", size: 13, colour: palette.textDim)

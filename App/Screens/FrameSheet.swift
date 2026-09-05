@@ -77,7 +77,9 @@ struct FrameSheet: View {
                                 label: { "f/\(trimmed($0))" },
                                 selection: $frame.aperture)
                             if apertureRange.isAssumed {
-                                Text("Aucun objectif déclaré : la graduation s’arrête à ce qu’un objectif courant permet.")
+                                Text(mountableLenses.isEmpty
+                                    ? "Aucun objectif déclaré : la graduation s’arrête à ce qu’un objectif courant permet."
+                                    : "Choisissez l’objectif employé ci-dessous : la graduation suivra ses vraies ouvertures.")
                                     .font(Typo.caption)
                                     .foregroundStyle(palette.textFaint)
                                     .fixedSize(horizontal: false, vertical: true)
@@ -181,6 +183,11 @@ struct FrameSheet: View {
                 // la feuille à chaque retour.
                 if referencePhoto == nil, let id = frame.refPhotoId {
                     referencePhoto = PhotoStore.load(id)
+                }
+                // Un seul objectif montable : c'est forcément lui. Le choisir
+                // d'office donne à la bague ses vraies ouvertures sans un geste.
+                if !isExisting, frame.lensId == nil, mountableLenses.count == 1 {
+                    frame.lensId = mountableLenses[0].id
                 }
             }
             // Fermée sans enregistrer — « Annuler », ou un glissement vers le
