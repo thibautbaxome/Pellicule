@@ -29,7 +29,8 @@ targets:
     # Schéma partagé explicite : sans lui, xcodebuild sur un poste vierge ne
     # trouve rien à compiler.
     scheme:
-      testTargets: []
+      testTargets:
+        - PelliculeUITests
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: app.pellicule.carnet
@@ -74,3 +75,19 @@ targets:
         # continue sans rien apporter à une application mono-fil.
         SWIFT_VERSION: "5"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+
+  # Parcours automatisé dans le simulateur. C'est le seul œil dont dispose ce
+  # projet sur son interface : elle s'écrit dans un environnement sans macOS,
+  # donc sans simulateur. Chaque étape produit une capture.
+  PelliculeUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: UITests
+    dependencies:
+      - target: Pellicule
+    settings:
+      base:
+        SWIFT_VERSION: "5"
+        CODE_SIGNING_ALLOWED: NO
+        TEST_TARGET_NAME: Pellicule

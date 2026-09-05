@@ -113,3 +113,132 @@ jobs:
           l'application, pas dans le code.
           NOTES
           )"
+
+  # Le parcours dans le simulateur : le seul œil de ce projet sur son
+  # interface, qui s'écrit dans un environnement sans macOS. Il échoue si un
+  # écran ne s'affiche pas, et publie une capture par étape sur la branche
+  # « captures », d'où elles peuvent être relues.
+  simulator:
+    name: Parcours dans le simulateur
+    runs-on: macos-15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Installer XcodeGen
+        run: brew install xcodegen
+
+      - name: Engendrer le projet
+        run: xcodegen generate
+
+      - name: Démarrer un iPhone
+        id: device
+        run: |
+          udid=$(xcrun simctl list devices available -j | python3 -c "
+          import sys, json
+          devices = json.load(sys.stdin)['devices']
+          best = None
+          for runtime, entries in devices.items():
+              if 'iOS' not in runtime:
+                  continue
+              for entry in entries:
+                  if entry.get('isAvailable') and entry['name'].startswith('iPhone'):
+                      best = entry
+          print(best['udid'])
+          ")
+          echo 'udid='"$udid" >> "$GITHUB_OUTPUT"
+          xcrun simctl boot "$udid" || true
+          xcrun simctl bootstatus "$udid" -b
+          xcrun simctl list devices | grep "$udid"
+
+      # Filet de sécurité : même si le parcours ne se construit pas, on veut
+      # savoir si l'application s'ouvre, et à quoi elle ressemble.
+      - name: Lancer l'application seule
+        run: |
+          set -o pipefail
+          xcodebuild build \
+            -project Pellicule.xcodeproj \
+            -scheme Pellicule \
+            -configuration Debug \
+            -destination "id=${{ steps.device.outputs.udid }}" \
+            -derivedDataPath build-sim \
+            CODE_SIGNING_ALLOWED=NO | xcbeautify
+          xcrun simctl install "${{ steps.device.outputs.udid }}" \
+            build-sim/Build/Products/Debug-iphonesimulator/Pellicule.app
+          xcrun simctl launch "${{ steps.device.outputs.udid }}" app.pellicule.carnet
+          sleep 6
+          mkdir -p captures
+          xcrun simctl io "${{ steps.device.outputs.udid }}" screenshot captures/00-lancement.png
+          xcrun simctl terminate "${{ steps.device.outputs.udid }}" app.pellicule.carnet || true
+
+      - name: Parcours complet
+        run: |
+          set -o pipefail
+          xcodebuild test \
+            -project Pellicule.xcodeproj \
+            -scheme Pellicule \
+            -destination "id=${{ steps.device.outputs.udid }}" \
+            -derivedDataPath build-sim \
+            -resultBundlePath Parcours.xcresult \
+            CODE_SIGNING_ALLOWED=NO | xcbeautify
+
+      # Les captures dorment dans le paquet de résultats sous des noms de
+      # hachage ; le manifeste rend les noms lisibles.
+      - name: Extraire les captures
+        if: always()
+        run: |
+          xcrun xcresulttool export attachments \
+            --path Parcours.xcresult --output-path captures-brutes || true
+          python3 - <<'EOF'
+          import json, pathlib, shutil
+          source = pathlib.Path("captures-brutes")
+          target = pathlib.Path("captures")
+          target.mkdir(exist_ok=True)
+          manifest = source / "manifest.json"
+          if not manifest.exists():
+              print("aucun manifeste : le parcours n'a produit aucune capture")
+              raise SystemExit(0)
+          for entry in json.loads(manifest.read_text()):
+              for item in entry.get("attachments", []):
+                  exported = item.get("exportedFileName")
+                  name = item.get("suggestedHumanReadableName") or exported
+                  if not exported:
+                      continue
+                  origin = source / exported
+                  if origin.exists():
+                      shutil.copy(origin, target / f"{pathlib.Path(name).stem}.png")
+                      print("capture", name)
+          EOF
+          ls -la captures
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: captures
+          path: captures
+          if-no-files-found: warn
+
+      # Publiées sur une branche à part : le dépôt principal n'a pas à porter
+      # des images qui changent à chaque poussée, mais elles doivent être
+      # consultables sans authentification.
+      - name: Publier les captures
+        if: always() && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd captures
+          cat > LISEZMOI.md <<'EOF'
+          # Captures du parcours automatisé
+
+          Engendrées à chaque poussée sur `main` par le parcours dans le
+          simulateur. Elles sont écrasées à chaque exécution : cette branche
+          n'a pas d'historique utile, elle sert à regarder l'interface.
+          EOF
+          git init -q
+          git checkout -qb captures
+          git add -A
+          git -c user.name="github-actions" -c user.email="actions@github.com" \
+            commit -qm "Captures de ${GITHUB_SHA:0:7}"
+          git push -qf \
+            "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}" captures

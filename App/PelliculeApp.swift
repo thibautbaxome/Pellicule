@@ -9,7 +9,11 @@ struct PelliculeApp: App {
     @State private var loadFailure: String?
 
     init() {
-        let carnet = Carnet(fileURL: URL.documentsDirectory.appendingPathComponent("carnet.json"))
+        // Le parcours automatisé part d'un carnet vierge et ne laisse rien
+        // derrière lui : sans quoi une exécution dépendrait de la précédente.
+        let ephemeral = ProcessInfo.processInfo.arguments.contains("-carnet-neuf")
+        let carnet = Carnet(
+            fileURL: ephemeral ? nil : URL.documentsDirectory.appendingPathComponent("carnet.json"))
         var failure: String?
         do {
             try carnet.load()
