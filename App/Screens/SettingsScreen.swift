@@ -9,6 +9,7 @@ struct SettingsScreen: View {
     @State private var isExporting = false
     @State private var isImporting = false
     @State private var importOutcome: ImportOutcome?
+    @State private var includePhotos = false
 
     private var theme: Theme { Theme(rawValue: carnet.settings.theme) ?? .dark }
 
@@ -16,6 +17,7 @@ struct SettingsScreen: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 26) {
+                    statsLink
                     themeField
                     locationField
                     backupSection
@@ -27,7 +29,7 @@ struct SettingsScreen: View {
             .navigationTitle("Réglages")
             .fileExporter(
                 isPresented: $isExporting,
-                document: CarnetDocument(carnet: carnet),
+                document: CarnetDocument(carnet: carnet, includePhotos: includePhotos),
                 contentType: .json,
                 defaultFilename: "pellicule-\(dateStamp()).json"
             ) { _ in }
@@ -49,6 +51,30 @@ struct SettingsScreen: View {
                 Text(outcome.message)
             }
         }
+    }
+
+    private var statsLink: some View {
+        NavigationLink {
+            StatsScreen(carnet: carnet)
+        } label: {
+            Card {
+                HStack {
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("Statistiques")
+                            .font(Typo.heading)
+                            .foregroundStyle(palette.text)
+                        Text("\(carnet.rolls.count) rouleau\(carnet.rolls.count > 1 ? "x" : ""), \(carnet.frames.count) vue\(carnet.frames.count > 1 ? "s" : "")")
+                            .font(Typo.caption)
+                            .foregroundStyle(palette.textDim)
+                    }
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 12))
+                        .foregroundStyle(palette.textFaint)
+                }
+            }
+        }
+        .buttonStyle(PressableCardStyle())
     }
 
     private var themeField: some View {
@@ -109,6 +135,19 @@ struct SettingsScreen: View {
                     .font(Typo.caption)
                     .foregroundStyle(palette.textDim)
 
+                Toggle(isOn: $includePhotos) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Avec les photos de repérage")
+                            .font(Typo.body)
+                            .foregroundStyle(palette.text)
+                        Text("Le fichier devient beaucoup plus gros. Sans elles, il reste minuscule et se relit en un instant.")
+                            .font(Typo.caption)
+                            .foregroundStyle(palette.textFaint)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+                .tint(palette.accent)
+
                 Button("Exporter le carnet") { isExporting = true }
                     .buttonStyle(SecondaryButtonStyle(palette: palette))
 
@@ -164,12 +203,14 @@ struct SettingsScreen: View {
 
             let backup = try Backup.decode(from: Data(contentsOf: url))
             carnet.restore(backup, mode: .merge)
+            let photos = PhotoStore.restore(backup.data.attachments)
             let summary = backup.summary
             return ImportOutcome(
                 title: "Carnet importé",
                 message: "\(summary.rolls) rouleau\(summary.rolls > 1 ? "x" : ""), "
                     + "\(summary.frames) vue\(summary.frames > 1 ? "s" : ""), "
-                    + "\(summary.cameras) boîtier\(summary.cameras > 1 ? "s" : "").")
+                    + "\(summary.cameras) boîtier\(summary.cameras > 1 ? "s" : "")"
+                    + (photos > 0 ? ", \(photos) photo\(photos > 1 ? "s" : "")." : "."))
         } catch let error as Backup.ImportError {
             return ImportOutcome(title: "Import impossible", message: error.description)
         } catch {
@@ -199,8 +240,10 @@ struct CarnetDocument: FileDocument {
 
     private let data: Data
 
-    init(carnet: Carnet) {
-        data = (try? carnet.backup(includingPhotos: false).encoded()) ?? Data()
+    init(carnet: Carnet, includePhotos: Bool) {
+        let attachments = includePhotos ? PhotoStore.attachments(for: carnet.frames) : []
+        data = (try? carnet.backup(
+            includingPhotos: includePhotos, attachments: attachments).encoded()) ?? Data()
     }
 
     init(configuration: ReadConfiguration) throws {

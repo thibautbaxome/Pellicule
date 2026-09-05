@@ -1,4 +1,5 @@
 import PelliculeCore
+import PhotosUI
 import SwiftUI
 
 /// Saisie d'une vue.
@@ -16,6 +17,10 @@ struct FrameSheet: View {
     @State private var showsDetails = false
     @State private var locator = Locator()
     @State private var isPickingFilter = false
+    @State private var isTakingPhoto = false
+    @State private var pickedPhoto: PhotosPickerItem?
+    @State private var referencePhoto: UIImage?
+    @State private var didSave = false
     @State private var isPickingLens = false
     @State private var isConfirmingDeletion = false
 
@@ -73,6 +78,8 @@ struct FrameSheet: View {
                             .fieldStyle(palette)
                     }
 
+                    photoField
+
                     DisclosureGroup(isExpanded: $showsDetails) {
                         VStack(alignment: .leading, spacing: 18) {
                             focalField
@@ -112,11 +119,15 @@ struct FrameSheet: View {
                 Button("Enregistrer") {
                     frame.updatedAt = Carnet.timestamp(Date())
                     carnet.save(frame)
+                    didSave = true
                     dismiss()
                 }
                 .buttonStyle(PrimaryButtonStyle(palette: palette))
                 .padding(16)
                 .background(palette.bg)
+                // Le retour haptique confirme l'enregistrement sans qu'on ait
+                // à regarder l'écran : sur le terrain, on a déjà l'œil ailleurs.
+                .sensoryFeedback(.success, trigger: didSave)
             }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -134,6 +145,23 @@ struct FrameSheet: View {
             }
             .onChange(of: locator.location) { _, relevé in
                 if let relevé, frame.location == nil { frame.location = relevé }
+            }
+            .onAppear {
+                if let id = frame.refPhotoId { referencePhoto = PhotoStore.load(id) }
+            }
+            .onChange(of: pickedPhoto) { _, item in
+                guard let item else { return }
+                Task {
+                    if let data = try? await item.loadTransferable(type: Data.self),
+                       let image = UIImage(data: data) {
+                        attach(image)
+                    }
+                    pickedPhoto = nil
+                }
+            }
+            .fullScreenCover(isPresented: $isTakingPhoto) {
+                CameraCapture { image in attach(image) }
+                    .ignoresSafeArea()
             }
             .sheet(isPresented: $isPickingFilter) {
                 FilterPickerSheet { preset in
@@ -296,6 +324,65 @@ struct FrameSheet: View {
             Button("Relever la position") { locator.request() }
                 .buttonStyle(SecondaryButtonStyle(palette: palette))
         }
+    }
+
+    /// La photo de repérage : le cadrage tel qu'on l'a vu, pour reconnaître
+    /// la vue trois semaines plus tard quand le rouleau revient du laboratoire.
+    private var photoField: some View {
+        FieldRow(label: "Photo de repérage") {
+            VStack(alignment: .leading, spacing: 10) {
+                if let referencePhoto {
+                    Image(uiImage: referencePhoto)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(height: 180)
+                        .frame(maxWidth: .infinity)
+                        .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 6, style: .continuous)
+                                .strokeBorder(palette.line, lineWidth: 1))
+                        .transition(.opacity.combined(with: .scale(scale: 0.97)))
+                    Button("Retirer la photo") { detachPhoto() }
+                        .buttonStyle(SecondaryButtonStyle(palette: palette))
+                } else {
+                    HStack(spacing: 10) {
+                        if CameraCapture.isAvailable {
+                            Button {
+                                isTakingPhoto = true
+                            } label: {
+                                Label("Prendre", systemImage: "camera")
+                            }
+                            .buttonStyle(SecondaryButtonStyle(palette: palette))
+                        }
+                        PhotosPicker(selection: $pickedPhoto, matching: .images) {
+                            Label("Choisir", systemImage: "photo.on.rectangle")
+                                .font(Typo.ui(16, .medium))
+                                .foregroundStyle(palette.text)
+                                .frame(maxWidth: .infinity, minHeight: 50)
+                                .background(palette.surface)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 6, style: .continuous)
+                                        .strokeBorder(palette.lineStrong, lineWidth: 1))
+                                .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
+                        }
+                    }
+                }
+            }
+            .animation(.snappy, value: referencePhoto == nil)
+        }
+    }
+
+    private func attach(_ image: UIImage) {
+        if let previous = frame.refPhotoId { PhotoStore.delete(previous) }
+        guard let id = PhotoStore.save(image) else { return }
+        frame.refPhotoId = id
+        referencePhoto = PhotoStore.load(id)
+    }
+
+    private func detachPhoto() {
+        if let id = frame.refPhotoId { PhotoStore.delete(id) }
+        frame.refPhotoId = nil
+        referencePhoto = nil
     }
 
     /// Un filtre coûte de la lumière : le noter, c'est pouvoir expliquer plus

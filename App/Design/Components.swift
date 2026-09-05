@@ -45,6 +45,18 @@ struct Card<Content: View>: View {
     }
 }
 
+/// Une carte qui se presse : elle s'enfonce d'un cheveu sous le doigt, comme
+/// un déclencheur, et revient. C'est ce qui distingue un élément qu'on peut
+/// toucher d'un simple bloc d'information.
+struct PressableCardStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.985 : 1)
+            .opacity(configuration.isPressed ? 0.92 : 1)
+            .animation(.snappy(duration: 0.18), value: configuration.isPressed)
+    }
+}
+
 /// Bouton principal d'un écran : ambré, plein, cible large.
 struct PrimaryButtonStyle: ButtonStyle {
     let palette: Palette

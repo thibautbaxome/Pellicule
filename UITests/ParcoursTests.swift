@@ -67,6 +67,15 @@ final class ParcoursTests: XCTestCase {
             "la plage de vitesses du boîtier doit être reprise de la banque")
         capture("04-materiel")
 
+        // Le boîtier s'ouvre et se corrige : sans cela une entrée fausse le
+        // resterait pour toujours.
+        app.staticTexts["Minolta X-300"].firstMatch.tap()
+        XCTAssertTrue(
+            app.staticTexts["Plage de vitesses"].waitForExistence(timeout: 10),
+            "la fiche du boîtier doit exposer sa plage de vitesses")
+        capture("04b-boitier-edition")
+        tap(button: "Annuler")
+
         // MARK: Charger une pellicule
         tapTab("Rouleaux")
         tap(button: "Charger une pellicule")
@@ -127,11 +136,53 @@ final class ParcoursTests: XCTestCase {
         if app.buttons["f/8"].exists { app.buttons["f/8"].tap() }
         capture("11-vue-reglee")
 
+        // Les détails repliés : filtre, position, mesure. Le filtre passe par la
+        // banque, avec le coût de chacun.
+        tap(button: "Plus de détails")
+        XCTAssertTrue(
+            app.staticTexts["Filtre"].waitForExistence(timeout: 10),
+            "les détails doivent proposer le filtre")
+        app.swipeUp()
+        capture("11b-vue-details")
+        tap(button: "Aucun")
+        XCTAssertTrue(
+            app.staticTexts["Rouge n°25"].waitForExistence(timeout: 10),
+            "la banque de filtres doit s’ouvrir")
+        capture("11c-filtres")
+        app.staticTexts["Rouge n°25"].tap()
+        XCTAssertTrue(
+            app.staticTexts["Rouge n°25"].waitForExistence(timeout: 10),
+            "le filtre choisi doit apparaître sur la vue")
+
         tap(button: "Enregistrer")
         XCTAssertTrue(
             app.staticTexts["1/125   f/8"].waitForExistence(timeout: 10),
             "la vue enregistrée doit s’afficher avec son couple")
         capture("12-rouleau-une-vue")
+
+        // La fiche du rouleau : archive, laboratoire, développement, coûts.
+        tap(button: "Actions")
+        tap(button: "Le rouleau")
+        XCTAssertTrue(
+            app.staticTexts["Référence d’archive"].waitForExistence(timeout: 10),
+            "la fiche du rouleau doit exposer la référence d’archive")
+        capture("12b-rouleau-fiche")
+        app.switches.firstMatch.tap()
+        XCTAssertTrue(
+            app.staticTexts["Révélateur"].waitForExistence(timeout: 10),
+            "développer soi-même ouvre le journal de développement")
+        app.swipeUp()
+        capture("12c-developpement")
+        tap(button: "Annuler")
+
+        // Vers les scans : sans fichier choisi, l'écran explique et attend.
+        tap(button: "Actions")
+        tap(button: "Vers les scans")
+        XCTAssertTrue(
+            app.buttons["Choisir les fichiers"].waitForExistence(timeout: 10),
+            "l’export doit commencer par le choix des scans")
+        capture("12d-vers-les-scans")
+        tap(button: "Fermer")
 
         // MARK: L'assistant
         tapTab("Assistant")
@@ -160,9 +211,18 @@ final class ParcoursTests: XCTestCase {
         tap(button: "Pose longue")
         capture("15-assistant-pose-longue")
 
-        // MARK: Les thèmes
+        // MARK: Réglages et statistiques
         tapTab("Réglages")
         capture("16-reglages")
+
+        tap(button: "Statistiques")
+        XCTAssertTrue(
+            app.staticTexts["Pellicules employées"].waitForExistence(timeout: 10),
+            "les statistiques doivent lister les pellicules")
+        capture("16b-statistiques")
+        app.navigationBars.buttons.firstMatch.tap()
+
+        // MARK: Les thèmes
 
         tap(button: "Papier")
         capture("17-theme-papier")

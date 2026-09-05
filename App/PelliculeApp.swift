@@ -9,6 +9,8 @@ struct PelliculeApp: App {
     @State private var loadFailure: String?
 
     init() {
+        Typo.registerFonts()
+
         // Le parcours automatisé part d'un carnet vierge et ne laisse rien
         // derrière lui : sans quoi une exécution dépendrait de la précédente.
         let ephemeral = ProcessInfo.processInfo.arguments.contains("-carnet-neuf")

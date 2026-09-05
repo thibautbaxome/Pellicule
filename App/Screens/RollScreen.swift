@@ -80,13 +80,15 @@ struct RollScreen: View {
                         } label: {
                             FrameRow(carnet: carnet, frame: frame)
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(PressableCardStyle())
+                        .transition(.opacity.combined(with: .move(edge: .bottom)))
                     }
                 }
                 statusPicker(roll: roll)
                 dangerZone(roll: roll)
             }
             .padding(16)
+            .animation(.snappy, value: frames.count)
         }
         .safeAreaInset(edge: .bottom) {
             if roll.status.isOpen {
@@ -121,6 +123,8 @@ struct RollScreen: View {
                     Spacer()
                     VStack(alignment: .trailing, spacing: 2) {
                         ValueText(text: "\(frames.count)", size: 30, weight: .bold)
+                            .contentTransition(.numericText())
+                            .animation(.snappy, value: frames.count)
                         MicroLabel("sur \(roll.exposures)")
                     }
                 }
@@ -187,6 +191,7 @@ struct RollScreen: View {
             titleVisibility: .visible
         ) {
             Button("Supprimer", role: .destructive) {
+                for frame in frames { frame.refPhotoId.map(PhotoStore.delete) }
                 carnet.delete(rollId: rollId)
                 dismiss()
             }
@@ -219,6 +224,16 @@ struct FrameRow: View {
                 text: String(format: "%02d", frame.number), size: 15, weight: .bold,
                 colour: palette.accent)
                 .frame(width: 28, alignment: .leading)
+
+            // La vignette de repérage, quand il y en a une : c'est elle qui fait
+            // reconnaître une vue d'un coup d'œil dans la liste.
+            if let id = frame.refPhotoId, let thumbnail = PhotoStore.load(id) {
+                Image(uiImage: thumbnail)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 40, height: 40)
+                    .clipShape(RoundedRectangle(cornerRadius: 3, style: .continuous))
+            }
 
             VStack(alignment: .leading, spacing: 3) {
                 ValueText(text: exposure, size: 15)

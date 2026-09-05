@@ -56,6 +56,7 @@ struct RollsScreen: View {
                 }
             }
             .padding(16)
+            .animation(.snappy, value: carnet.rolls.count)
         }
     }
 
@@ -69,7 +70,8 @@ struct RollsScreen: View {
                 } label: {
                     RollCard(carnet: carnet, roll: roll)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(PressableCardStyle())
+                .transition(.opacity.combined(with: .move(edge: .top)))
             }
         }
     }

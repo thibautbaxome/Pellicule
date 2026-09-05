@@ -1,25 +1,52 @@
+import CoreText
 import SwiftUI
 
 /// Deux règles typographiques tiennent tout le système.
 ///
 /// Les valeurs chiffrées — vitesses, ouvertures, sensibilités, coordonnées —
-/// sont en chasse fixe à chiffres tabulaires : elles se lisent d'un coup d'œil
+/// sont en Space Mono, à chiffres tabulaires : elles se lisent d'un coup d'œil
 /// au soleil, et une colonne de valeurs s'aligne comme une graduation gravée.
+/// Ses formes de machine à écrire donnent aux valeurs l'air d'être gravées sur
+/// une bague d'objectif.
 ///
-/// Les micro-libellés sont en capitales largement interlettrées, à la manière
-/// des mentions imprimées sur une boîte de film — « 135 · 36 POSES · ISO 400 ».
+/// L'interface est en Space Grotesk, un grotesque aux formes techniques, sans
+/// la neutralité fade des polices système. Les micro-libellés sont en
+/// capitales largement interlettrées, à la manière des mentions imprimées sur
+/// une boîte de film — « 135 · 36 POSES · ISO 400 ».
 ///
-/// Les polices dessinées pour le projet, Space Grotesk et Space Mono, ne sont
-/// pas encore empaquetées : `ui` et `value` désignent les rôles, pas les
-/// fichiers. Le jour où elles arrivent, ce fichier est le seul à changer.
+/// Les deux polices sont embarquées et enregistrées au lancement plutôt que
+/// déclarées dans l'Info.plist : une déclaration oubliée ferait retomber en
+/// silence sur la police système, alors qu'un enregistrement raté se voit dans
+/// le journal.
 enum Typo {
 
+    /// À appeler une fois, au démarrage, avant la première vue.
+    static func registerFonts() {
+        guard let urls = Bundle.main.urls(forResourcesWithExtension: "ttf", subdirectory: nil)
+        else { return }
+        for url in urls {
+            CTFontManagerRegisterFontsForURL(url as CFURL, .process, nil)
+        }
+    }
+
     static func ui(_ size: CGFloat, _ weight: Font.Weight = .regular) -> Font {
-        .system(size: size, weight: weight)
+        let face: String
+        switch weight {
+        case .bold, .heavy, .black: face = "SpaceGrotesk-Bold"
+        case .semibold: face = "SpaceGrotesk-SemiBold"
+        case .medium: face = "SpaceGrotesk-Medium"
+        default: face = "SpaceGrotesk-Regular"
+        }
+        return .custom(face, size: size)
     }
 
     static func value(_ size: CGFloat, _ weight: Font.Weight = .medium) -> Font {
-        .system(size: size, weight: weight, design: .monospaced)
+        // Space Mono n'existe qu'en deux graisses ; le medium tombe sur la
+        // régulière, dont le trait est déjà ferme.
+        switch weight {
+        case .semibold, .bold, .heavy, .black: .custom("SpaceMono-Bold", size: size)
+        default: .custom("SpaceMono-Regular", size: size)
+        }
     }
 
     static let title = ui(26, .semibold)
@@ -28,7 +55,7 @@ enum Typo {
     static let caption = ui(13)
 
     /// Le chiffre héroïque : le couple vitesse/ouverture qu'on lit à bout de bras.
-    static let hero = value(38, .semibold)
+    static let hero = value(38, .bold)
     static let reading = value(17)
     static let smallReading = value(13)
 }
@@ -47,7 +74,7 @@ struct MicroLabel: View {
 
     var body: some View {
         Text(text.uppercased())
-            .font(.system(size: 10.5, weight: .semibold))
+            .font(Typo.ui(10.5, .semibold))
             .tracking(1.4)
             .foregroundStyle(colour ?? palette.textFaint)
             // Les capitales sont un parti pris typographique, pas le texte :

@@ -85,7 +85,7 @@ struct GearScreen: View {
                         Button { editedCamera = camera } label: {
                             CameraCard(camera: camera)
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(PressableCardStyle())
                     }
                 }
                 if !carnet.lenses.isEmpty {
@@ -94,7 +94,7 @@ struct GearScreen: View {
                         Button { editedLens = lens } label: {
                             LensCard(lens: lens)
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(PressableCardStyle())
                     }
                 }
             }

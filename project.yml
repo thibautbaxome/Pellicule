@@ -21,6 +21,9 @@ targets:
   Pellicule:
     type: application
     platform: iOS
+    # Tout ce qui n'est pas du code dans App — les polices, le catalogue
+    # d'icônes — est copié comme ressource. Les polices sont enregistrées au
+    # lancement par Typo.registerFonts.
     sources:
       - path: App
     dependencies:
