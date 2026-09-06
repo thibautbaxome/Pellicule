@@ -28,8 +28,10 @@ Chaque poussée compile l'application pour l'appareil et la fait tourner dans un
 simulateur, où un parcours automatisé traverse tous les écrans et publie une
 capture de chacun sur la branche `captures`.
 
-L'installation passe par SideStore, et non par l'App Store : voir
-[INSTALLATION.md](INSTALLATION.md), qui dit aussi ce que ça coûte.
+L'installation ne passe pas par l'App Store : l'application se signe avec votre
+propre compte Apple, par AltStore de préférence. Voir
+[INSTALLATION.md](INSTALLATION.md), qui dit aussi ce que ça coûte — sept jours
+de validité, et une re-signature que l'outil fait pour vous.
 
 ## Ce que l'application fait
 

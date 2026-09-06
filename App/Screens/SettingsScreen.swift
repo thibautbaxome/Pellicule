@@ -232,6 +232,9 @@ struct SettingsScreen: View {
         FieldRow(label: "À propos") {
             VStack(alignment: .leading, spacing: 10) {
                 SprocketRule(holes: 12).frame(width: 150)
+                if let signature {
+                    signatureLine(signature)
+                }
                 summaryLine("Boîtiers", carnet.cameras.count)
                 summaryLine("Objectifs", carnet.lenses.count)
                 summaryLine("Rouleaux", carnet.rolls.count)
@@ -248,6 +251,45 @@ struct SettingsScreen: View {
                     .padding(.top, 6)
             }
         }
+    }
+
+    /// Jusqu'à quand l'application s'ouvrira. Installée hors de l'App Store,
+    /// elle expire au bout de sept jours, et rien sur le téléphone ne le dit :
+    /// c'est ici qu'on l'apprend, avant d'être devant une icône muette.
+    private func signatureLine(_ profile: Signature.Profile) -> some View {
+        let now = Date()
+        let days = profile.daysLeft(at: now)
+        let colour: Color = profile.isExpired(at: now) || days <= 1
+            ? palette.danger : (days <= 3 ? palette.accent : palette.textDim)
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "fr_FR")
+        formatter.dateStyle = .medium
+        let remaining = profile.isExpired(at: now)
+            ? "expirée"
+            : (days == 0 ? "dernier jour" : "\(days) jour\(days > 1 ? "s" : "")")
+
+        return VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                MicroLabel("Signature")
+                Spacer()
+                ValueText(
+                    text: "\(formatter.string(from: profile.expiresAt)) · \(remaining)",
+                    size: 14, colour: colour)
+            }
+            Text("Installée hors de l’App Store, l’application doit être réinstallée depuis l’ordinateur avant cette date. Le carnet est conservé.")
+                .font(Typo.caption)
+                .foregroundStyle(palette.textFaint)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(.bottom, 4)
+    }
+
+    /// Le profil de signature, s'il y en a un — pas dans le simulateur.
+    private var signature: Signature.Profile? {
+        guard let url = Bundle.main.url(forResource: "embedded", withExtension: "mobileprovision"),
+              let data = try? Data(contentsOf: url)
+        else { return nil }
+        return Signature.profile(from: data)
     }
 
     private func summaryLine(_ label: String, _ count: Int) -> some View {

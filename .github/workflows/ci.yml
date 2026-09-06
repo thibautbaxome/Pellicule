@@ -98,8 +98,8 @@ jobs:
           path: Pellicule.ipa
           if-no-files-found: error
 
-      # Une version publiée donne une adresse directe, que SideStore sait
-      # ouvrir depuis l'iPhone sans passer par un ordinateur.
+      # Une version publiée donne une adresse directe au fichier, à ouvrir
+      # depuis l'iPhone ou l'ordinateur selon la méthode d'installation.
       - name: Publier la version
         if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/v')
         env:
@@ -110,14 +110,17 @@ jobs:
             --target "${GITHUB_SHA}" \
             --title "Pellicule $VERSION" \
             --notes "$(cat <<'NOTES'
-          Application **non signée**, à installer avec SideStore — elle sera
-          signée sur votre iPhone par votre propre compte Apple.
+          Application **non signée** : elle sera signée avec votre propre
+          compte Apple, par AltStore de préférence (ou tout outil de
+          chargement sur ordinateur).
 
-          Le parcours complet, et ce qu'il coûte, sont décrits dans
+          Le parcours complet, et ce qu'il coûte — sept jours de validité,
+          re-signature par le Wi-Fi —, sont décrits dans
           [INSTALLATION.md](https://github.com/thibautbaxome/Pellicule/blob/main/INSTALLATION.md).
 
           Une mise à jour conserve le carnet : il vit dans les documents de
-          l'application, pas dans le code.
+          l'application, pas dans le code. La date d'expiration de la
+          signature est visible dans Réglages → À propos.
           NOTES
           )"
 
