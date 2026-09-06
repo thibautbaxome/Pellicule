@@ -105,11 +105,10 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION: ${{ inputs.version || github.ref_name }}
+        # Les notes passent par un fichier : un heredoc dans une substitution
+        # de commande trébuche sur les apostrophes du français.
         run: |
-          gh release create "$VERSION" Pellicule.ipa \
-            --target "${GITHUB_SHA}" \
-            --title "Pellicule $VERSION" \
-            --notes "$(cat <<'NOTES'
+          cat > notes.md <<'NOTES'
           Application **non signée** : elle sera signée avec votre propre
           compte Apple, par AltStore de préférence (ou tout outil de
           chargement sur ordinateur).
@@ -122,7 +121,10 @@ jobs:
           l'application, pas dans le code. La date d'expiration de la
           signature est visible dans Réglages → À propos.
           NOTES
-          )"
+          gh release create "$VERSION" Pellicule.ipa \
+            --target "${GITHUB_SHA}" \
+            --title "Pellicule $VERSION" \
+            --notes-file notes.md
 
   # Le parcours dans le simulateur : le seul œil de ce projet sur son
   # interface, qui s'écrit dans un environnement sans macOS. Il échoue si un
