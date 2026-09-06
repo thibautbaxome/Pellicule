@@ -295,10 +295,14 @@ final class ParcoursTests: XCTestCase {
 
         // MARK: Les thèmes
 
+        // Le changement de thème s'anime : capturer aussitôt fige des
+        // couleurs à mi-chemin et un texte en cours de remise en page.
         tap(button: "Papier")
+        settle()
         capture("17-theme-papier")
 
         tap(button: "Chambre noire")
+        settle()
         capture("18-theme-chambre-noire")
 
         tap(button: "Sombre")
@@ -335,6 +339,11 @@ final class ParcoursTests: XCTestCase {
         XCTAssertTrue(
             element.exists && element.isHittable, "élément introuvable après défilement",
             file: file, line: line)
+    }
+
+    /// Laisse une animation se terminer avant de regarder l'écran.
+    private func settle() {
+        Thread.sleep(forTimeInterval: 0.8)
     }
 
     /// Les captures survivent au succès du test : ce sont elles qu'on regarde,

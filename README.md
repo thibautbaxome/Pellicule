@@ -1,150 +1,169 @@
 # Pellicule
 
-Carnet de prise de vue argentique pour iPhone. Application native, hors ligne,
-sans compte ni serveur : les données restent dans le téléphone.
+**Le carnet de prise de vue argentique, gratuit, pour iPhone.**
 
-Format pris en charge : **135 (24×36)**.
+Vous venez de charger votre première pellicule, ou votre centième. À chaque
+déclenchement, il faudrait noter la vitesse, l'ouverture, le sujet, la lumière —
+sinon, trois semaines plus tard, le rouleau revient du laboratoire et vous ne
+savez plus pourquoi la vue 14 est sombre ni où était prise la 22. Un carnet
+papier le fait ; il ne sait pas vous dire que votre boîtier ne monte pas au
+1/2000, ni mesurer la lumière, ni inscrire tout cela dans vos scans.
 
-## État du projet
+Pellicule fait tout ça. **Sans compte, sans abonnement, sans publicité, sans
+serveur** : vos données restent dans votre téléphone, et le code est libre.
 
-**Version 0.2.** De quoi tenir un rouleau de bout en bout et récupérer ses
-scans : déclarer et corriger son matériel, charger une pellicule, noter ses
-vues avec leur filtre, leur position et une photo de repérage, mesurer la
-lumière avec la caméra, suivre le rouleau jusqu'à l'archive, tenir son journal
-de développement et ses coûts, puis inscrire tout cela dans les scans du
-laboratoire.
+<p align="center">
+  <img src="docs/captures/rouleaux.png" width="190" alt="La liste des rouleaux">
+  <img src="docs/captures/vue.png" width="190" alt="La saisie d’une vue">
+  <img src="docs/captures/assistant.png" width="190" alt="L’assistant de prise de vue">
+  <img src="docs/captures/papier.png" width="190" alt="Le thème papier">
+</p>
 
-| | |
-|---|---|
-| Calculs argentiques, banques de matériel, assistant | **fait**, 146 tests |
-| Stockage du carnet, import et export | **fait** |
-| Écrans : rouleaux, vues, matériel, réglages, statistiques | **fait** |
-| Assistant de prise de vue | **fait** |
-| Posemètre par la caméra | **fait** — à valider sur appareil |
-| Rapprochement des scans et écriture des métadonnées | **fait** |
-| Photo de repérage, position | **fait** |
+## Pourquoi celle-là
 
-Chaque poussée compile l'application pour l'appareil et la fait tourner dans un
-simulateur, où un parcours automatisé traverse tous les écrans et publie une
-capture de chacun sur la branche `captures`.
+La plupart des carnets argentiques sur iPhone sont payants ou par abonnement,
+et gardent vos données chez eux. Pellicule est **gratuite et le restera** : elle
+n'a pas de serveur à financer, pas de compte à vous faire créer, rien à vous
+vendre. Elle est écrite pour quelqu'un qui débute — chaque conseil dit
+*pourquoi* — et pour quelqu'un qui pratique depuis vingt ans — rien n'est
+imposé, tout se corrige.
 
-L'installation ne passe pas par l'App Store : l'application se signe avec votre
-propre compte Apple, par AltStore de préférence. Voir
-[INSTALLATION.md](INSTALLATION.md), qui dit aussi ce que ça coûte — sept jours
-de validité, et une re-signature que l'outil fait pour vous.
+Et elle est **honnête** : quand elle ne sait pas, elle le dit. Une valeur
+absente y vaut mieux qu'une valeur devinée.
 
-## Ce que l'application fait
+## Ce qu'elle fait
 
-**Matériel.** Boîtiers (monture, numéro de série, décalage du posemètre, plage
-de vitesses) et objectifs (focale, ouvertures extrêmes, diamètre de filtre). Les
-caractéristiques déclarées bornent tout ce que l'application propose ensuite.
+**Elle connaît votre matériel.** Plus de cent cinquante boîtiers et
+soixante-dix objectifs dans la banque, avec leurs vraies plages de vitesses et
+d'ouvertures. Choisissez votre Minolta X-300 : l'application ne vous proposera
+plus jamais un 1/2000 qu'il ne sait pas faire. Un appareil absent se déclare à
+la main en trente secondes.
 
-**Pellicules.** Une cinquantaine d'émulsions 135 préchargées — noir et blanc,
-négatif couleur, diapositive — avec sensibilité nominale, procédé, courbe de
-réciprocité et, pour les principales, des temps de développement de référence.
+<p align="center">
+  <img src="docs/captures/materiel.png" width="190" alt="Le matériel déclaré">
+  <img src="docs/captures/objectifs.png" width="190" alt="La banque d’objectifs">
+  <img src="docs/captures/chargement.png" width="190" alt="Charger une pellicule">
+</p>
 
-**Rouleaux.** Chargement, suivi du cycle de vie — chargé, en cours, terminé, au
-labo, développé, scanné, archivé — référence d'archive, laboratoire, coûts. Le
-push/pull se déduit de l'écart entre la sensibilité employée et l'ISO de la
-boîte.
+**Elle tient le rouleau.** Chargez une pellicule — une cinquantaine
+d'émulsions préchargées, noir et blanc, couleur, diapositive —, dites si vous
+la poussez, puis notez chaque vue : vitesse, ouverture, objectif, filtre et son
+coût en lumière, position, photo de repérage prise au téléphone pour
+reconnaître le cadrage plus tard. Les réglages se reprennent d'une vue à
+l'autre : sur le terrain, c'est deux gestes.
 
-**Vues.** Vitesse, ouverture, objectif, focale, correction d'exposition, sujet,
-notes. Les graduations sont bornées par le matériel : les vitesses sont celles
-du boîtier, les ouvertures celles de l'objectif monté — proposer un 1/4000 sur
-un boîtier qui plafonne à 1/1000, c'est offrir de consigner un réglage qui n'a
-jamais existé. D'une vue à l'autre les réglages sont repris, le sujet non.
+<p align="center">
+  <img src="docs/captures/vue-details.png" width="190" alt="Les détails d’une vue">
+  <img src="docs/captures/filtres.png" width="190" alt="La banque de filtres">
+  <img src="docs/captures/rouleau.png" width="190" alt="Un rouleau et ses vues">
+</p>
 
-**Assistant de prise de vue.** Le cœur de l'aide à la décision. On déclare une intention — portrait,
-paysage, rue, mouvement, filé, basse lumière, pose longue — et une condition de
-lumière ; l'application en déduit le couple vitesse/ouverture, la zone de
-netteté et l'hyperfocale.
+**Elle vous aide à régler.** Dites ce que vous voulez faire — un portrait, un
+paysage, une rue, un filé — et la lumière que vous avez devant vous. L'assistant
+en déduit le couple vitesse/ouverture, la zone de netteté, l'hyperfocale, et
+explique ce qui coince quand la scène sort des limites de votre matériel : film
+trop rapide, filtre gris neutre nécessaire, risque de flou de bougé. Il ne
+propose jamais un réglage que votre boîtier ne sait pas tenir.
 
-Tout est borné par le matériel réellement déclaré. Quand la scène sort de ces
-limites, l'application ne se contente pas de le signaler : elle propose la
-correction applicable et explique ce qui coince — un film trop rapide pour la
-lumière, un besoin de filtre gris neutre, un risque de flou de bougé au regard
-de la règle du 1/focale.
+**Elle mesure la lumière.** La caméra du téléphone sert de posemètre. Elle
+compare sa mesure à votre estimation à l'œil — c'est comme ça qu'on apprend à
+s'en passer — et vous prévient quand elle est au bout de ce qu'elle sait
+mesurer, au lieu d'afficher un chiffre qui aurait l'air d'en être un.
 
-**Développement.** Révélateur, dilution, temps,
-température, agitation. Le temps se déduit des données du film, de la
-température du bain et du push/pull du rouleau.
+<p align="center">
+  <img src="docs/captures/assistant-paysage.png" width="190" alt="L’assistant en paysage">
+  <img src="docs/captures/developpement.png" width="190" alt="Le journal de développement">
+  <img src="docs/captures/statistiques.png" width="190" alt="Les statistiques">
+</p>
 
-**Métadonnées des scans.** Un scan de laboratoire arrive nu : ni date de prise
-de vue, ni boîtier, ni réglages. L'application reconstitue tout cela depuis le
-carnet et l'écrit dans des copies des fichiers — jamais dans les originaux —,
-qui se comportent dès lors comme des photos numériques dans n'importe quelle
-photothèque. Le décalage entre la numérotation du laboratoire et celle du
-carnet, dû aux vues gâchées à l'amorce, se règle à la main avec un aperçu du
-résultat : c'est le photographe qui reconnaît ses images, pas un algorithme.
+**Elle suit le rouleau jusqu'à l'archive.** Terminé, au labo, développé,
+scanné, archivé ; référence de la pochette, laboratoire, coûts. Si vous
+développez vous-même : révélateur, dilution, température, et le temps suggéré
+d'après les données du film et la poussée du rouleau.
 
-**Posemètre.** La caméra du téléphone, en exposition automatique, choisit une
-vitesse et une sensibilité ; les lire, c'est lire la lumière. L'application
-signale quand l'appareil est au bout de ce qu'il sait mesurer, compare la
-mesure à l'estimation faite à l'œil, et se calibre une fois pour toutes contre
-une cellule de confiance.
+**Elle rend aux scans ce que le laboratoire leur a retiré.** Un scan arrive nu,
+daté du jour de la numérisation. Pellicule y inscrit la date de prise de vue,
+le boîtier, l'objectif, les réglages, le lieu — dans des copies, jamais dans
+vos originaux. Vos photos argentiques se comportent alors comme des photos
+numériques dans n'importe quelle photothèque.
 
-**Sauvegarde.** Le carnet *est* un fichier JSON lisible, et il appartient au
-photographe. Il n'y a pas de base de données à côté : exporter revient à en
-copier une, importer à la relire. Le fichier apparaît dans l'application
-Fichiers, sous « Sur mon iPhone » — récupérable même si l'application refuse de
-s'ouvrir.
+<p align="center">
+  <img src="docs/captures/scans.png" width="190" alt="Inscrire dans les scans">
+</p>
 
-## Le noyau
+**Et le reste.** Statistiques — coût par vue, émulsion préférée, réglage le
+plus fréquent. Trois thèmes, dont une chambre noire entièrement rouge pour ne
+pas voiler de papier. Sauvegarde en un fichier lisible qui vous appartient,
+récupérable dans Fichiers même si l'application refusait de s'ouvrir.
+
+## Installer
+
+> **À lire avant, c'est important.** Pellicule n'est pas sur l'App Store — y
+> être coûte 99 € par an, et le projet préfère rester gratuit. Elle s'installe
+> en la signant avec **votre propre compte Apple**, et cette signature
+> **expire au bout de sept jours** : c'est une règle d'Apple, aucun outil ne
+> la contourne. Avec AltStore, la re-signature se fait toute seule par le
+> Wi-Fi tant que votre ordinateur est allumé ; sans, il faut réinstaller
+> chaque semaine. Dans tous les cas **le carnet n'est jamais perdu**, et
+> l'application affiche elle-même la date d'expiration dans *Réglages → À
+> propos*. Un compte gratuit signe trois applications au maximum.
+
+En vingt minutes, une fois :
+
+1. **Installez AltServer** sur votre Mac ou PC depuis <https://altstore.io>, et
+   branchez l'iPhone au câble. Sur macOS, dans le Finder, cochez « Afficher cet
+   iPhone lorsqu'il est en Wi-Fi ».
+2. Dans le menu AltServer, **Install AltStore** sur votre iPhone, avec votre
+   identifiant Apple. Sur l'iPhone, faites confiance au profil dans
+   *Réglages → Général → VPN et gestion de l'appareil*.
+3. Sur l'iPhone, téléchargez **`Pellicule.ipa`** depuis la
+   [dernière version](https://github.com/thibautbaxome/Pellicule/releases/latest).
+4. Dans AltStore, onglet *My Apps* : **+**, choisissez le fichier. L'icône
+   apparaît.
+
+Ensuite, rien : AltStore re-signe Pellicule en tâche de fond. Pour mettre à
+jour, même geste avec le nouvel `.ipa` — le carnet est conservé.
+
+Les autres méthodes (iLoader, Sideloadly, SideStore), les pannes courantes et
+ce qu'il faut savoir sur votre identifiant Apple sont dans
+[INSTALLATION.md](INSTALLATION.md).
+
+## Sous le capot
 
 `PelliculeCore/` contient tout ce qui calcule et tout ce qui se range : échelles
 d'exposition, réciprocité, profondeur de champ, temps de développement, moteur
-de l'assistant, banques de matériel, carnet, persistance, métadonnées.
-`App/` ne contient que des écrans.
-
-Il ne dépend d'**aucun SDK Apple**, ce qui a une conséquence pratique
-importante : il se compile et se teste sur Linux comme sur macOS, en une
-dizaine de secondes, sans simulateur. Toute la partie du projet où une erreur
-coûte un rouleau de pellicule est donc vérifiable partout.
+de l'assistant, banques de matériel, carnet, sauvegarde, métadonnées. Il ne
+dépend d'**aucune bibliothèque Apple** et se teste sur Linux comme sur macOS,
+en une dizaine de secondes — cent cinquante tests, dont un balayage de
+1 700 combinaisons de l'assistant.
 
 ```sh
 cd PelliculeCore && swift test
 ```
 
-L'intégration continue les rejoue sur Linux à chaque poussée, et compile le même
-code pour iOS sur un runner macOS.
+`App/` ne contient que des écrans SwiftUI. À chaque poussée, l'intégration
+continue rejoue les tests sur Linux, compile l'application pour iPhone, la fait
+tourner dans un simulateur où un parcours automatisé traverse tous les écrans,
+et publie une capture de chacun sur la branche `captures`.
 
-## Ce que l'application ne fera pas
+**Réserves.** Les exposants de réciprocité viennent des notices des fabricants
+quand elles les publient, de l'interpolation de leurs tables sinon. La
+correction de température du développement suit un coefficient de 2,5 pour
+10 °C, et la poussée allonge d'environ 35 % par diaphragme. Ces modèles
+reproduisent les tables publiées à quelques pourcents près : ils cadrent une
+décision sur le terrain, ils ne remplacent ni la notice du film ni, après
+quelques rouleaux, votre propre expérience.
 
-**Aucun compte, aucun serveur, aucune télémétrie.** Il n'y a rien à héberger et
-rien à collecter : le carnet vit dans le téléphone et dans les sauvegardes que
-son propriétaire en fait.
-
-## Réserves sur les calculs
-
-Les exposants de réciprocité viennent des notices des fabricants quand elles les
-publient, de l'interpolation de leurs tables sinon. La correction de température
-du développement suit un coefficient de 2,5 pour 10 °C, et le push allonge
-d'environ 35 % par diaphragme. Ces modèles reproduisent les tables publiées à
-quelques pourcents près : ils cadrent une décision sur le terrain, ils ne
-remplacent pas la notice du film ni, après quelques rouleaux, votre propre
-expérience.
-
-La règle du projet, valable aussi pour les banques de matériel : **une valeur
-absente vaut mieux qu'une valeur devinée.** Un conseil faux donné avec assurance
-est pire qu'un conseil manquant.
-
-## Historique
-
-Le carnet a d'abord existé sous forme d'application web installable, en
-TypeScript. Elle fonctionnait, mais deux besoins la dépassaient : mesurer la
-lumière avec la caméra, ce que WebKit interdit, et écrire les métadonnées
-directement dans les scans. Le projet a donc entièrement basculé en natif.
-
-Cette version-là n'est pas maintenue et ne fait plus partie du dépôt ; elle
-reste dans l'historique Git. L'application lit ses sauvegardes, de sorte qu'un
-carnet tenu avant la bascule se reprend sans rien ressaisir — c'est même l'objet
-d'une partie des tests.
+**Ce qu'elle ne fera pas.** Un compte, un serveur, de la télémétrie. Il n'y a
+rien à héberger et rien à collecter. Format 135 seulement pour l'instant ; pas
+de version Android ni ordinateur.
 
 ## Contribuer
 
 Voir [CONTRIBUTING.md](CONTRIBUTING.md). La contribution la plus utile n'exige
 aucune connaissance de Swift : compléter les banques de boîtiers, d'objectifs et
-de pellicules, qui sont de simples fichiers JSON.
+de pellicules, qui sont de simples fichiers JSON. Si votre appareil manque, vous
+êtes la bonne personne pour l'ajouter.
 
 ## Licence
 

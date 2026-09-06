@@ -169,6 +169,12 @@ struct ScaleDial<Value: Hashable>: View {
             .onAppear {
                 if let selection { proxy.scrollTo(selection, anchor: .center) }
             }
+            // La valeur choisie vient au centre, comme le cran d'une bague
+            // sous le repère : touchée au bord, elle restait à moitié cachée.
+            .onChange(of: selection) { _, selection in
+                guard let selection else { return }
+                withAnimation(.snappy) { proxy.scrollTo(selection, anchor: .center) }
+            }
         }
     }
 }
