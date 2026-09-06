@@ -89,6 +89,7 @@ numériques dans n'importe quelle photothèque.
 
 <p align="center">
   <img src="docs/captures/scans.png" width="190" alt="Inscrire dans les scans">
+  <img src="docs/captures/chambre-noire.png" width="190" alt="Le thème chambre noire">
 </p>
 
 **Et le reste.** Statistiques — coût par vue, émulsion préférée, réglage le
